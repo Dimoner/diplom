@@ -1,0 +1,36 @@
+.start-measure{
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 504px;
+  height: 374px;
+  &-text{
+    &-title{
+      font-size: larger;
+      margin-bottom: 5px;
+
+    }
+    &-simple{
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+
+    &-control {
+      margin-bottom: 10px;
+    }
+  }
+
+  &-action{
+    height: 40px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  &-result{
+    position: absolute;
+    bottom: 70px;
+  }
+}

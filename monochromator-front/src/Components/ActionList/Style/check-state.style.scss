@@ -1,0 +1,26 @@
+.check-state{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  height: 374px;
+  &-text{
+    &-title{
+      font-size: larger;
+      margin-bottom: 5px;
+
+    }
+    &-simple{
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+  }
+
+  &-action{
+    height: 40px;
+  }
+
+  &-result{
+    position: absolute;
+    bottom: 70px;
+  }
+}
