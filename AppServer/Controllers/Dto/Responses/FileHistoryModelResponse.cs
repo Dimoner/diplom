@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace AppServer.Controllers.Dto.Responses
 {
@@ -17,7 +18,7 @@ namespace AppServer.Controllers.Dto.Responses
         /// Вермя создание файла
         /// </summary>
         [JsonProperty("creationDateTime")]
-        public string CreationDateTime { get; set; }
+        public DateTime CreationDateTime { get; set; }
         
         /// <summary>
         /// Описание файла

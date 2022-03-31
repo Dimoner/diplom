@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,12 +28,12 @@ namespace AppServer.History
                 var names = info.Name.Split('_');
                 return names[0] == mqttResponse.Id.ToString();
             });
-
+            
             if (currentFile != null)
             {
-                var xValue = mqttResponse.X.ToString();
-                var yValue = mqttResponse.Y.ToString();
-                File.AppendAllText(currentFile.FullName, $"\r{xValue}       | {yValue}");
+                var xValue = BaseDetectRequest.GetMeasureCurrentFormat(mqttResponse.X);
+                var yValue = BaseDetectRequest.GetMeasureCurrentFormat(mqttResponse.Y);
+                File.AppendAllText(currentFile.FullName, $"\r{xValue}|{yValue}");
             }
         }
 
@@ -40,27 +41,38 @@ namespace AppServer.History
         public (FileHistoryModel[] historyModels, int totalElem) GetFileHistory(int start, int end, string name)
         {
             var files = GetFilesFromDirectory()
-                .Where(file => !string.IsNullOrWhiteSpace(name) || file.Name.Contains(name ?? ""))
+                .Select(file =>
+                {
+                    var text = File.ReadAllText(file.FullName);
+                    var description = text.GetPartOfString("Description:", "-----------------------------------------");
+                    var measureName = text.GetPartOfString("Name:", "-----------------------------------------");
+                    var names = file.Name.Split('_');
+
+                    return new FileHistoryModel
+                    {
+                        Id = Convert.ToInt32(names[0]),
+                        CreationDateTime = MeasureHelper.GetCurrentDateTimeFromMeasureDate(names[1]),
+                        Description = description,
+                        MeasureName = measureName
+                    };
+                })
+                .Where(file =>
+                {
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        return true;
+                    }
+
+                    var dateInString = file.CreationDateTime.ToString("yyyy-MM-dd");
+                    var dateInStringTime = file.CreationDateTime.ToString("HH:mm:ss tt zz:mm:ss");
+                    return $"{dateInString} {dateInStringTime}".Contains(name) || file.MeasureName.Contains(name) || file.Description.Contains(name);
+                })
+                .OrderByDescending(value => value.CreationDateTime)
                 .ToArray();
             
             var result = files
-                .Where((_, index) => index >= start && index <= end)
-                .Select(fileInfo =>
-            {
-                var text = File.ReadAllText(fileInfo.FullName);
-                var description = text.GetPartOfString("Description:", "-----------------------------------------");
-                var measureName = text.GetPartOfString("Name:", "-----------------------------------------");
-                var names = fileInfo.Name.Split('_');
-                
-                
-                return new FileHistoryModel
-                {
-                    Id = Convert.ToInt32(names[0]),
-                    CreationDateTime = names[1],
-                    Description = description,
-                    MeasureName = measureName
-                };
-            }).ToArray();
+                .Where((_, index) => index >= start && index < end)
+                .ToArray();
             
             return (result, files.Length);
         }
@@ -106,8 +118,7 @@ Description:
 -----------------------------------------
 Measure:
 {dto.CreateTableHeader()}
------------------------------------------
-                ");
+-----------------------------------------");
             }
 
             return d;

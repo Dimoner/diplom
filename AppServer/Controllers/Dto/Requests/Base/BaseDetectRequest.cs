@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Linq;
 using AppServer.Domains;
 using Newtonsoft.Json;
 
@@ -44,8 +46,19 @@ namespace AppServer.Controllers.Dto.Requests.Base
 
         /// <summary>
         /// Формируем заголовок таблицы
+        /// 12 символов 1 ячейка
         /// </summary>
         /// <returns></returns>
         public abstract string CreateTableHeader();
+        
+        /// <summary>
+        /// Преобразуем под размер ячейки блоки
+        /// </summary>
+        public static string GetMeasureCurrentFormat(double measureInt)
+        {
+            var valueString = measureInt.ToString(CultureInfo.InvariantCulture);
+            var concat = string.Concat(valueString, string.Concat(Enumerable.Repeat(" ", 12 - valueString.Length)));
+            return concat;
+        }
     }
 }

@@ -1,12 +1,8 @@
 import React from "react";
 import {TextField} from "@mui/material";
-import {getPropertyName} from "../../../Helpers/PropertyName";
+import {getPropertyName} from "../../../../Helpers/PropertyName";
+import {ITimeMeasureFormComponentField} from "../Interfaces/StartMeasureInterfaces";
 
-export interface ITimeMeasureFormComponentField {
-    delay: number,
-    num: number,
-    frequency: number
-}
 
 export interface ITimeMeasureFormComponentAction {
     setValue: (value: number, fieldName: string) => void,

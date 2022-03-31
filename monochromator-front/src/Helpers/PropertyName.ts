@@ -31,3 +31,4 @@ export function getDeepPropertyName<T = unknown>(expression: (instance: T) => an
         isDeep: true
     });
 }
+

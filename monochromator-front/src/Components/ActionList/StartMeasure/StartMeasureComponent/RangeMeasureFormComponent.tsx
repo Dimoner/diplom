@@ -1,12 +1,8 @@
 import React from "react";
 import {TextField} from "@mui/material";
-import {getPropertyName} from "../../../Helpers/PropertyName";
+import {getPropertyName} from "../../../../Helpers/PropertyName";
+import {IRangeMeasureFormComponentField} from "../Interfaces/StartMeasureInterfaces";
 
-export interface IRangeMeasureFormComponentField {
-    endPosition: number,
-    step: number,
-    count: number,
-}
 
 export interface IRangeMeasureFormComponentAction {
     setValue: (value: number, fieldName: string) => void,

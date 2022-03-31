@@ -59,10 +59,10 @@ namespace AppServer.Controllers.Dto.Requests
             model.FromDtoApiRequest(this);
             return model;
         }
-
+        
         public override string CreateTableHeader()
         {
-            return $"Wave, нм  | {(ActionType == ActionTypeEnum.Tick ? "Cont" : "Amperage, Am")}";
+            return $"Wave, нм    | {(ActionType == ActionTypeEnum.Tick ? "Cont" : "Amperage, Am")}  ";
         }
     }
 }

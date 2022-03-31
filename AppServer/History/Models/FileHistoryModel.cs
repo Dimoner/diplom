@@ -1,4 +1,6 @@
-﻿namespace AppServer.History.Models
+﻿using System;
+
+namespace AppServer.History.Models
 {
     /// <summary>
     /// Модель файла для истории
@@ -18,7 +20,7 @@
         /// <summary>
         /// Вермя создание файла
         /// </summary>
-        public string CreationDateTime { get; set; }
+        public DateTime CreationDateTime { get; set; }
         
         /// <summary>
         /// Описание файла

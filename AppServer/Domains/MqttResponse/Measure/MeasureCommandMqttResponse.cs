@@ -1,4 +1,5 @@
 ﻿using AppServer.Domains.MqttResponse.Models;
+using Newtonsoft.Json;
 
 namespace AppServer.Domains.MqttResponse.Measure
 {
@@ -10,6 +11,7 @@ namespace AppServer.Domains.MqttResponse.Measure
         /// <summary>
         /// Идентификатор измерения
         /// </summary>
+        [JsonProperty("measureId")]
         public int MeasureId { get; set; }
     }
 }

@@ -1,0 +1,39 @@
+.history {
+  margin: 20px;
+
+  &-pagination {
+    padding-bottom: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    &-title{
+      font-family: "Roboto","Helvetica","Arial",sans-serif;
+      font-weight: 500;
+      font-size: 1.25rem;
+      line-height: 1.6;
+      letter-spacing: 0.0075em;
+      margin-right: 25px;
+      white-space: nowrap;
+    }
+  }
+
+  &-search {
+    align-items: end;
+    display: flex;
+  }
+
+  .load-history {
+    min-height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300%;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-weight: 500;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    letter-spacing: 0.0075em;
+    white-space: nowrap;
+  }
+}

@@ -3,11 +3,17 @@ import React, {useEffect} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import "./Style/component.style.scss";
 
-const pathNavigation: { [key in string]: number } = {
-    "amperage": 0,
-    "count": 1,
-    "history": 2
-}
+const pathNavigation: { label: string }[] = [
+    {
+        label: "Amperage",
+    },
+    {
+        label: "Count",
+    },
+    {
+        label: "History",
+    }
+];
 
 export default function Header() {
     const [value, setValue] = React.useState(0);
@@ -17,14 +23,14 @@ export default function Header() {
 
     const handleChange = (event: any, newValue: number) => {
         setValue(newValue);
-        const navigateValue: string = Object.keys(pathNavigation).find(key => pathNavigation[key] === newValue) ?? ""
+        const navigateValue: string = pathNavigation[newValue].label.toLowerCase()
         navigate(navigateValue, {replace: true})
     };
 
     useEffect(() => {
-        const navigateValue = Object.keys(pathNavigation).find(key => location.pathname.includes(key));
+        const navigateValue = pathNavigation.findIndex(key => location.pathname.toLowerCase().includes(key.label.toLowerCase()));
         if (navigateValue !== undefined) {
-            setValue(pathNavigation[navigateValue]);
+             setValue(navigateValue);
         }
     }, []);
 
@@ -39,8 +45,9 @@ export default function Header() {
         <div>
             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="Amperage" {...a11yProps(pathNavigation.amperage)} />
-                    <Tab label="Count" {...a11yProps(pathNavigation.count)} />
+                    {pathNavigation.map((item, index) =>{
+                        return <Tab key={item.label} label={item.label} {...a11yProps(index)} />
+                    })}
                 </Tabs>
             </Box>
         </div>

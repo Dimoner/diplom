@@ -1,59 +1,58 @@
 import React from "react";
 import {Button, CircularProgress, TextField} from "@mui/material";
-import "./Style/start-measure.style.scss";
-import {IStartMeasureData} from "../../Interfaces/IStartMeasureData";
-import {TSubType, TType} from "../../Types/Types";
-import RangeMeasureFormComponent, {IRangeMeasureFormComponentField} from "./StartMeasureComponent/RangeMeasureFormComponent";
-import TimeMeasureFormComponent, {ITimeMeasureFormComponentField} from "./StartMeasureComponent/TimeMeasureFormComponent";
-import {IErrorResponse} from "../../Error/IErrorResponse";
+import "../Style/start-measure.style.scss";
+import {TSubType, TType} from "../../../Types/Types";
+import RangeMeasureFormComponent from "./StartMeasureComponent/RangeMeasureFormComponent";
+import TimeMeasureFormComponent from "./StartMeasureComponent/TimeMeasureFormComponent";
+import {IErrorResponse} from "../../../Error/IErrorResponse";
+import {IStartMeasureRequest, IStartMeasureResponse, IStartMeasureState} from "./Interfaces/StartMeasureInterfaces";
 
 export interface IStartMeasureProps {
-    startMeasure: (startMeasure: IStartMeasureData) => void,
+    startMeasure: (startMeasure: IStartMeasureResponse) => void,
     type: TType,
     subType: TSubType
 }
 
-interface IMainStartMeasureForm {
-    currentPosition: number,
-    startPosition: number
-}
+
 
 export default function StartMeasure(props: IStartMeasureProps) {
     const [isLoad, setLoad] = React.useState(false);
     const [actionResultView, setActionResultView] = React.useState("");
     const [actionResultViewSuccess, setActionResultViewSuccess] = React.useState(false);
 
-    const [mainFrom, setMainForm] = React.useState<IMainStartMeasureForm>({currentPosition: 0, startPosition: 0})
-    const [rangeForm, setRangeForm] = React.useState<IRangeMeasureFormComponentField>({
-        count: 0,
-        endPosition: 0,
-        step: 0
-    })
-
-    const [timeForm, setTimeForm] = React.useState<ITimeMeasureFormComponentField>({ num: 0, delay: 0, frequency: 0})
+    const [mainFrom, setMainForm] = React.useState<IStartMeasureState>({
+        currentPosition: 0,
+        startPosition: 0,
+        description: "",
+        measureName: "",
+        rangeState: {
+            endPosition: 0,
+            step: 0,
+            count: 0,
+        },
+        timeState: {
+            delay: 0,
+            num: 0,
+            frequency: 0
+        }
+    });
 
     const sendRequest = async () => {
         setLoad(true);
         setActionResultViewSuccess(false)
         setActionResultView("");
 
-        let requestBody = {
-            ...mainFrom,
-            actionType: props.type === "amp" ? 3 : 4
-        }
-
-        if (props.subType === "time"){
-            requestBody = {
-                ...requestBody,
-                ...timeForm
-            }
-        }
-
-        if (props.subType === "range"){
-            requestBody = {
-                ...requestBody,
-                ...rangeForm
-            }
+        let requestBody: IStartMeasureRequest = {
+            currentPosition: mainFrom.currentPosition,
+            startPosition: mainFrom.startPosition,
+            description: mainFrom.description,
+            measureName: mainFrom.measureName,
+            endPosition: mainFrom.rangeState?.endPosition,
+            step: mainFrom.rangeState?.step,
+            count: mainFrom.rangeState?.count,
+            delay: mainFrom.timeState?.delay,
+            num: mainFrom.timeState?.num,
+            frequency: mainFrom.timeState?.frequency
         }
 
         let response = await fetch(`http://localhost:5000/logic/${props.subType === "time" ? 'start-detect-time' : 'start-detect-range'}`,
@@ -74,7 +73,13 @@ export default function StartMeasure(props: IStartMeasureProps) {
         }
 
         if (response.ok) {
-           // setActionResultViewSuccess()
+            const result: {measureId: number} = await response.json();
+            const response: IStartMeasureResponse = {
+                ...result,
+                ...requestBody
+            }
+            setActionResultViewSuccess(true)
+            props.startMeasure(response);
             return;
         }
 
@@ -95,7 +100,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                 <div className="start-measure-text-control">
                     <TextField
                         onChange={(value) => {
-                            setMainForm(prev => ({
+                            setMainForm((prev: any) => ({
                                 ...prev,
                                 currentPosition: Number(value.target.value || 0)
                             }));
@@ -108,7 +113,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                 <div className="start-measure-text-control">
                     <TextField
                         onChange={(value) => {
-                            setMainForm(prev => ({
+                            setMainForm((prev: any) => ({
                                 ...prev,
                                 startPosition: Number(value.target.value || 0)
                             }));
@@ -125,18 +130,18 @@ export default function StartMeasure(props: IStartMeasureProps) {
                                 ...prev,
                                 [name]: value
                             }))}
-                            count={rangeForm.count}
-                            endPosition={rangeForm.endPosition}
-                            step={rangeForm.step}
+                            count={mainFrom.rangeState.count}
+                            endPosition={mainFrom.rangeState.endPosition}
+                            step={mainFrom.rangeState.step}
                         />
                         : <TimeMeasureFormComponent
                             setValue={(value, name) => setTimeForm(prev => ({
                                 ...prev,
                                 [name]: value
                             }))}
-                            delay={timeForm.delay}
-                            num={timeForm.num}
-                            frequency={timeForm.frequency}
+                            delay={mainFrom.timeState.delay}
+                            num={mainFrom.timeState.num}
+                            frequency={mainFrom.timeState.frequency}
                         />
                 }
             </div>

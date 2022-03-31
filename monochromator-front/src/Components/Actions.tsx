@@ -11,7 +11,7 @@ import {
     Typography
 } from "@mui/material";
 import CheckState from "./ActionList/CheckState";
-import StartMeasure from "./ActionList/StartMeasure";
+import StartMeasure from "./ActionList/StartMeasure/StartMeasure";
 import ChangePosition from "./ActionList/ChangePosition";
 import {IStartMeasureData} from "../Interfaces/IStartMeasureData";
 import {TSubType, TType} from "../Types/Types";
