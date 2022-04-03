@@ -103,7 +103,7 @@ namespace AppServer.Domains.MqttResponse
         {
             var response = GetMeasureResponseHandler(payload);
             HistoryManager.WireInFile(response);
-            Task.Run(() => hubContext.Clients.All.SendAsync("measure", response)).Wait();
+            Task.Run(() => hubContext.Clients.All.SendAsync(response.Id.ToString(), response)).Wait();
         }
 
         /// <summary>

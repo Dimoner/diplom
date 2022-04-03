@@ -28,8 +28,8 @@ namespace AppServer.Controllers
         {
             try
             {
-                await _measureManager.CheckStateAsync();
-                return Ok();
+                var result = await _measureManager.CheckStateAsync();
+                return Ok(result);
             }
             catch (Exception e)
             {
@@ -45,8 +45,8 @@ namespace AppServer.Controllers
         {
             try
             {
-                await _measureManager.ChangePositionAsync(dto);
-                return Ok();
+                var result = await _measureManager.ChangePositionAsync(dto);
+                return Ok(result);
             }
             catch (Exception e)
             {
@@ -62,8 +62,8 @@ namespace AppServer.Controllers
         {
             try
             {
-                await _measureManager.StartDetectAsync(dto);
-                return Ok();
+                var result = await _measureManager.StartDetectAsync(dto);
+                return Ok(result);
             }
             catch (Exception e)
             {
@@ -79,8 +79,8 @@ namespace AppServer.Controllers
         {
             try
             {
-                await _measureManager.StartDetectAsync(dto);
-                return Ok();
+                var result = await _measureManager.StartDetectAsync(dto);
+                return Ok(result);
             }
             catch (Exception e)
             {

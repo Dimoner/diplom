@@ -15,6 +15,7 @@ jspm_packages/
 
 # Distribution directories
 dist/
+AppServer/obj
 
 # Typescript v1 declaration files
 typings/

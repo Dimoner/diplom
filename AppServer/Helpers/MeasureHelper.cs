@@ -10,10 +10,17 @@ namespace AppServer.Helpers
     {
         public static string GetPartOfString(this string text, string startStr, string endStr)
         {
-            var start = startStr.Length;
-            var end = text.IndexOf(endStr, start, StringComparison.Ordinal);
-            var description = text.Substring(start + 1, end - start - 1).Trim();
-            return description;
+            try
+            {
+                var start = startStr.Length;
+                var end = text.IndexOf(endStr, start);
+                var description = text.Substring(start + 1, end - start - 1).Trim();
+                return description;
+            }
+            catch (Exception e)
+            {
+                return "";
+            }
         }
 
         /// <summary>

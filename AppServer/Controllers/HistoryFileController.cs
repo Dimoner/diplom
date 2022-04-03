@@ -31,7 +31,6 @@ namespace AppServer.Controllers
         {
             try
             {
-                Task.Delay(1000).Wait();
                 var history = _historyManager.GetFileHistory(dto.StartRow, dto.EndRow, dto.Name);
                 var response = history.historyModels.Select(item => new FileHistoryModelResponse
                 {

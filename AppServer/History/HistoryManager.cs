@@ -40,7 +40,8 @@ namespace AppServer.History
         /// <inheritdoc />
         public (FileHistoryModel[] historyModels, int totalElem) GetFileHistory(int start, int end, string name)
         {
-            var files = GetFilesFromDirectory()
+            var baseFiles = GetFilesFromDirectory();
+            var afterFilterData = baseFiles
                 .Select(file =>
                 {
                     var text = File.ReadAllText(file.FullName);
@@ -65,8 +66,10 @@ namespace AppServer.History
 
                     var dateInString = file.CreationDateTime.ToString("yyyy-MM-dd");
                     var dateInStringTime = file.CreationDateTime.ToString("HH:mm:ss tt zz:mm:ss");
-                    return $"{dateInString} {dateInStringTime}".Contains(name) || file.MeasureName.Contains(name) || file.Description.Contains(name);
-                })
+                    return $"{dateInString} {dateInStringTime}".Contains(name) || file.MeasureName.Contains(name) ||
+                           file.Description.Contains(name);
+                }).ToArray();
+            var files = afterFilterData
                 .OrderByDescending(value => value.CreationDateTime)
                 .ToArray();
             

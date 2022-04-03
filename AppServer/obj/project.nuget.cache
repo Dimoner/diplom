@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "KWtkojHaCYVOggXXDZoHqELqEkwpDAayDlu1ZBZ3pdwtXVACz00lvfxt+WCxvdNbCm72XJv2wpdypR4RkFVU5w==",
+  "dgSpecHash": "2rjgZxrNIxCmx8eJEPwMbYC7QWhAn1opQqz+N7s95F2+vaYH4aNrQ8jE1+fEtynOSplubaJFaQ4wUzdaayV4og==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Dima\\Documents\\diplom\\AppServer\\AppServer.csproj",
+  "projectFilePath": "C:\\Users\\user\\Desktop\\diplom-main\\AppServer\\AppServer.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Dima\\.nuget\\packages\\mqttnet\\3.0.16\\mqttnet.3.0.16.nupkg.sha512",
-    "C:\\Users\\Dima\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+    "C:\\Users\\user\\.nuget\\packages\\mqttnet\\3.0.16\\mqttnet.3.0.16.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.14\\microsoft.netcore.app.host.win-x64.5.0.14.nupkg.sha512"
   ],
   "logs": []
 }
