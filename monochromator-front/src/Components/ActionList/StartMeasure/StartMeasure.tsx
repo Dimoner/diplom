@@ -122,6 +122,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                         }}
                         style={{width: "330px"}}
                         id="standard-basic"
+                        type={"number"}
                         label="Текущие положение (нм):"
                         variant="standard"/>
                 </div>
@@ -135,6 +136,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                         }}
                         style={{width: "330px"}}
                         id="standard-basic"
+                        type={"number"}
                         label="Начальное положение (нм):"
                         variant="standard"/>
                 </div>

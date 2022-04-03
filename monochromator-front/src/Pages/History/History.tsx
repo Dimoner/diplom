@@ -227,7 +227,11 @@ export default function History(){
                                             {historyItem.measureName}
                                         </StyledTableCell>
                                         <StyledTableCell align="right">{historyItem.creationDateTime?.replace("T", " ")}</StyledTableCell>
-                                        <StyledTableCell align="right">{historyItem.description}</StyledTableCell>
+                                        <StyledTableCell style={{display: "flex"}} align="right">
+                                            <div style={{whiteSpace: "pre-line", width: "50%", textAlign: "start"}}>
+                                                {historyItem.description}
+                                            </div>
+                                        </StyledTableCell>
                                         <StyledTableCell align="right">
                                             <Link href="#" onClick={() => downloadAsFile(historyItem.id, historyItem.measureName || historyItem.creationDateTime)}>
                                                 Скачать

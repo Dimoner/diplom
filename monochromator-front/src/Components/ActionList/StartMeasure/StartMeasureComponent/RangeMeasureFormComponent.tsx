@@ -19,6 +19,7 @@ export default function RangeMeasureFormComponent(props: IRangeMeasureFormCompon
                     }}
                     style={{width: "330px"}}
                     id="standard-basic"
+                    type={"number"}
                     label="Конечное положение (нм):"
                     variant="standard" />
             </div>
@@ -30,6 +31,7 @@ export default function RangeMeasureFormComponent(props: IRangeMeasureFormCompon
                     style={{width: "330px"}}
                     id="standard-basic"
                     label="Шаг (нм):"
+                    type={"number"}
                     variant="standard" />
             </div>
             <div className="start-measure-text-control">
@@ -39,6 +41,7 @@ export default function RangeMeasureFormComponent(props: IRangeMeasureFormCompon
                     }}
                     style={{width: "330px"}}
                     id="standard-basic"
+                    type={"number"}
                     label="Кол-во измерений в точке"
                     variant="standard" />
             </div>

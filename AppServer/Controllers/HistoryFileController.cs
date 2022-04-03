@@ -35,7 +35,7 @@ namespace AppServer.Controllers
                 var response = history.historyModels.Select(item => new FileHistoryModelResponse
                 {
                     Id = item.Id,
-                    Description = item.Description,
+                    Description = string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description,
                     CreationDateTime = item.CreationDateTime,
                     MeasureName = item.MeasureName
                 }).ToArray();

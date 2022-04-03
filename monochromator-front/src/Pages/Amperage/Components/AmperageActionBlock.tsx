@@ -6,6 +6,7 @@ import LastMeasureComponent from "../../Components/LastMeasureComponent";
 import { IAmperageState, IMeasureItem } from "../Interfaces/AmperagePageInterfaces";
 import { IStartMeasureResponse } from "../../../Components/ActionList/StartMeasure/Interfaces/StartMeasureInterfaces";
 import { IAmperageMarks } from "../../../Interfaces/IAmperageMarks";
+import {measureInLocalStorageName} from "../Amperage";
 
 export interface IAmperageActionBlock{
     alignment: TSubType,
@@ -15,6 +16,7 @@ export interface IAmperageActionBlock{
 
 export default function AmperageActionBlock({alignment, measureList, setStateAmperage}: IAmperageActionBlock) {
     const startMeasureAction = (startMeasure: IStartMeasureResponse) => {
+        localStorage.removeItem(measureInLocalStorageName);
         //pfgecr bpvthtybz pltcm
         // @ts-ignore
         const sub = startMeasure.endPosition - startMeasure.startPosition;

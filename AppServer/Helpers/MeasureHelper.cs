@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace AppServer.Helpers
 {
@@ -10,17 +11,9 @@ namespace AppServer.Helpers
     {
         public static string GetPartOfString(this string text, string startStr, string endStr)
         {
-            try
-            {
-                var start = startStr.Length;
-                var end = text.IndexOf(endStr, start);
-                var description = text.Substring(start + 1, end - start - 1).Trim();
-                return description;
-            }
-            catch (Exception e)
-            {
-                return "";
-            }
+            return Regex.Match(text, $"{startStr}\\s(?<words>[\\w\\s]+)\\s{endStr}", RegexOptions.IgnoreCase)
+                .Groups["words"]
+                .Value;
         }
 
         /// <summary>

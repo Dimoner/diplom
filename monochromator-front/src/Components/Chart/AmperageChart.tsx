@@ -2,9 +2,10 @@ import * as React from 'react';
 import Chart from "react-apexcharts";
 import {ApexOptions} from "apexcharts";
 import {useEffect, useState} from "react";
+import {IMeasureItem} from "../../Pages/Amperage/Interfaces/AmperagePageInterfaces";
 
 export interface IChartComponentProps {
-    measure: { xValue: number, yValue: number }[],
+    measure: IMeasureItem[],
     xFormatter: (seriesName: number) =>  string,
     yFormatter: (val: number, opts?: any) =>  string,
     yTitleFormatter: (value: string) => string
@@ -98,8 +99,8 @@ export default function ChartComponent(props: IChartComponentProps) {
                 name: "series-1",
                 data: [...measure.map(value => {
                     return {
-                        x : value.xValue,
-                        y: value.yValue
+                        x : value.x,
+                        y: value.y
                     }
                 })]
             }
@@ -107,11 +108,16 @@ export default function ChartComponent(props: IChartComponentProps) {
 
         chartState.option.yaxis = {
             min: 0,
-            max: Math.max(...measure.map(value => value.yValue)) + (Math.max(...measure.map(value => value.yValue)) * 20) / 100
+            max: Math.max(...measure.map(value => value.y)) + (Math.max(...measure.map(value => value.y)) * 20) / 100
         }
 
         ApexCharts.exec('basic-bar', 'updateOptions', chartState.option);
         ApexCharts.exec("realtime", "updateSeries", chartState.series)
+        setChartState(prev => {
+            return {
+                ...prev,
+            }
+        })
     }, [props.measure])
 
 

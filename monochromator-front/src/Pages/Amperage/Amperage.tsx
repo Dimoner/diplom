@@ -7,6 +7,9 @@ import * as signalR from "@microsoft/signalr";
 import DialogComponent from "../Components/DialogComponent";
 import { IAmperageState, IMeasureElemMqttResponse } from "./Interfaces/AmperagePageInterfaces";
 import AmperageActionBlock from "./Components/AmperageActionBlock";
+import {MeasureStateManager} from "../../StateManager/MeasureStateMaanger";
+
+export const measureInLocalStorageName: string = "measure";
 
 export default function Amperage() {
     const hubConnection = useRef<HubConnection>(new signalR.HubConnectionBuilder()
@@ -30,6 +33,12 @@ export default function Amperage() {
         hubConnection.current.start().then(a => {
             console.log(a)
         });
+        const existHistory: string | null = localStorage.getItem(measureInLocalStorageName)
+        if (existHistory !== undefined && existHistory !== "" && existHistory !== null){
+            const parseHistory: IAmperageState = JSON.parse(existHistory)
+            setStateAmperage(prev => parseHistory)
+            setDima(Math.random().toString())
+        }
 
         return () => {
             hubConnection.current.stop();
@@ -37,14 +46,19 @@ export default function Amperage() {
     }, []);
 
     const action = (message: IMeasureElemMqttResponse) => {
-        if(message.isStop){
-            hubConnection.current.off(message.id.toString());
-            window.onbeforeunload = () => undefined
-            return;
-        }
-
         setStateAmperage(prev => {
-            return {
+            if(message.isStop){
+                hubConnection.current.off(message.id.toString());
+                MeasureStateManager.IsMeasure = false;
+                window.onbeforeunload = () => undefined
+                prev.measureId = "0"
+                localStorage.setItem(measureInLocalStorageName, JSON.stringify(prev))
+                return {...prev};
+            }
+
+            MeasureStateManager.IsMeasure = true;
+
+            const result = {
                 ...prev,
                 measureList: [{ x: message.x, y: message.y }, ...prev.measureList],
                 amperageMarks: {
@@ -53,6 +67,8 @@ export default function Amperage() {
                     maxMave: prev.amperageMarks.maxMave
                 }
             }
+            localStorage.setItem(measureInLocalStorageName, JSON.stringify(result))
+            return result;
         })
         setDima(Math.random().toString())
     };
@@ -92,7 +108,7 @@ export default function Amperage() {
                     </div>
                     <div style={{marginTop: "40px", display: "flex", justifyContent: "center"}}>
                         <ChartComponent
-                            measure={stateAmperage.measureList.map(value => ({xValue: value.x, yValue: value.y}))}
+                            measure={stateAmperage.measureList}
                             xFormatter={(seriesName: number) => `Длина волны: ${seriesName}, нм`}
                             yFormatter={(val: number, opts?: any) => `${val}, Ам`}
                             yTitleFormatter={value => "Ток:"}
