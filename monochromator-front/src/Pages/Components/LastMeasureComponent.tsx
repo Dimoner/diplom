@@ -11,9 +11,10 @@ import {
     Typography
 } from "@mui/material";
 import React from "react";
+import { IMeasureItem } from "../Amperage/Interfaces/AmperagePageInterfaces";
 
 export interface ILastMeasureComponent {
-    measure: { waveLength: number, amperage: number }[],
+    measure: IMeasureItem[],
     leftName: string,
     rightName: string
 }
@@ -51,8 +52,8 @@ export default function LastMeasureComponent(props: ILastMeasureComponent) {
                                     key={Math.random()}
                                     sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                 >
-                                    <TableCell align="right">{row.waveLength}</TableCell>
-                                    <TableCell align="right">{row.amperage}</TableCell>
+                                    <TableCell align="right">{row.x}</TableCell>
+                                    <TableCell align="right">{row.y}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

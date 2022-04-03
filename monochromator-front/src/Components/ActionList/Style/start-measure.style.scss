@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: flex-start;
   width: 504px;
-  height: 374px;
+  height: 640px;
   &-text{
     &-title{
       font-size: larger;
@@ -18,6 +18,8 @@
 
     &-control {
       margin-bottom: 10px;
+      /*display: flex;
+      justify-content: end;*/
     }
   }
 
@@ -33,4 +35,20 @@
     position: absolute;
     bottom: 70px;
   }
+}
+
+.measure-description{
+  display: flex;
+  align-items: center;
+  margin-top: -2px;
+
+
+
+  &--text {
+    margin-right: 10px;
+  }
+}
+
+.start-measure-text-control-description{
+  margin-top: 27px;
 }

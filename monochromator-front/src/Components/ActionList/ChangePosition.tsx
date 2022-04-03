@@ -89,7 +89,7 @@ export default function ChangePosition() {
                         onChange={(value) => {
                             setStatePosition(prevState => ({...prevState, startPosition: Number(value.target.value)}))
                         }}
-                        style={{width: "230px"}}
+                        style={{width: "330px"}}
                         id="standard-basic"
                         label="Начальное положение (нм):"
                         variant="standard"/>
@@ -99,7 +99,7 @@ export default function ChangePosition() {
                         onChange={(value) => {
                             setStatePosition(prevState => ({...prevState, endPosition: Number(value.target.value)}))
                         }}
-                        style={{width: "230px"}}
+                        style={{width: "330px"}}
                         id="standard-basic"
                         label="Конечное положение (нм):"
                         variant="standard"/>

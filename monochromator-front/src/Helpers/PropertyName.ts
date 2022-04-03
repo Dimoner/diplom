@@ -1,6 +1,6 @@
-function getPropertyNameInternal<T = unknown>(expression: (instance: T) => any, options: {
+function getPropertyNameInternal<T>(expression: (instance: T) => any, options: {
     isDeep: boolean
-}) {
+}): keyof T {
     let propertyThatWasAccessed = "";
     const proxy: any = new Proxy({} as any, {
         get: function(_: any, prop: any) {
@@ -17,18 +17,13 @@ function getPropertyNameInternal<T = unknown>(expression: (instance: T) => any, 
     });
     expression(proxy);
 
-    return propertyThatWasAccessed;
+    return propertyThatWasAccessed as  keyof T;
 }
 
-export function getPropertyName<T = unknown>(expression: (instance: T) => any) {
-    return getPropertyNameInternal(expression, {
+export function getPropertyName<T extends {[key in string]: any}>(expression: (instance: T) => any):  keyof T {
+    return getPropertyNameInternal<T>(expression, {
         isDeep: false
     });
 }
 
-export function getDeepPropertyName<T = unknown>(expression: (instance: T) => any) {
-    return getPropertyNameInternal(expression, {
-        isDeep: true
-    });
-}
 

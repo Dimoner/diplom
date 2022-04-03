@@ -15,6 +15,7 @@ import StartMeasure from "./ActionList/StartMeasure/StartMeasure";
 import ChangePosition from "./ActionList/ChangePosition";
 import {IStartMeasureData} from "../Interfaces/IStartMeasureData";
 import {TSubType, TType} from "../Types/Types";
+import { IStartMeasureResponse } from "./ActionList/StartMeasure/Interfaces/StartMeasureInterfaces";
 
 function TabPanel(props: any) {
     const { children, value, index, ...other } = props;
@@ -37,7 +38,7 @@ function TabPanel(props: any) {
 }
 
 export interface IActionsProps {
-    startMeasure: (startMeasure: IStartMeasureData) => void,
+    startMeasure: (startMeasure: IStartMeasureResponse) => void,
     type: TType,
     subType: TSubType
 }
@@ -59,7 +60,7 @@ export default function Actions(props: IActionsProps) {
         setValue(newValue);
     };
 
-    const startMeasureAction = (startMeasure: IStartMeasureData) => {
+    const startMeasureAction = (startMeasure: IStartMeasureResponse) => {
         props.startMeasure(startMeasure);
         handleClose()
     }

@@ -1,19 +1,21 @@
 import React from "react";
-import {Button, CircularProgress, TextField} from "@mui/material";
+import { Button, CircularProgress, TextareaAutosize, TextField } from "@mui/material";
 import "../Style/start-measure.style.scss";
 import {TSubType, TType} from "../../../Types/Types";
 import RangeMeasureFormComponent from "./StartMeasureComponent/RangeMeasureFormComponent";
 import TimeMeasureFormComponent from "./StartMeasureComponent/TimeMeasureFormComponent";
 import {IErrorResponse} from "../../../Error/IErrorResponse";
-import {IStartMeasureRequest, IStartMeasureResponse, IStartMeasureState} from "./Interfaces/StartMeasureInterfaces";
+import {
+    IStartMeasureRequest,
+    IStartMeasureResponse,
+    IStartMeasureState
+} from "./Interfaces/StartMeasureInterfaces";
 
 export interface IStartMeasureProps {
     startMeasure: (startMeasure: IStartMeasureResponse) => void,
     type: TType,
     subType: TSubType
 }
-
-
 
 export default function StartMeasure(props: IStartMeasureProps) {
     const [isLoad, setLoad] = React.useState(false);
@@ -43,6 +45,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
         setActionResultView("");
 
         let requestBody: IStartMeasureRequest = {
+            actionType: props.type === "amp" ? 3 : 4,
             currentPosition: mainFrom.currentPosition,
             startPosition: mainFrom.startPosition,
             description: mainFrom.description,
@@ -55,7 +58,8 @@ export default function StartMeasure(props: IStartMeasureProps) {
             frequency: mainFrom.timeState?.frequency
         }
 
-        let response = await fetch(`http://localhost:5000/logic/${props.subType === "time" ? 'start-detect-time' : 'start-detect-range'}`,
+        const uri = `http://localhost:5000/logic/${props.subType === "time" ? 'start-detect-time' : 'start-detect-range'}`;
+        const response = await fetch(uri,
             {
                 method: 'POST',
                 headers: {
@@ -64,22 +68,20 @@ export default function StartMeasure(props: IStartMeasureProps) {
                 body: JSON.stringify(requestBody)
             });
 
+        const responseBody: IErrorResponse | {measureId: number} = await response.json()
         if (response.status == 400) {
-            const result: IErrorResponse = await response.json()
             setLoad(false);
             setActionResultViewSuccess(false)
-            setActionResultView(result.errorText);
+            setActionResultView((responseBody as IErrorResponse).errorText);
             return;
         }
 
         if (response.ok) {
-            const result: {measureId: number} = await response.json();
-            const response: IStartMeasureResponse = {
-                ...result,
+            const result: IStartMeasureResponse = {
+                ...(responseBody as {measureId: number}),
                 ...requestBody
             }
-            setActionResultViewSuccess(true)
-            props.startMeasure(response);
+            props.startMeasure(result);
             return;
         }
 
@@ -91,11 +93,24 @@ export default function StartMeasure(props: IStartMeasureProps) {
     return (
         <div className="start-measure">
             <div className="start-measure-text">
-                <div className="start-measure-text-title">
-                    Описание действия:
+                <div className="start-measure-text-control measure-description">
+                    <div className="measure-description--text">
+                        Название измерения:
+                    </div>
+                    <TextField
+                        onChange={(value) => {
+                            setMainForm((prev: any) => ({
+                                ...prev,
+                                measureName: value.target.value
+                            }));
+                        }}
+                        style={{width: "330px"}}
+                        id="standard-basic"
+                        placeholder="Введите название..."
+                        variant="standard"/>
                 </div>
-                <div className="start-measure-text-simple">
-                    Измерение
+                <div style={{ marginTop: 22 }}>
+                   Технические характеристики измерения:
                 </div>
                 <div className="start-measure-text-control">
                     <TextField
@@ -105,7 +120,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                                 currentPosition: Number(value.target.value || 0)
                             }));
                         }}
-                        style={{width: "230px"}}
+                        style={{width: "330px"}}
                         id="standard-basic"
                         label="Текущие положение (нм):"
                         variant="standard"/>
@@ -118,7 +133,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                                 startPosition: Number(value.target.value || 0)
                             }));
                         }}
-                        style={{width: "230px"}}
+                        style={{width: "330px"}}
                         id="standard-basic"
                         label="Начальное положение (нм):"
                         variant="standard"/>
@@ -126,24 +141,50 @@ export default function StartMeasure(props: IStartMeasureProps) {
                 {
                     props.subType === "range"
                         ? <RangeMeasureFormComponent
-                            setValue={(value, name) => setRangeForm(prev => ({
-                                ...prev,
-                                [name]: value
-                            }))}
-                            count={mainFrom.rangeState.count}
-                            endPosition={mainFrom.rangeState.endPosition}
-                            step={mainFrom.rangeState.step}
+                            setValue={(value, name) => {
+                                if(mainFrom.rangeState !== undefined)
+                                {
+                                    mainFrom.rangeState[name] = value
+                                }
+
+                                setMainForm({...mainFrom})
+                            }}
+                            count={mainFrom.rangeState?.count || 0}
+                            endPosition={mainFrom.rangeState?.endPosition || 0}
+                            step={mainFrom.rangeState?.step || 0}
                         />
                         : <TimeMeasureFormComponent
-                            setValue={(value, name) => setTimeForm(prev => ({
-                                ...prev,
-                                [name]: value
-                            }))}
-                            delay={mainFrom.timeState.delay}
-                            num={mainFrom.timeState.num}
-                            frequency={mainFrom.timeState.frequency}
+                            setValue={(value, name) => {
+                                if(mainFrom.timeState !== undefined)
+                                {
+                                    mainFrom.timeState[name] = value
+                                }
+
+                                setMainForm({...mainFrom})
+                            }}
+                            delay={mainFrom.timeState?.delay || 0}
+                            num={mainFrom.timeState?.num || 0}
+                            frequency={mainFrom.timeState?.frequency || 0}
                         />
                 }
+                <div className="start-measure-text-control-description">
+                    Описание измерения:
+                </div>
+                <div className="start-measure-text-control">
+                    <TextareaAutosize
+                        maxRows={4}
+                        aria-labelledby="asdfsadf"
+                        aria-label="maximum height"
+                        placeholder="Введите текст...."
+                        onChange={(value) => {
+                            setMainForm((prev: any) => ({
+                                ...prev,
+                                description: value.target.value
+                            }));
+                        }}
+                        style={{ width: 496, minWidth: 496, maxWidth: 496, minHeight: 200, maxHeight: 200, height: 200, padding: 5 }}
+                    />
+                </div>
             </div>
             <div className="start-measure-action">
                 {

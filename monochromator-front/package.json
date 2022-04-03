@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aspnet/signalr": "^1.0.27",
-    "@devexpress/dx-react-chart": "^3.0.2",
-    "@devexpress/dx-react-core": "^3.0.2",
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.8.1",
     "@material-ui/types": "^5.1.0",
@@ -20,18 +17,14 @@
     "@types/react-dom": "^17.0.13",
     "@types/recharts": "^1.8.23",
     "apexcharts": "^3.33.2",
-    "chart.js": "^3.7.1",
-    "node-sass": "^7.0.1",
-    "node-scss": "^7.0.3",
     "react": "^17.0.2",
     "react-apexcharts": "^1.4.0",
-    "react-chartjs-2": "^4.0.1",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.2",
     "react-scripts": "5.0.0",
-    "swr": "^1.2.2",
     "typescript": "^4.6.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "node-sass": "4.14.1"
   },
   "scripts": {
     "start": "react-scripts start",
