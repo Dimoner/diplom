@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Newtonsoft.Json;
 
 namespace AppServer.Controllers.Dto.Responses
 {
@@ -12,5 +14,11 @@ namespace AppServer.Controllers.Dto.Responses
         /// </summary>
         [JsonProperty("errorText")]
         public string ErrorText { get; set; }
+
+        /// <summary>
+        /// Список ошибок полей контроллеров
+        /// </summary>
+        [JsonProperty("errorControllerList")]
+        public Dictionary<string, string[]> ErrorControllerList { get; set; }
     }
 }

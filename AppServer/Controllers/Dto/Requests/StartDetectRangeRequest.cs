@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using AppServer.Controllers.Attributes;
 using AppServer.Controllers.Dto.Requests.Base;
 using AppServer.Controllers.Dto.Requests.Interfaces;
 using AppServer.Domains;
@@ -21,6 +22,7 @@ namespace AppServer.Controllers.Dto.Requests
         /// </summary>
         [Required]
         [JsonProperty("endPosition")]
+        [PosNumberNoZero]
         public int EndPosition { get; set; }
         
         /// <summary>
@@ -28,6 +30,7 @@ namespace AppServer.Controllers.Dto.Requests
         /// </summary>
         [Required]
         [JsonProperty("step")]
+        [PosNumberNoZero]
         public int Step { get; set; }
         
         /// <summary>
@@ -35,6 +38,7 @@ namespace AppServer.Controllers.Dto.Requests
         /// </summary>
         [Required]
         [JsonProperty("count")]
+        [PosNumberNoZero]
         public int Count { get; set; }
 
         public bool ValidationRequest()

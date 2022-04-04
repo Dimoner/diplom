@@ -8,6 +8,8 @@ import DialogComponent from "../Components/DialogComponent";
 import { IAmperageState, IMeasureElemMqttResponse } from "./Interfaces/AmperagePageInterfaces";
 import AmperageActionBlock from "./Components/AmperageActionBlock";
 import {MeasureStateManager} from "../../StateManager/MeasureStateMaanger";
+import { IAmperageMarks } from "./Interfaces/IAmperageSlider";
+
 
 export const measureInLocalStorageName: string = "measure";
 
@@ -95,15 +97,19 @@ export default function Amperage() {
                         <Slider
                             aria-label="Custom marks"
                             value={stateAmperage.amperageMarks.value}
-                            disabled={true}
-                            getAriaValueText={(value: any) => {
-                                return `${value * stateAmperage.amperageMarks.maxMave / 100}, нм`
-                            }}
-                            valueLabelDisplay="off"
-                            getAriaLabel={(value: any) => {
-                                return `${value * stateAmperage.amperageMarks.maxMave / 100}, нм`
-                            }}
-                            marks={stateAmperage.amperageMarks.marks}
+                            marks={stateAmperage.amperageMarks.marks.map((value: IAmperageMarks, index: number) => {
+                                if (index === 0 || index === 3 || index === 6 || index === 8 || index === 10){
+                                    if(value.label.includes("нм")){
+                                        return value;
+                                    }
+
+                                    value.label = `${value.label}, нм`
+                                    return value;
+                                }
+
+                                value.label = "";
+                                return value;
+                            })}
                         />
                     </div>
                     <div style={{marginTop: "40px", display: "flex", justifyContent: "center"}}>
@@ -112,6 +118,8 @@ export default function Amperage() {
                             xFormatter={(seriesName: number) => `Длина волны: ${seriesName}, нм`}
                             yFormatter={(val: number, opts?: any) => `${val}, Ам`}
                             yTitleFormatter={value => "Ток:"}
+                            yTitle="Ток, Ам"
+                            xTitle="Длина волны, нм"
                         />
                     </div>
                 </div>

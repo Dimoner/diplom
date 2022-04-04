@@ -5,8 +5,8 @@ import Actions from "../../../Components/Actions";
 import LastMeasureComponent from "../../Components/LastMeasureComponent";
 import { IAmperageState, IMeasureItem } from "../Interfaces/AmperagePageInterfaces";
 import { IStartMeasureResponse } from "../../../Components/ActionList/StartMeasure/Interfaces/StartMeasureInterfaces";
-import { IAmperageMarks } from "../../../Interfaces/IAmperageMarks";
 import {measureInLocalStorageName} from "../Amperage";
+import { IAmperageMarks } from "../Interfaces/IAmperageSlider";
 
 export interface IAmperageActionBlock{
     alignment: TSubType,

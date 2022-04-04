@@ -1,5 +1,4 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
-import {IErrorResponse} from "../../Error/IErrorResponse";
 import {
     IFileHistoryFullResponse,
     IGetFileHistoryFilterRequest, IHistoryItem,
@@ -23,6 +22,7 @@ import {
     Link,
     Pagination,
 } from "@mui/material";
+import { IErrorResponse } from "../../Helpers/HttpServiceHelper";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {

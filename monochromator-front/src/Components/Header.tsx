@@ -31,11 +31,20 @@ const pathNavigation: { label: string, key: string }[] = [
     }
 ];
 
+const a11yProps = (index: number) => {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+    };
+}
+
 export default function Header() {
     const [value, setValue] = React.useState(0);
 
     const navigate = useNavigate();
     const location = useLocation();
+
+    const [open, setOpen] = React.useState<number>(-1);
 
     useEffect(() => {
         const navigateValue = pathNavigation.findIndex(key => location.pathname.toLowerCase().includes(key.key.toLowerCase()));
@@ -43,13 +52,6 @@ export default function Header() {
              setValue(navigateValue);
         }
     }, []);
-
-    const a11yProps = (index: number) => {
-        return {
-            id: `simple-tab-${index}`,
-            'aria-controls': `simple-tabpanel-${index}`,
-        };
-    }
 
     const relocateAction = (newValue: number) => {
         setValue(newValue);
@@ -59,17 +61,12 @@ export default function Header() {
 
     const handleChange = (event: any, newValue: number) => {
         if (MeasureStateManager.IsMeasure){
-            handleClickOpen(newValue);
+            setOpen(newValue);
             return;
         }
         relocateAction(newValue);
     };
 
-    const [open, setOpen] = React.useState<number>(-1);
-
-    const handleClickOpen = (value: number) => {
-        setOpen(value);
-    };
 
     const handleClose = (isCancel: boolean) => {
         if(isCancel){

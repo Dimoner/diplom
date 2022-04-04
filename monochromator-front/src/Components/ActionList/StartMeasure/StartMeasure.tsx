@@ -1,15 +1,13 @@
-import React from "react";
-import { Button, CircularProgress, TextareaAutosize, TextField } from "@mui/material";
+import React, { ChangeEvent } from "react";
+import { Button, CircularProgress, FormGroup, TextareaAutosize, TextField } from "@mui/material";
 import "../Style/start-measure.style.scss";
-import {TSubType, TType} from "../../../Types/Types";
+import { TSubType, TType } from "../../../Types/Types";
 import RangeMeasureFormComponent from "./StartMeasureComponent/RangeMeasureFormComponent";
 import TimeMeasureFormComponent from "./StartMeasureComponent/TimeMeasureFormComponent";
-import {IErrorResponse} from "../../../Error/IErrorResponse";
-import {
-    IStartMeasureRequest,
-    IStartMeasureResponse,
-    IStartMeasureState
-} from "./Interfaces/StartMeasureInterfaces";
+import { IStartMeasureRequest, IStartMeasureResponse, IStartMeasureState } from "./Interfaces/StartMeasureInterfaces";
+import { getPropertyNameToLower } from "../../../Helpers/PropertyName";
+import { HttpServiceHelper } from "../../../Helpers/HttpServiceHelper";
+import { BaseControlItem } from "../../Base/ControlItem";
 
 export interface IStartMeasureProps {
     startMeasure: (startMeasure: IStartMeasureResponse) => void,
@@ -17,34 +15,36 @@ export interface IStartMeasureProps {
     subType: TSubType
 }
 
+const defaultValue: IStartMeasureState = {
+    currentPosition: 0,
+    startPosition: 0,
+    description: "",
+    measureName: "",
+    rangeState: {
+        endPosition: 0,
+        step: 0,
+        count: 0,
+    },
+    timeState: {
+        delay: 0,
+        num: 0,
+        frequency: 0
+    }
+};
+
 export default function StartMeasure(props: IStartMeasureProps) {
     const [isLoad, setLoad] = React.useState(false);
     const [actionResultView, setActionResultView] = React.useState("");
     const [actionResultViewSuccess, setActionResultViewSuccess] = React.useState(false);
 
-    const [mainFrom, setMainForm] = React.useState<IStartMeasureState>({
-        currentPosition: 0,
-        startPosition: 0,
-        description: "",
-        measureName: "",
-        rangeState: {
-            endPosition: 0,
-            step: 0,
-            count: 0,
-        },
-        timeState: {
-            delay: 0,
-            num: 0,
-            frequency: 0
-        }
-    });
+    const [mainFrom, setMainForm] = React.useState<IStartMeasureState>(defaultValue);
 
     const sendRequest = async () => {
         setLoad(true);
         setActionResultViewSuccess(false)
         setActionResultView("");
 
-        let requestBody: IStartMeasureRequest = {
+        const requestBody: IStartMeasureRequest = {
             actionType: props.type === "amp" ? 3 : 4,
             currentPosition: mainFrom.currentPosition,
             startPosition: mainFrom.startPosition,
@@ -59,26 +59,11 @@ export default function StartMeasure(props: IStartMeasureProps) {
         }
 
         const uri = `http://localhost:5000/logic/${props.subType === "time" ? 'start-detect-time' : 'start-detect-range'}`;
-        const response = await fetch(uri,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            });
 
-        const responseBody: IErrorResponse | {measureId: number} = await response.json()
-        if (response.status == 400) {
-            setLoad(false);
-            setActionResultViewSuccess(false)
-            setActionResultView((responseBody as IErrorResponse).errorText);
-            return;
-        }
-
-        if (response.ok) {
+        const response = await HttpServiceHelper.SendPostRequest<IStartMeasureRequest, { measureId: number }>(uri, requestBody);
+        if (response.errorBody === undefined) {
             const result: IStartMeasureResponse = {
-                ...(responseBody as {measureId: number}),
+                ...(response.body as { measureId: number }),
                 ...requestBody
             }
             props.startMeasure(result);
@@ -87,8 +72,35 @@ export default function StartMeasure(props: IStartMeasureProps) {
 
         setLoad(false);
         setActionResultViewSuccess(false)
-        setActionResultView("Произошла неизвестная ошибка");
+        setActionResultView(response.errorBody?.errorText || "Произошла неизвестная ошибка");
     };
+
+    const setValueForForm = (name: string, innerName: string = "") => (value: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        let valueCurrent: string | number = value.target.value;
+        if (
+            name !== getPropertyNameToLower<IStartMeasureState>(v => v.description) &&
+            name !==getPropertyNameToLower<IStartMeasureState>(v => v.measureName)
+        )
+        {
+            valueCurrent = Number(value.target.value)
+        }
+
+        if(innerName !== ""){
+            setMainForm((prev: any) => ({
+                ...prev,
+                [innerName]: {
+                    ...prev[innerName],
+                    [name]: valueCurrent
+                }
+            }));
+            return;
+        }
+
+        setMainForm((prev: any) => ({
+            ...prev,
+            [name]: valueCurrent
+        }));
+    }
 
     return (
         <div className="start-measure">
@@ -98,75 +110,53 @@ export default function StartMeasure(props: IStartMeasureProps) {
                         Название измерения:
                     </div>
                     <TextField
-                        onChange={(value) => {
-                            setMainForm((prev: any) => ({
-                                ...prev,
-                                measureName: value.target.value
-                            }));
-                        }}
-                        style={{width: "330px"}}
+                        onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.measureName))}
+                        style={{ width: "330px" }}
                         id="standard-basic"
+                        error={actionResultView !== "" && mainFrom.measureName === ""}
+                        required={true}
                         placeholder="Введите название..."
+                        key={getPropertyNameToLower<IStartMeasureState>(v => v.measureName)}
                         variant="standard"/>
                 </div>
                 <div style={{ marginTop: 22 }}>
-                   Технические характеристики измерения:
+                    Технические характеристики измерения:
                 </div>
                 <div className="start-measure-text-control">
                     <TextField
-                        onChange={(value) => {
-                            setMainForm((prev: any) => ({
-                                ...prev,
-                                currentPosition: Number(value.target.value || 0)
-                            }));
-                        }}
-                        style={{width: "330px"}}
+                        onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.currentPosition))}
+                        style={{ width: "330px" }}
                         id="standard-basic"
                         type={"number"}
+                        required={true}
+                        error={actionResultView !== "" && mainFrom.currentPosition <= 0}
+                        key={getPropertyNameToLower<IStartMeasureState>(v => v.currentPosition)}
                         label="Текущие положение (нм):"
                         variant="standard"/>
                 </div>
                 <div className="start-measure-text-control">
                     <TextField
-                        onChange={(value) => {
-                            setMainForm((prev: any) => ({
-                                ...prev,
-                                startPosition: Number(value.target.value || 0)
-                            }));
-                        }}
-                        style={{width: "330px"}}
+                        onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.startPosition), )}
+                        style={{ width: "330px" }}
+                        key={getPropertyNameToLower<IStartMeasureState>(v => v.startPosition)}
+                        error={actionResultView !== "" && mainFrom.startPosition <= 0}
                         id="standard-basic"
                         type={"number"}
+                        required={true}
                         label="Начальное положение (нм):"
                         variant="standard"/>
                 </div>
                 {
                     props.subType === "range"
                         ? <RangeMeasureFormComponent
-                            setValue={(value, name) => {
-                                if(mainFrom.rangeState !== undefined)
-                                {
-                                    mainFrom.rangeState[name] = value
-                                }
-
-                                setMainForm({...mainFrom})
-                            }}
-                            count={mainFrom.rangeState?.count || 0}
-                            endPosition={mainFrom.rangeState?.endPosition || 0}
-                            step={mainFrom.rangeState?.step || 0}
+                            setValue={setValueForForm}
+                            actionResultView={actionResultView}
+                            data={mainFrom.rangeState}
                         />
                         : <TimeMeasureFormComponent
-                            setValue={(value, name) => {
-                                if(mainFrom.timeState !== undefined)
-                                {
-                                    mainFrom.timeState[name] = value
-                                }
-
-                                setMainForm({...mainFrom})
-                            }}
-                            delay={mainFrom.timeState?.delay || 0}
-                            num={mainFrom.timeState?.num || 0}
-                            frequency={mainFrom.timeState?.frequency || 0}
+                            setValue={setValueForForm}
+                            actionResultView={actionResultView}
+                            data={mainFrom.timeState}
                         />
                 }
                 <div className="start-measure-text-control-description">
@@ -178,13 +168,17 @@ export default function StartMeasure(props: IStartMeasureProps) {
                         aria-labelledby="asdfsadf"
                         aria-label="maximum height"
                         placeholder="Введите текст...."
-                        onChange={(value) => {
-                            setMainForm((prev: any) => ({
-                                ...prev,
-                                description: value.target.value
-                            }));
+                        onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.description))}
+                        key={getPropertyNameToLower<IStartMeasureState>(v => v.description)}
+                        style={{
+                            width: 496,
+                            minWidth: 496,
+                            maxWidth: 496,
+                            minHeight: 200,
+                            maxHeight: 200,
+                            height: 200,
+                            padding: 5
                         }}
-                        style={{ width: 496, minWidth: 496, maxWidth: 496, minHeight: 200, maxHeight: 200, height: 200, padding: 5 }}
                     />
                 </div>
             </div>
@@ -196,7 +190,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                 }
             </div>
             {!isLoad && actionResultView !== "" ?
-                <div className="start-measure-result" style={{color: actionResultViewSuccess ? "green" : "red"}}>
+                <div className="start-measure-result" style={{ color: actionResultViewSuccess ? "green" : "red" }}>
                     {actionResultView}
                 </div> : ""}
         </div>

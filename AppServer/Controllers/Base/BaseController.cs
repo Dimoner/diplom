@@ -1,4 +1,5 @@
 ﻿using AppServer.Controllers.Dto.Responses;
+using AppServer.Controllers.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppServer.Controllers.Base
@@ -6,6 +7,7 @@ namespace AppServer.Controllers.Base
     /// <summary>
     /// Базовый контроллер
     /// </summary>
+    [ModelStateValidationActionFilter]
     public class BaseController : Controller
     {
         /// <summary>

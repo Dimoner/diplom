@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using AppServer.Controllers.Attributes;
 using AppServer.Domains;
 using Newtonsoft.Json;
 
@@ -23,6 +24,7 @@ namespace AppServer.Controllers.Dto.Requests.Base
         /// </summary>
         [Required]
         [JsonProperty("currentPosition")]
+        [PosNumberNoZero]
         public int CurrentPosition { get; set; }
         
         /// <summary>
@@ -30,6 +32,7 @@ namespace AppServer.Controllers.Dto.Requests.Base
         /// </summary>
         [Required]
         [JsonProperty("startPosition")]
+        [PosNumberNoZero]
         public int StartPosition { get; set; }
         
         /// <summary>

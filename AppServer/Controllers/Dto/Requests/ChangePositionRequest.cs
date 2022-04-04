@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AppServer.Controllers.Attributes;
 using AppServer.Controllers.Dto.Requests.Interfaces;
 using AppServer.Domains.MqttRequests.Interfaces;
 using AppServer.Domains.MqttRequests.Models;
@@ -16,6 +17,7 @@ namespace AppServer.Controllers.Dto.Requests
         /// </summary>
         [Required]
         [JsonProperty("startPosition")]
+        [PosNumberNoZero]
         public int StartPosition { get; set; }
         
         /// <summary>
@@ -23,6 +25,7 @@ namespace AppServer.Controllers.Dto.Requests
         /// </summary>
         [Required]
         [JsonProperty("endPosition")]
+        [PosNumberNoZero]
         public int EndPosition { get; set; }
 
         /// <inheritdoc />

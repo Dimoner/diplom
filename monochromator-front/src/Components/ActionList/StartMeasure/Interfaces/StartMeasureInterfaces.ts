@@ -1,12 +1,14 @@
+import { IBaseControlItem } from "../../../Base/ControlItem";
+
 export interface IStartMeasureState{
     currentPosition: number,
     startPosition: number,
     description: string,
     measureName: string
     // для измерения на отрезке
-    rangeState?: IRangeMeasureFormComponentField,
+    rangeState: IRangeMeasureFormComponentField,
     // для измерения в точке от времени
-    timeState?: ITimeMeasureFormComponentField
+    timeState: ITimeMeasureFormComponentField
 }
 
 // для измерения на отрезке

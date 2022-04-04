@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, CircularProgress, TextField} from "@mui/material";
 import "./Style/change-position.style.scss"
-import {IErrorResponse} from "../../Error/IErrorResponse";
+import { IErrorResponse } from "../../Helpers/HttpServiceHelper";
 
 interface IPosition {
     startPosition: number,
@@ -22,6 +22,12 @@ export default function ChangePosition() {
 
     const sendRequest = async () => {
         if (statePosition.startPosition <= 0 || statePosition.endPosition <= 0) {
+            setStatePosition(prev => {
+                return {
+                    ...prev,
+                    view: "Ошибка валидации полей"
+                }
+            })
             return;
         }
 
@@ -89,6 +95,7 @@ export default function ChangePosition() {
                         onChange={(value) => {
                             setStatePosition(prevState => ({...prevState, startPosition: Number(value.target.value)}))
                         }}
+                        error={statePosition.view !== "" && statePosition.startPosition <= 0}
                         style={{width: "330px"}}
                         id="standard-basic"
                         label="Начальное положение (нм):"
@@ -99,6 +106,7 @@ export default function ChangePosition() {
                         onChange={(value) => {
                             setStatePosition(prevState => ({...prevState, endPosition: Number(value.target.value)}))
                         }}
+                        error={statePosition.view !== "" && statePosition.endPosition <= 0}
                         style={{width: "330px"}}
                         id="standard-basic"
                         label="Конечное положение (нм):"

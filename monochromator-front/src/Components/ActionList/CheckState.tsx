@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, CircularProgress} from "@mui/material";
 import "./Style/check-state.style.scss"
-import {IErrorResponse} from "../../Error/IErrorResponse";
+import { IErrorResponse } from "../../Helpers/HttpServiceHelper";
 export default function CheckState() {
     const [isLoad, setLoad] = React.useState(false);
 

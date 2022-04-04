@@ -26,4 +26,12 @@ export function getPropertyName<T extends {[key in string]: any}>(expression: (i
     });
 }
 
+export function getPropertyNameToLower<T extends {[key in string]: any}>(expression: (instance: T) => any):  keyof T {
+    return getPropertyNameInternal<T>(expression, {
+        isDeep: false
+    });
+}
+
+
+
 

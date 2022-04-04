@@ -7,6 +7,8 @@ import {IMeasureItem} from "../../Pages/Amperage/Interfaces/AmperagePageInterfac
 export interface IChartComponentProps {
     measure: IMeasureItem[],
     xFormatter: (seriesName: number) =>  string,
+    xTitle: string,
+    yTitle: string,
     yFormatter: (val: number, opts?: any) =>  string,
     yTitleFormatter: (value: string) => string
 }
@@ -43,9 +45,15 @@ export default function ChartComponent(props: IChartComponentProps) {
                 size: 5,
             },
             xaxis: {
+                title: {
+                    text: props.xTitle
+                },
                 type: "numeric"
             },
             yaxis: {
+                title: {
+                    text: props.yTitle
+                },
                 min: 0,
                 max: 0
             },
@@ -107,6 +115,9 @@ export default function ChartComponent(props: IChartComponentProps) {
         ]
 
         chartState.option.yaxis = {
+            title: {
+                text: props.yTitle
+            },
             min: 0,
             max: Math.max(...measure.map(value => value.y)) + (Math.max(...measure.map(value => value.y)) * 20) / 100
         }

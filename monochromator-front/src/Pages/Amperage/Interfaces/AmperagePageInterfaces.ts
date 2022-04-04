@@ -1,5 +1,5 @@
-import { IAmperageSlider } from "../../../Interfaces/IAmperageSlider";
 import { TSubType } from "../../../Types/Types";
+import { IAmperageSlider } from "./IAmperageSlider";
 
 export interface IAmperageState {
     measureList: IMeasureItem[],

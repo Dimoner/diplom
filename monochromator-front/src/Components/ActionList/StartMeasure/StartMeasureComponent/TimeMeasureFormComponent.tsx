@@ -1,20 +1,30 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import {TextField} from "@mui/material";
-import {getPropertyName} from "../../../../Helpers/PropertyName";
-import { IRangeMeasureFormComponentField, ITimeMeasureFormComponentField } from "../Interfaces/StartMeasureInterfaces";
+import { getPropertyName, getPropertyNameToLower } from "../../../../Helpers/PropertyName";
+import {
+    IRangeMeasureFormComponentField,
+    IStartMeasureState,
+    ITimeMeasureFormComponentField
+} from "../Interfaces/StartMeasureInterfaces";
 
 
 export interface ITimeMeasureFormComponentAction {
-    setValue: (value: number, fieldName: keyof ITimeMeasureFormComponentField) => void,
+    setValue: (name: string, innerName: string) => (value: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void,
+    actionResultView: string,
+    data: ITimeMeasureFormComponentField
 }
-export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponentField & ITimeMeasureFormComponentAction) {
+
+export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponentAction) {
     return (
         <div>
             <div className="start-measure-text-control">
                 <TextField
-                    onChange={(value) => {
-                        props.setValue(Number(value.target.value || 0), getPropertyName<ITimeMeasureFormComponentField>(v => v.delay))
-                    }}
+                    onChange={props.setValue(
+                        getPropertyName<ITimeMeasureFormComponentField>(v => v.delay),
+                        getPropertyNameToLower<IStartMeasureState>(v => v.timeState)
+                    )}
+                    required={true}
+                    error={props.actionResultView !== "" && props.data.delay <= 0}
                     style={{width: "330px"}}
                     id="standard-basic"
                     label="Время измерения, сек"
@@ -22,21 +32,29 @@ export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponen
             </div>
             <div className="start-measure-text-control">
                 <TextField
-                    onChange={(value) => {
-                        props.setValue(Number(value.target.value || 0), getPropertyName<ITimeMeasureFormComponentField>(v => v.frequency))
-                    }}
+                    onChange={props.setValue(
+                        getPropertyName<ITimeMeasureFormComponentField>(v => v.frequency),
+                        getPropertyNameToLower<IStartMeasureState>(v => v.timeState)
+                    )}
+                    error={props.actionResultView !== "" && props.data.frequency <= 0}
+                    required={true}
                     style={{width: "330px"}}
                     id="standard-basic"
+                    key={getPropertyNameToLower<ITimeMeasureFormComponentField>(v => v.frequency)}
                     label="Частота измерения"
                     variant="standard" />
             </div>
             <div className="start-measure-text-control">
                 <TextField
-                    onChange={(value) => {
-                        props.setValue(Number(value.target.value || 0), getPropertyName<ITimeMeasureFormComponentField>(v => v.num))
-                    }}
+                    onChange={props.setValue(
+                        getPropertyName<ITimeMeasureFormComponentField>(v => v.num),
+                        getPropertyNameToLower<IStartMeasureState>(v => v.timeState)
+                    )}
+                    required={true}
                     style={{width: "330px"}}
+                    error={props.actionResultView !== "" && props.data.num <= 0}
                     id="standard-basic"
+                    key={getPropertyNameToLower<ITimeMeasureFormComponentField>(v => v.num)}
                     label="Кол-во измерений за 1 период"
                     variant="standard" />
             </div>
