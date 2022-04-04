@@ -99,6 +99,7 @@ export default function ChangePosition() {
                         style={{width: "330px"}}
                         id="standard-basic"
                         label="Начальное положение (нм):"
+                        required={true}
                         variant="standard"/>
                 </div>
                 <div className="change-position-text-control">
@@ -109,6 +110,7 @@ export default function ChangePosition() {
                         error={statePosition.view !== "" && statePosition.endPosition <= 0}
                         style={{width: "330px"}}
                         id="standard-basic"
+                        required={true}
                         label="Конечное положение (нм):"
                         variant="standard"/>
                 </div>

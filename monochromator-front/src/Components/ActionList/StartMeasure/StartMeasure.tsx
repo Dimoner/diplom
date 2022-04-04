@@ -115,7 +115,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                         id="standard-basic"
                         error={actionResultView !== "" && mainFrom.measureName === ""}
                         required={true}
-                        placeholder="Введите название..."
+                        label="Название измерения"
                         key={getPropertyNameToLower<IStartMeasureState>(v => v.measureName)}
                         variant="standard"/>
                 </div>
