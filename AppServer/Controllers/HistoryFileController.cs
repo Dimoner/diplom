@@ -31,13 +31,15 @@ namespace AppServer.Controllers
         {
             try
             {
+                await Task.Delay(300);
                 var history = _historyManager.GetFileHistory(dto.StartRow, dto.EndRow, dto.Name);
                 var response = history.historyModels.Select(item => new FileHistoryModelResponse
                 {
                     Id = item.Id,
-                    Description = string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description,
+                    Description = string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace(@"\", @"\\"),
                     CreationDateTime = item.CreationDateTime,
-                    MeasureName = item.MeasureName
+                    MeasureName = item.MeasureName,
+                    MeasureType = item.MeasureType
                 }).ToArray();
                 
                 return Ok(new FileHistoryFullResponse

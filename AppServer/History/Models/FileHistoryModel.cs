@@ -18,6 +18,11 @@ namespace AppServer.History.Models
         public string MeasureName { get; set; }
         
         /// <summary>
+        /// Тип измерения
+        /// </summary>
+        public string MeasureType { get; set; }
+        
+        /// <summary>
         /// Вермя создание файла
         /// </summary>
         public DateTime CreationDateTime { get; set; }

@@ -1,6 +1,6 @@
 import {
     Box,
-    Button,
+    Button, CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -37,6 +37,7 @@ export default function Header() {
     const location = useLocation();
 
     const [open, setOpen] = React.useState<number>(-1);
+    const [awaitResponse, setAwaitResponse] = React.useState<boolean>(false);
 
     useEffect(() => {
         const navigateValue = pathNavigation.findIndex(key => location.pathname.toLowerCase().includes(key.key.toLowerCase()));
@@ -74,12 +75,16 @@ export default function Header() {
             return;
         }
 
-        fetch(`http://localhost:5000/control-measure/stop`).then()
-        MeasureStateManager.IsMeasure = false;
-        clearMeasureInStorageId(measureRangeInLocalStorageName);
-        clearMeasureInStorageId(measureTimeInLocalStorageName);
-        relocateAction(open)
-        setOpen(-1)
+        setAwaitResponse(true)
+        fetch(`http://localhost:5000/control-measure/stop`).then(() => {
+            MeasureStateManager.IsMeasure = false;
+            clearMeasureInStorageId(measureRangeInLocalStorageName);
+            clearMeasureInStorageId(measureTimeInLocalStorageName);
+            relocateAction(open)
+            setOpen(-1)
+        }).finally(() => {
+            setAwaitResponse(false)
+        })
     };
 
     return (
@@ -103,6 +108,28 @@ export default function Header() {
                         )
                     })}
                 </List>
+                <Divider />
+                <DialogTitle id="alert-dialog-title">
+                    Действия:
+                </DialogTitle>
+                <div style={{paddingLeft: 13, paddingBottom: 17}}>
+                    <Button
+                        variant="contained"
+                        onClick={() => {}}
+                        style={{marginBottom: 17, width: "130px"}}
+                    >
+                        Положение
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setOpen(value)
+                        }}
+                        style={{width: "130px"}}
+                        variant="contained"
+                        color="error">
+                        Сбросить
+                    </Button>
+                </div>
             </Box>
             <Dialog
                 open={open !== -1}
@@ -115,13 +142,13 @@ export default function Header() {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        В данный момент идет измерение, вы уверены, что хотите его прервать?
+                        Вы уверены, что хотите сбросить состояние устрйоства?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => handleClose(true)}>Отменить переход</Button>
-                    <Button onClick={() => handleClose(false)} autoFocus>
-                        Прервать измерение
+                    <Button style={{height: "70px"}} onClick={() => handleClose(true)}>Отменить</Button>
+                    <Button style={{height: "70px", marginRight: "20px"}} onClick={() => handleClose(false)} autoFocus>
+                        {awaitResponse ? <CircularProgress style={{marginRight: "20px"}}/> : "Сбросить"}
                     </Button>
                 </DialogActions>
             </Dialog>

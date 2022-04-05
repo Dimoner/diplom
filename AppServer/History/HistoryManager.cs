@@ -3,8 +3,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AppServer.Controllers.Dto.Requests;
 using AppServer.Controllers.Dto.Requests.Base;
 using AppServer.Controllers.Dto.Requests.Interfaces;
+using AppServer.Domains;
 using AppServer.Domains.MqttResponse.Models;
 using AppServer.Helpers;
 using AppServer.History.Interfaces;
@@ -28,7 +30,7 @@ namespace AppServer.History
                 var names = info.Name.Split('_');
                 return names[0] == mqttResponse.Id.ToString();
             });
-            
+
             if (currentFile != null)
             {
                 var xValue = BaseDetectRequest.GetMeasureCurrentFormat(mqttResponse.X);
@@ -46,12 +48,14 @@ namespace AppServer.History
                 {
                     var text = File.ReadAllText(file.FullName);
                     var description = text.GetPartOfString("Description:", "-----------------------------------------");
+                    var measureType = text.GetPartOfString("MeasureType:", "-----------------------------------------");
                     var measureName = text.GetPartOfString("Name:", "-----------------------------------------");
                     var names = file.Name.Split('_');
 
                     return new FileHistoryModel
                     {
                         Id = Convert.ToInt32(names[0]),
+                        MeasureType = measureType,
                         CreationDateTime = MeasureHelper.GetCurrentDateTimeFromMeasureDate(names[1]),
                         Description = description,
                         MeasureName = measureName
@@ -64,7 +68,7 @@ namespace AppServer.History
                         return true;
                     }
 
-                    var dateInString = file.CreationDateTime.ToString("yyyy-MM-dd");
+                    var dateInString = file.CreationDateTime.ToString("DD.MM.yyyy");
                     var dateInStringTime = file.CreationDateTime.ToString("HH:mm:ss tt zz:mm:ss");
                     return $"{dateInString} {dateInStringTime}".Contains(name) || file.MeasureName.Contains(name) ||
                            file.Description.Contains(name);
@@ -72,11 +76,11 @@ namespace AppServer.History
             var files = afterFilterData
                 .OrderByDescending(value => value.CreationDateTime)
                 .ToArray();
-            
+
             var result = files
                 .Where((_, index) => index >= start && index < end)
                 .ToArray();
-            
+
             return (result, files.Length);
         }
 
@@ -84,7 +88,7 @@ namespace AppServer.History
         public async Task<byte[]> DownloadFileAsync(int id)
         {
             var files = GetFilesFromDirectory(); //Getting Text files
-            
+
             var currentFileInfo = files.FirstOrDefault(file =>
             {
                 var name = file.Name;
@@ -105,16 +109,25 @@ namespace AppServer.History
         {
             var d = GetLastNumberId();
             d += 1;
-            var dateTimeString = DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss");
+            var dateTimeString = DateTime.Now.ToString("dd.MM.yyyy--HH-mm-ss");
             var fileName = $"{d}_{dateTimeString}.txt";
 
             var fullFileName = _directoryPath + $"/{fileName}";
             File.Create(fullFileName).Dispose();
-           
-            if (!string.IsNullOrWhiteSpace(dto.Description))
-            {
-                File.WriteAllText(fullFileName, $@"Name: 
+            var measureTypeString = dto.ActionType == ActionTypeEnum.Amperage
+                ? "Режим: токовый"
+                : "Режим: счетный";
+            var measureSubTypeString = dto.GetType() == typeof(StartDetectRangeRequest)
+                ? "Тип: на промежутке"
+                : "Тип: от времени";
+            File.WriteAllText(fullFileName, $@"Name: 
 {dto.MeasureName}
+-----------------------------------------
+Date: {DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss")} 
+-----------------------------------------
+MeasureType:
+{measureTypeString} 
+{measureSubTypeString}
 -----------------------------------------
 Description:
 {dto.Description}
@@ -122,7 +135,7 @@ Description:
 Measure:
 {dto.CreateTableHeader()}
 -----------------------------------------");
-            }
+
 
             return d;
         }
@@ -138,6 +151,7 @@ Measure:
             {
                 return 0;
             }
+
             var fileIdListList = files.Select(file =>
             {
                 var name = file.Name;
