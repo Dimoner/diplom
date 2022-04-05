@@ -1,17 +1,32 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Slider} from "@mui/material";
 import './Style/amperage.style.scss'
-import ChartComponent from "../../Components/Chart/AmperageChart";
 import {HubConnection} from "@microsoft/signalr";
 import * as signalR from "@microsoft/signalr";
 import DialogComponent from "../Components/DialogComponent";
-import { IAmperageState, IMeasureElemMqttResponse } from "./Interfaces/AmperagePageInterfaces";
+import { IAmperageState, IMeasureElemMqttResponse, MeasureStatusEnum } from "./Interfaces/AmperagePageInterfaces";
 import AmperageActionBlock from "./Components/AmperageActionBlock";
 import {MeasureStateManager} from "../../StateManager/MeasureStateMaanger";
-import { IAmperageMarks } from "./Interfaces/IAmperageSlider";
+import AmperageRange from "./MeasureTypeComponent/AmperageRange";
+import AmperageTime from "./MeasureTypeComponent/AmperageTime";
 
+export const measureRangeInLocalStorageName: string = "measure-range";
+export const measureTimeInLocalStorageName: string = "measure-time";
 
-export const measureInLocalStorageName: string = "measure";
+const defaultValue: IAmperageState = {
+    measureList: [],
+    amperageMarks: {marks: [], value: 0, maxValue: 0},
+    rangeWave: 0,
+    startWave: 0,
+    measureId: "0",
+    open: false,
+    alignment: 'range',
+    measureAdditionInfo: {
+        status: MeasureStatusEnum.None,
+        measureDate: "",
+        measureId: 0,
+        measureName: ""
+    }
+};
 
 export default function Amperage() {
     const hubConnection = useRef<HubConnection>(new signalR.HubConnectionBuilder()
@@ -19,15 +34,11 @@ export default function Amperage() {
         .configureLogging(signalR.LogLevel.Information)
         .build());
 
-    const [stateAmperage, setStateAmperage] = useState<IAmperageState>({
-        measureList: [],
-        amperageMarks: {marks: [], value: 0, maxMave: 0},
-        rangeWave: 0,
-        startWave: 0,
-        measureId: "0",
-        open: false,
-        alignment: 'range'
-    });
+    const getDefaultValue = (): IAmperageState => {
+        return defaultValue;
+    }
+
+    const [stateAmperage, setStateAmperage] = useState<IAmperageState>(getDefaultValue());
 
     const [dima, setDima] = useState<string>("");
 
@@ -35,42 +46,74 @@ export default function Amperage() {
         hubConnection.current.start().then(a => {
             console.log(a)
         });
-        const existHistory: string | null = localStorage.getItem(measureInLocalStorageName)
-        if (existHistory !== undefined && existHistory !== "" && existHistory !== null){
-            const parseHistory: IAmperageState = JSON.parse(existHistory)
-            setStateAmperage(prev => parseHistory)
-            setDima(Math.random().toString())
-        }
 
         return () => {
             hubConnection.current.stop();
         };
     }, []);
 
+    useEffect(() => {
+        const existHistory: string | null = localStorage.getItem(stateAmperage.alignment === "range"
+            ? measureRangeInLocalStorageName
+            : measureTimeInLocalStorageName)
+
+        if (existHistory !== undefined && existHistory !== "" && existHistory !== null){
+            const parseHistory: IAmperageState = JSON.parse(existHistory)
+            setStateAmperage(prev => parseHistory)
+        }
+        else {
+            setStateAmperage({...defaultValue, alignment: stateAmperage.alignment})
+        }
+    }, [stateAmperage.alignment]);
+
+    const endMeasureAction = (prev: IAmperageState, message: IMeasureElemMqttResponse) => {
+        hubConnection.current.off(message.id.toString());
+        MeasureStateManager.IsMeasure = false;
+        window.onbeforeunload = () => undefined
+        prev.measureAdditionInfo = {
+            ...prev.measureAdditionInfo,
+            status: MeasureStatusEnum.End,
+            measureId: message.id,
+        }
+        prev.measureId = "0"
+
+        localStorage.setItem(stateAmperage.alignment === "range"
+            ? measureRangeInLocalStorageName
+            : measureTimeInLocalStorageName, JSON.stringify(prev))
+    }
+
+    const continueMeasureAction = (prev: IAmperageState, message: IMeasureElemMqttResponse): IAmperageState => {
+        MeasureStateManager.IsMeasure = true;
+
+        const result = {
+            ...prev,
+            measureList: [{ x: message.x, y: message.y }, ...prev.measureList],
+            amperageMarks: {
+                marks: [...prev.amperageMarks.marks],
+                value: ((message.x - prev.startWave) * 100 / prev.rangeWave),
+                maxValue: prev.amperageMarks.maxValue
+            },
+            measureAdditionInfo: {
+                ...prev.measureAdditionInfo,
+                status: MeasureStatusEnum.Measuring,
+            }
+        }
+
+        localStorage.setItem(stateAmperage.alignment === "range"
+            ? measureRangeInLocalStorageName
+            : measureTimeInLocalStorageName, JSON.stringify(result))
+
+        return result;
+    }
+
     const action = (message: IMeasureElemMqttResponse) => {
         setStateAmperage(prev => {
             if(message.isStop){
-                hubConnection.current.off(message.id.toString());
-                MeasureStateManager.IsMeasure = false;
-                window.onbeforeunload = () => undefined
-                prev.measureId = "0"
-                localStorage.setItem(measureInLocalStorageName, JSON.stringify(prev))
-                return {...prev};
+                endMeasureAction(prev, message)
+                return {...prev, open: true};
             }
 
-            MeasureStateManager.IsMeasure = true;
-
-            const result = {
-                ...prev,
-                measureList: [{ x: message.x, y: message.y }, ...prev.measureList],
-                amperageMarks: {
-                    marks: [...prev.amperageMarks.marks],
-                    value: ((message.x - prev.startWave) * 100 / prev.rangeWave),
-                    maxMave: prev.amperageMarks.maxMave
-                }
-            }
-            localStorage.setItem(measureInLocalStorageName, JSON.stringify(result))
-            return result;
+            return continueMeasureAction(prev, message);
         })
         setDima(Math.random().toString())
     };
@@ -85,45 +128,25 @@ export default function Amperage() {
     }, [stateAmperage.measureId]);
 
     return (
-        <div>
+        <div style={{ width: "90%", marginLeft: "-5px"}}>
             <div className="amperage-container">
                <AmperageActionBlock
                    alignment={stateAmperage.alignment}
                    setStateAmperage={setStateAmperage}
-                   measureList={stateAmperage.measureList}
                />
-                <div className="amperage-loader">
-                    <div style={{width: "350px"}}>
-                        <Slider
-                            aria-label="Custom marks"
-                            value={stateAmperage.amperageMarks.value}
-                            marks={stateAmperage.amperageMarks.marks.map((value: IAmperageMarks, index: number) => {
-                                if (index === 0 || index === 3 || index === 6 || index === 8 || index === 10){
-                                    if(value.label.includes("нм")){
-                                        return value;
-                                    }
-
-                                    value.label = `${value.label}, нм`
-                                    return value;
-                                }
-
-                                value.label = "";
-                                return value;
-                            })}
-                        />
-                    </div>
-                    <div style={{marginTop: "40px", display: "flex", justifyContent: "center"}}>
-                        <ChartComponent
-                            measure={stateAmperage.measureList}
-                            xFormatter={(seriesName: number) => `Длина волны: ${seriesName}, нм`}
-                            yFormatter={(val: number, opts?: any) => `${val}, Ам`}
-                            yTitleFormatter={value => "Ток:"}
-                            yTitle="Ток, Ам"
-                            xTitle="Длина волны, нм"
-                        />
-                    </div>
-                </div>
             </div>
+            {
+                stateAmperage.alignment === "range"
+                    ? <AmperageRange
+                        measureList={stateAmperage.measureList}
+                        measureAdditionInfo={stateAmperage.measureAdditionInfo}
+                        amperageMarks={stateAmperage.amperageMarks}
+                    /> :
+                    <AmperageTime
+                        measureList={stateAmperage.measureList}
+                        amperageMarks={stateAmperage.amperageMarks}
+                    />
+            }
            <DialogComponent
                onClickAction={() => {
                    setStateAmperage(prev => ({

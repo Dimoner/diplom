@@ -174,9 +174,9 @@ export default function StartMeasure(props: IStartMeasureProps) {
                             width: 496,
                             minWidth: 496,
                             maxWidth: 496,
-                            minHeight: 200,
-                            maxHeight: 200,
-                            height: 200,
+                            minHeight: 180,
+                            maxHeight: 180,
+                            height: 180,
                             padding: 5
                         }}
                     />

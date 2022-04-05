@@ -20,8 +20,9 @@ export interface ILastMeasureComponent {
 }
 
 export default function LastMeasureComponent(props: ILastMeasureComponent) {
+    const countMeasure = Math.floor((window.innerHeight - 209 - 52) / 52);
     return (
-        <Box sx={{width: "100%"}}>
+        <Box style={{marginLeft: "20px"}}>
             <Paper sx={{width: "100%", mb: 1}}>
                 <Toolbar
                     sx={{
@@ -35,7 +36,7 @@ export default function LastMeasureComponent(props: ILastMeasureComponent) {
                         id="tableTitle"
                         component="div"
                     >
-                        Последние измерения
+                        Последние {countMeasure} измерений:
                     </Typography>
                 </Toolbar>
                 <TableContainer component={Paper}>
@@ -47,7 +48,7 @@ export default function LastMeasureComponent(props: ILastMeasureComponent) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {props.measure.filter((_, index) => index < 15).map((row) => (
+                            {props.measure.filter((_, index) => index < countMeasure).map((row) => (
                                 <TableRow
                                     key={Math.random()}
                                     sx={{'&:last-child td, &:last-child th': {border: 0}}}

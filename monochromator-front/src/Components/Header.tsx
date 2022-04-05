@@ -5,16 +5,15 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle,
-    Tab,
-    Tabs
+    DialogTitle, Divider, List, ListItem, ListItemText
 } from "@mui/material";
 import React, {useEffect} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import "./Style/component.style.scss";
 import {MeasureStateManager} from "../StateManager/MeasureStateMaanger";
 import {IAmperageState} from "../Pages/Amperage/Interfaces/AmperagePageInterfaces";
-import {measureInLocalStorageName} from "../Pages/Amperage/Amperage";
+import "./Style/header.style.scss";
+import { measureRangeInLocalStorageName, measureTimeInLocalStorageName } from "../Pages/Amperage/Amperage";
 
 const pathNavigation: { label: string, key: string }[] = [
     {
@@ -31,15 +30,8 @@ const pathNavigation: { label: string, key: string }[] = [
     }
 ];
 
-const a11yProps = (index: number) => {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
 export default function Header() {
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState(-1);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -59,7 +51,7 @@ export default function Header() {
         navigate(navigateValue, {replace: true})
     }
 
-    const handleChange = (event: any, newValue: number) => {
+    const handleChange = (newValue: number) => {
         if (MeasureStateManager.IsMeasure){
             setOpen(newValue);
             return;
@@ -67,6 +59,14 @@ export default function Header() {
         relocateAction(newValue);
     };
 
+    const clearMeasureInStorageId = (measureInLocalStorageName: string) => {
+        const existHistory: string | null = localStorage.getItem(measureInLocalStorageName)
+        if (existHistory !== undefined && existHistory !== "" && existHistory !== null){
+            const parseHistory: IAmperageState = JSON.parse(existHistory)
+            parseHistory.measureId = "0";
+            localStorage.setItem(measureInLocalStorageName, JSON.stringify(parseHistory))
+        }
+    }
 
     const handleClose = (isCancel: boolean) => {
         if(isCancel){
@@ -76,24 +76,33 @@ export default function Header() {
 
         // TODO отправить команду STOP на сервер
         MeasureStateManager.IsMeasure = false;
-        const existHistory: string | null = localStorage.getItem(measureInLocalStorageName)
-        if (existHistory !== undefined && existHistory !== "" && existHistory !== null){
-            const parseHistory: IAmperageState = JSON.parse(existHistory)
-            parseHistory.measureId = "0";
-            localStorage.setItem(measureInLocalStorageName, JSON.stringify(parseHistory))
-        }
+        clearMeasureInStorageId(measureRangeInLocalStorageName);
+        clearMeasureInStorageId(measureTimeInLocalStorageName);
         relocateAction(open)
         setOpen(-1)
     };
 
     return (
-        <div>
-            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
-                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+        <div className="header-main">
+            <Box
+                role="presentation"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    Режимы:
+                </DialogTitle>
+                <Divider />
+                <List>
                     {pathNavigation.map((item, index) =>{
-                        return <Tab key={item.key} label={item.label} {...a11yProps(index)} />
+                        return (
+                            <ListItem
+                                button key={item.key}
+                                style={index === value ? {background:" rgba(25, 118, 210, 0.12)", borderRadius: "8px"}: {}}
+                                onClick={() => handleChange(index)}>
+                                <ListItemText primary={item.label} />
+                            </ListItem>
+                        )
                     })}
-                </Tabs>
+                </List>
             </Box>
             <Dialog
                 open={open !== -1}

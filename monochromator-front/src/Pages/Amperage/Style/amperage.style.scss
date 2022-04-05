@@ -1,7 +1,93 @@
 .amperage-loader {
   width: 80%;
   margin-left: 40px;
-  margin-top: 17px;
+
+  &-information {
+    display: flex;
+    &-slider {
+      width: 350px;
+    }
+
+    &-data {
+      display: flex;
+      width: 230px;
+      justify-content: space-between;
+      margin-left: 45px;
+      height: 65px;
+
+      .data-info {
+        width: 100%;
+        margin-top: -10px;
+        display: flex;
+        justify-content: space-between;
+        &-block {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          height: 10px;
+          &-title {
+            font-family: "Roboto","Helvetica","Arial",sans-serif;
+            font-weight: 500;
+            font-size: 17px;
+            line-height: 1.6;
+            letter-spacing: 0.0075em;
+            width: 85px;
+            text-decoration: underline;
+          }
+
+          &-content {
+            min-width: 126px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            white-space: nowrap;
+
+            font-family: "Roboto","Helvetica","Arial",sans-serif;
+            font-weight: 400;
+            font-size: 15px;
+            line-height: 1.6;
+            letter-spacing: 0.0075em;
+
+
+            .complete-measure{
+              background-color: #f5fbf7;
+              padding: 0px 4px;
+              border: #4da400 solid 1px;
+              border-radius: 9px;
+              color: green;
+            }
+
+            .process-measure{
+              background-color: #e0f0ff;
+              padding: 0px 4px;
+              border: #0d6df6 solid 1px;
+              border-radius: 9px;
+              color: #0d6df6;
+            }
+
+            .is-unknown-measure{
+              background-color: #e8e9eb;
+              padding: 0px 4px;
+              border: #acabab solid 1px;
+              border-radius: 9px;
+              color: black;
+            }
+          }
+        }
+
+        &-block-text {
+          height: auto;
+          align-items: start;
+
+          &-content {
+            min-height: 29px;
+          }
+        }
+      }
+
+    }
+  }
 }
 
 .amperage-container {
@@ -10,9 +96,8 @@
   &-left {
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
     margin-left: 20px;
-    width: 20%;
+    width: 100%;
 
     &-action{
       display: flex;

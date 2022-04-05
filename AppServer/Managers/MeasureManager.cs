@@ -77,15 +77,15 @@ namespace AppServer.Managers
             Task.Run(() =>
             {
                 var rnd = new Random();
-                for (int i = 90; i <= 400; i += 10)
+                for (int i = 10; i <= 200; i += 10)
                 {
                     _mqttManager.SendMessageAsync($"_M_{fileId}-{i}-{rnd.Next(10, 100)}", _appSettings.FromTopic);
-                    Task.Delay(100).Wait();
+                    Task.Delay(1000).Wait();
                 }
                 
                 _mqttManager.SendMessageAsync($"_M_STOP_{fileId}", _appSettings.FromTopic);
             });
-            // тестовый блок
+            // тестовый блок 
             
             return new MeasureCommandMqttResponse
             {

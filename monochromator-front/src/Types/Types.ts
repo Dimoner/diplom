@@ -5,3 +5,13 @@ export type TType = "amp" | "count";
 
 // режимы измерений
 export type TSubType = "time" | "range";
+export const SubTypeList: {key: TSubType, label: string}[] = [
+    {
+        key: "range",
+        label: "Диапозон длин волн"
+    },
+    {
+        key: "time",
+        label: "Одна точка от времени"
+    },
+]

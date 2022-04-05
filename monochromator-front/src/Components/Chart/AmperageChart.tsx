@@ -133,7 +133,7 @@ export default function ChartComponent(props: IChartComponentProps) {
 
 
     return (
-        <div style={{width: "80%"}}>
+        <div style={{width: "88%"}}>
             <Chart
                 options={chartState.option}
                 series={chartState.series}

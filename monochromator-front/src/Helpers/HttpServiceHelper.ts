@@ -11,6 +11,18 @@ export interface IHttpResponseModel<TResponse> {
 }
 
 export class HttpServiceHelper {
+    public static downloadAsFile(id: number, fileName: string) {
+        fetch(`http://localhost:5000/history/load/${id}`)
+            .then(resp => resp.blob())
+            .then(blob => {
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `${fileName}.txt`;
+                a.click();
+            })
+            .catch(() => alert('oh no!'));
+    }
+
     public static async SendPostRequest<TBody, TResponse>(url: string, body?: TBody): Promise<IHttpResponseModel<TResponse>>{
         const options = {
             method: 'POST',

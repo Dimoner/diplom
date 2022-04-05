@@ -15,6 +15,7 @@ import StartMeasure from "./ActionList/StartMeasure/StartMeasure";
 import ChangePosition from "./ActionList/ChangePosition";
 import {TSubType, TType} from "../Types/Types";
 import { IStartMeasureResponse } from "./ActionList/StartMeasure/Interfaces/StartMeasureInterfaces";
+import { MeasureStateManager } from "../StateManager/MeasureStateMaanger";
 
 function TabPanel(props: any) {
     const { children, value, index, ...other } = props;
@@ -72,8 +73,8 @@ export default function Actions(props: IActionsProps) {
     }
 
     return (
-        <div style={{marginTop: "30px"}}>
-            <Button  variant="outlined" onClick={handleClickOpen}>
+        <div style={{ position: "absolute", right: 25, top: 21}}>
+            <Button  variant="outlined" onClick={handleClickOpen} disabled={MeasureStateManager.IsMeasure}>
                 Действия
             </Button>
             <Dialog

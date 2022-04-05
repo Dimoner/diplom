@@ -2,7 +2,7 @@
 export interface IAmperageSlider {
     marks: IAmperageMarks[],
     value: number,
-    maxMave: number
+    maxValue: number
 }
 
 export interface IAmperageMarks {

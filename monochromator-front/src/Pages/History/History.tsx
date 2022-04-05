@@ -22,7 +22,8 @@ import {
     Link,
     Pagination,
 } from "@mui/material";
-import { IErrorResponse } from "../../Helpers/HttpServiceHelper";
+import { HttpServiceHelper, IErrorResponse } from "../../Helpers/HttpServiceHelper";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -139,18 +140,6 @@ export default function History(){
         getMeasure(1).then(r => r);
     }, [])
 
-    const downloadAsFile = (id: number, fileName: string) => {
-        fetch(`http://localhost:5000/history/load/${id}`)
-            .then(resp => resp.blob())
-            .then(blob => {
-                let a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = `${fileName}.txt`;
-                a.click();
-            })
-            .catch(() => alert('oh no!'));
-    }
-
     const debounce = (func: any, wait: any, immediate: any) => {
         let timeout: any;
 
@@ -226,14 +215,14 @@ export default function History(){
                                         <StyledTableCell component="th" scope="row">
                                             {historyItem.measureName}
                                         </StyledTableCell>
-                                        <StyledTableCell align="right">{historyItem.creationDateTime?.replace("T", " ")}</StyledTableCell>
+                                        <StyledTableCell align="right">{moment(historyItem.creationDateTime).format("DD.MM.yyyy HH:mm")}</StyledTableCell>
                                         <StyledTableCell style={{display: "flex"}} align="right">
                                             <div style={{whiteSpace: "pre-line", width: "50%", textAlign: "start"}}>
                                                 {historyItem.description}
                                             </div>
                                         </StyledTableCell>
                                         <StyledTableCell align="right">
-                                            <Link href="#" onClick={() => downloadAsFile(historyItem.id, historyItem.measureName || historyItem.creationDateTime)}>
+                                            <Link href="#" onClick={() => HttpServiceHelper.downloadAsFile(historyItem.id, historyItem.measureName || historyItem.creationDateTime)}>
                                                 Скачать
                                             </Link>
                                         </StyledTableCell>

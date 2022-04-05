@@ -10,7 +10,8 @@ export interface IAmperageState {
     measureId: string,
     open: boolean,
     // режимы измерений
-    alignment: TSubType
+    alignment: TSubType,
+    measureAdditionInfo: IOldMeasureState
 }
 
 export interface IMeasureItem {
@@ -34,4 +35,17 @@ export interface IMeasureElemMqttResponse {
 
     // Конец ли это измерения
     isStop: boolean
+}
+
+export interface IOldMeasureState {
+    status: MeasureStatusEnum,
+    measureDate: string,
+    measureName: string,
+    measureId: number
+}
+
+export enum MeasureStatusEnum {
+    None = 1,
+    Measuring = 2,
+    End = 3,
 }

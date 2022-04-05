@@ -1,5 +1,6 @@
 .history {
   margin: 20px;
+  width: 100%;
 
   &-pagination {
     padding-bottom: 20px;
@@ -7,14 +8,15 @@
     align-items: flex-end;
     justify-content: space-between;
 
-    &-title{
-      font-family: "Roboto","Helvetica","Arial",sans-serif;
+    &-title {
+      font-family: "Roboto", "Helvetica", "Arial", sans-serif;
       font-weight: 500;
       font-size: 1.25rem;
       line-height: 1.6;
       letter-spacing: 0.0075em;
       margin-right: 25px;
       white-space: nowrap;
+      margin-left: 10px;
     }
   }
 
@@ -29,7 +31,7 @@
     justify-content: center;
     align-items: center;
     width: 300%;
-    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
     font-weight: 500;
     font-size: 1.25rem;
     line-height: 1.6;
