@@ -26,7 +26,6 @@ namespace AppServer.Controllers
         {
             // если пользователь прерывает содинение во время измерения
             // (закрывает браузер или вкладку, мы отправляем команду на прерывание выполнения измерения)
-            await _controlMeasureManager.StopAsync();
             await base.OnDisconnectedAsync(exception);
         }
     }

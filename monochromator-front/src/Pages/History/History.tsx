@@ -45,7 +45,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const onePageCountOfElem: number = 15;
+const onePageCountOfElem: number = Math.floor((window.innerHeight - 177 - 53) / 53);
 
 export default function History(){
     const [cacheHistory, setCacheHistory] = useState<{[key in string]: IHistoryPageState}>({})
@@ -203,7 +203,7 @@ export default function History(){
                             <StyledTableCell>Название измерение</StyledTableCell>
                             <StyledTableCell align="right">Дата измерения</StyledTableCell>
                             <StyledTableCell align="right">Описание измерения</StyledTableCell>
-                            <StyledTableCell align="right"></StyledTableCell>
+                            <StyledTableCell align="right">Скачивание данных</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

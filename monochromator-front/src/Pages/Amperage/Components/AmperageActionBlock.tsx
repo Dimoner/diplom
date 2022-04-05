@@ -56,6 +56,11 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
                     status: MeasureStatusEnum.Measuring,
                     measureName: startMeasure.measureName,
                     measureDate: moment().format("DD.MM.yyyy HH:mm")
+                },
+                managerMeasure: {
+                    ...prev.managerMeasure,
+                    isPause: false,
+                    isWork: true
                 }
             }))
             return;
@@ -73,7 +78,18 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
                 startWave: 0,
                 measureId: startMeasure.measureId.toString(),
                 open: false,
-                alignment: alignment
+                alignment: alignment,
+                measureAdditionInfo: {
+                    measureId: 0,
+                    status: MeasureStatusEnum.Measuring,
+                    measureName: startMeasure.measureName,
+                    measureDate: moment().format("DD.MM.yyyy HH:mm")
+                },
+                managerMeasure: {
+                    ...prev.managerMeasure,
+                    isPause: false,
+                    isWork: true
+                }
             }))
             return;
         }

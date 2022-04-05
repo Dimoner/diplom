@@ -6,13 +6,13 @@
     display: flex;
     &-slider {
       width: 350px;
+      margin-left: 75px;
     }
 
     &-data {
       display: flex;
       width: 230px;
       justify-content: space-between;
-      margin-left: 45px;
       height: 65px;
 
       .data-info {
@@ -105,5 +105,38 @@
       justify-content: space-between;
       margin-bottom: 20px;
     }
+  }
+}
+
+.control-measure {
+  height: 65px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-left: 75px;
+  width: 400px;
+  &-title {
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.6;
+    letter-spacing: 0.0075em;
+    text-decoration: underline;
+  }
+
+  &-title-disable {
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.6;
+    letter-spacing: 0.0075em;
+    text-decoration: underline;
+    color: rgba(0, 0, 0, 0.26);
+    box-shadow: none;
+  }
+
+  &-buttons {
+    display: flex;
+    justify-content: space-between;
   }
 }

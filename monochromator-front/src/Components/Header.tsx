@@ -74,7 +74,7 @@ export default function Header() {
             return;
         }
 
-        // TODO отправить команду STOP на сервер
+        fetch(`http://localhost:5000/control-measure/stop`).then()
         MeasureStateManager.IsMeasure = false;
         clearMeasureInStorageId(measureRangeInLocalStorageName);
         clearMeasureInStorageId(measureTimeInLocalStorageName);

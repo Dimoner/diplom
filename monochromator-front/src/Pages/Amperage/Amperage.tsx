@@ -8,6 +8,7 @@ import AmperageActionBlock from "./Components/AmperageActionBlock";
 import {MeasureStateManager} from "../../StateManager/MeasureStateMaanger";
 import AmperageRange from "./MeasureTypeComponent/AmperageRange";
 import AmperageTime from "./MeasureTypeComponent/AmperageTime";
+import { TSubType } from "../../Types/Types";
 
 export const measureRangeInLocalStorageName: string = "measure-range";
 export const measureTimeInLocalStorageName: string = "measure-time";
@@ -19,12 +20,16 @@ const defaultValue: IAmperageState = {
     startWave: 0,
     measureId: "0",
     open: false,
-    alignment: 'range',
+    alignment: (localStorage.getItem("amperage-alignment") as TSubType) || 'range',
     measureAdditionInfo: {
         status: MeasureStatusEnum.None,
         measureDate: "",
         measureId: 0,
         measureName: ""
+    },
+    managerMeasure: {
+        isPause: false,
+        isWork: false
     }
 };
 
@@ -53,6 +58,8 @@ export default function Amperage() {
     }, []);
 
     useEffect(() => {
+        localStorage.setItem("amperage-alignment", stateAmperage.alignment)
+
         const existHistory: string | null = localStorage.getItem(stateAmperage.alignment === "range"
             ? measureRangeInLocalStorageName
             : measureTimeInLocalStorageName)
@@ -76,6 +83,11 @@ export default function Amperage() {
             measureId: message.id,
         }
         prev.measureId = "0"
+
+        prev.managerMeasure = {
+            isPause: false,
+            isWork: false
+        }
 
         localStorage.setItem(stateAmperage.alignment === "range"
             ? measureRangeInLocalStorageName
@@ -141,10 +153,15 @@ export default function Amperage() {
                         measureList={stateAmperage.measureList}
                         measureAdditionInfo={stateAmperage.measureAdditionInfo}
                         amperageMarks={stateAmperage.amperageMarks}
+                        managerMeasure={stateAmperage.managerMeasure}
+                        setStateAmperage={setStateAmperage}
                     /> :
                     <AmperageTime
                         measureList={stateAmperage.measureList}
                         amperageMarks={stateAmperage.amperageMarks}
+                        measureAdditionInfo={stateAmperage.measureAdditionInfo}
+                        managerMeasure={stateAmperage.managerMeasure}
+                        setStateAmperage={setStateAmperage}
                     />
             }
            <DialogComponent

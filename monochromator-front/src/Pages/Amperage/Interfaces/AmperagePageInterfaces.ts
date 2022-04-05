@@ -11,7 +11,8 @@ export interface IAmperageState {
     open: boolean,
     // режимы измерений
     alignment: TSubType,
-    measureAdditionInfo: IOldMeasureState
+    measureAdditionInfo: IOldMeasureState,
+    managerMeasure: IManagerMeasure
 }
 
 export interface IMeasureItem {
@@ -48,4 +49,10 @@ export enum MeasureStatusEnum {
     None = 1,
     Measuring = 2,
     End = 3,
+}
+
+// управление процессом измерения
+export interface IManagerMeasure {
+    isPause: boolean,
+    isWork: boolean
 }

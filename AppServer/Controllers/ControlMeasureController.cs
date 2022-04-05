@@ -9,6 +9,7 @@ namespace AppServer.Controllers
     /// <summary>
     /// Контроллер для паузы/старта после паузы/стопа измерений
     /// </summary>
+    [Route("control-measure")]
     public class ControlMeasureController : BaseController
     {
         private readonly IControlMeasureManager _controlMeasureManager;

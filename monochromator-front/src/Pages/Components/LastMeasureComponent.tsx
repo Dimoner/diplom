@@ -21,6 +21,13 @@ export interface ILastMeasureComponent {
 
 export default function LastMeasureComponent(props: ILastMeasureComponent) {
     const countMeasure = Math.floor((window.innerHeight - 209 - 52) / 52);
+    const measureList: any = props.measure.filter((_, index) => index < countMeasure);
+
+    const lengthBefore = measureList.length;
+    for (let i = 0; i < countMeasure - lengthBefore; i++){
+        measureList.push({x: "-", y: "-"})
+    }
+
     return (
         <Box style={{marginLeft: "20px"}}>
             <Paper sx={{width: "100%", mb: 1}}>
@@ -48,7 +55,7 @@ export default function LastMeasureComponent(props: ILastMeasureComponent) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {props.measure.filter((_, index) => index < countMeasure).map((row) => (
+                            {measureList.map((row: {x: string, y: string}) => (
                                 <TableRow
                                     key={Math.random()}
                                     sx={{'&:last-child td, &:last-child th': {border: 0}}}

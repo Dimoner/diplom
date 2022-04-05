@@ -6,7 +6,7 @@ import {Outlet} from "react-router-dom";
 function App(): any {
 
     return (
-        <div style={{display: "flex"}}>
+        <div style={{display: "flex"}} className="main">
             <Header />
             <Outlet/>
         </div>
