@@ -8,12 +8,6 @@ namespace AppServer.Controllers.Dto.Requests.Interfaces
     public interface IBaseApiRequest
     {
         /// <summary>
-        /// Валидация необходимости запроса к конроллеру
-        /// </summary>
-        /// <returns></returns>
-        public bool ValidationRequest();
-
-        /// <summary>
         /// Формируем запрос для контроллера
         /// </summary>
         /// <returns></returns>

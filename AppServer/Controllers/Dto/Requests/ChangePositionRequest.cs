@@ -18,7 +18,9 @@ namespace AppServer.Controllers.Dto.Requests
         [Required]
         [JsonProperty("startPosition")]
         [PosNumberNoZero]
-        public int StartPosition { get; set; }
+        [MinInt(180)]
+        [MaxInt(1000)]
+        public float StartPosition { get; set; }
         
         /// <summary>
         /// Конечная позиция в нм
@@ -26,23 +28,9 @@ namespace AppServer.Controllers.Dto.Requests
         [Required]
         [JsonProperty("endPosition")]
         [PosNumberNoZero]
-        public int EndPosition { get; set; }
-
-        /// <inheritdoc />
-        public bool ValidationRequest()
-        {
-            if (StartPosition == EndPosition)
-            {
-                return false;
-            }
-                
-            if (EndPosition == 0 && EndPosition == 0)
-            {
-                return false;
-            }
-
-            return true;
-        }
+        [MinInt(180)]
+        [MaxInt(1000)]
+        public float EndPosition { get; set; }
 
         /// <inheritdoc />
         public IDomainItemMqttRequestBase GetMqttRequest()

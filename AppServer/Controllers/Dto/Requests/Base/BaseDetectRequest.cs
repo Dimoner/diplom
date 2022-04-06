@@ -25,7 +25,8 @@ namespace AppServer.Controllers.Dto.Requests.Base
         [Required]
         [JsonProperty("currentPosition")]
         [PosNumberNoZero]
-        public int CurrentPosition { get; set; }
+        [Range(180, 1000)]
+        public float CurrentPosition { get; set; }
         
         /// <summary>
         /// Начальная позиция в нм
@@ -33,7 +34,9 @@ namespace AppServer.Controllers.Dto.Requests.Base
         [Required]
         [JsonProperty("startPosition")]
         [PosNumberNoZero]
-        public int StartPosition { get; set; }
+        [MinInt(180)]
+        [MaxInt(1000)]
+        public float StartPosition { get; set; }
         
         /// <summary>
         /// предварительное описание, которое надо добавить в новый файл

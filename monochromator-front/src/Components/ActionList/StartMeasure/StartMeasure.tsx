@@ -15,6 +15,12 @@ export interface IStartMeasureProps {
     subType: TSubType
 }
 
+export const actionAmperageRange: string = "amperage-range";
+export const actionAmperageTime: string = "amperage-time";
+
+export const actionTickRange: string = "tick-range";
+export const actionTickTime: string = "tick-time";
+
 const defaultValue: IStartMeasureState = {
     currentPosition: 0,
     startPosition: 0,
@@ -32,12 +38,52 @@ const defaultValue: IStartMeasureState = {
     }
 };
 
+const getFormName = (type: TType, subType: TSubType): string => {
+    if (type === "amp" && subType === "range"){
+        return actionAmperageRange;
+    }
+
+    if (type === "amp" && subType === "time"){
+        return actionAmperageTime;
+    }
+
+    if (type === "count" && subType === "range"){
+        return actionTickRange;
+    }
+
+    if (type === "count" && subType === "range"){
+        return actionTickTime;
+    }
+
+    return "";
+}
+
+const getDefaultValue = (type: TType, subType: TSubType):IStartMeasureState  => {
+    const name = getFormName(type, subType);
+    const item = localStorage.getItem(name);
+    if(item === undefined || item === "" || item === null){
+        return {...defaultValue}
+    }
+
+    const value: IStartMeasureState = JSON.parse(item);
+    return value;
+}
+
 export default function StartMeasure(props: IStartMeasureProps) {
     const [isLoad, setLoad] = React.useState(false);
     const [actionResultView, setActionResultView] = React.useState("");
     const [actionResultViewSuccess, setActionResultViewSuccess] = React.useState(false);
 
-    const [mainFrom, setMainForm] = React.useState<IStartMeasureState>(defaultValue);
+    const [mainFrom, setMainForm] = React.useState<IStartMeasureState>(getDefaultValue(props.type, props.subType));
+
+    const savePrevForm = () => {
+        const form = {...mainFrom}
+        form.measureName = "";
+        form.description = "";
+        const jsonFormat = JSON.stringify(form);
+        const name = getFormName(props.type, props.subType)
+        localStorage.setItem(name, jsonFormat);
+    }
 
     const sendRequest = async () => {
         setLoad(true);
@@ -62,6 +108,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
 
         const response = await HttpServiceHelper.SendPostRequest<IStartMeasureRequest, { measureId: number }>(uri, requestBody);
         if (response.errorBody === undefined) {
+            savePrevForm();
             const result: IStartMeasureResponse = {
                 ...(response.body as { measureId: number }),
                 ...requestBody
@@ -122,30 +169,45 @@ export default function StartMeasure(props: IStartMeasureProps) {
                 <div style={{ marginTop: 22 }}>
                     Технические характеристики измерения:
                 </div>
-                <div className="start-measure-text-control">
-                    <TextField
-                        onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.currentPosition))}
-                        style={{ width: "330px" }}
-                        id="standard-basic"
-                        type={"number"}
-                        required={true}
-                        error={actionResultView !== "" && mainFrom.currentPosition <= 0}
-                        key={getPropertyNameToLower<IStartMeasureState>(v => v.currentPosition)}
-                        label="Текущие положение (нм):"
-                        variant="standard"/>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <div className="start-measure-text-control">
+                        <TextField
+                            onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.currentPosition))}
+                            defaultValue={mainFrom.currentPosition || undefined}
+                            style={{ width: "230px", height: "80px", marginBottom: 0 }}
+                            id="standard-basic"
+                            type={"number"}
+                            required={true}
+                            error={actionResultView !== "" && (mainFrom.currentPosition <= 180 || mainFrom.currentPosition >= 1000)}
+                            helperText={
+                                ( actionResultView !== "" && (mainFrom.currentPosition <= 180 || mainFrom.currentPosition >= 1000))
+                                    ? "Диапозоне от 180 до 1000 нм"
+                                    : ""
+                            }
+                            key={getPropertyNameToLower<IStartMeasureState>(v => v.currentPosition)}
+                            label="Текущие положение (нм):"
+                            variant="standard"/>
+                    </div>
+                    <div className="start-measure-text-control">
+                        <TextField
+                            onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.startPosition), )}
+                            style={{ width: "230px", height: "80px", marginBottom: 0 }}
+                            key={getPropertyNameToLower<IStartMeasureState>(v => v.startPosition)}
+                            error={actionResultView !== "" && (mainFrom.startPosition <= 180 || mainFrom.startPosition >= 1000)}
+                            id="standard-basic"
+                            type={"number"}
+                            required={true}
+                            defaultValue={mainFrom.startPosition || undefined}
+                            helperText={
+                                ( actionResultView !== "" && (mainFrom.currentPosition <= 180 || mainFrom.currentPosition >= 1000))
+                                    ? "Диапозоне от 180 до 1000 нм"
+                                    : ""
+                            }
+                            label="Начальное положение (нм):"
+                            variant="standard"/>
+                    </div>
                 </div>
-                <div className="start-measure-text-control">
-                    <TextField
-                        onChange={setValueForForm(getPropertyNameToLower<IStartMeasureState>(v => v.startPosition), )}
-                        style={{ width: "330px" }}
-                        key={getPropertyNameToLower<IStartMeasureState>(v => v.startPosition)}
-                        error={actionResultView !== "" && mainFrom.startPosition <= 0}
-                        id="standard-basic"
-                        type={"number"}
-                        required={true}
-                        label="Начальное положение (нм):"
-                        variant="standard"/>
-                </div>
+
                 {
                     props.subType === "range"
                         ? <RangeMeasureFormComponent
@@ -172,11 +234,12 @@ export default function StartMeasure(props: IStartMeasureProps) {
                         key={getPropertyNameToLower<IStartMeasureState>(v => v.description)}
                         style={{
                             width: 496,
+                            margin: 0,
                             minWidth: 496,
                             maxWidth: 496,
-                            minHeight: 180,
-                            maxHeight: 180,
-                            height: 180,
+                            minHeight: 150,
+                            maxHeight: 150,
+                            height: 150,
                             padding: 5
                         }}
                     />

@@ -17,7 +17,7 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         /// <summary>
         /// Время измерения в сек
         /// </summary>
-        private int _delay;
+        private float _delay;
 
         /// <summary>
         /// Кол-во измерений за 1 _delay
@@ -27,7 +27,7 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         /// <summary>
         /// Частота измерения в сек
         /// </summary>
-        private int _frequency { get; set; }
+        private float _frequency { get; set; }
         
         /// <summary>
         /// Парсинг сообщения с фронта

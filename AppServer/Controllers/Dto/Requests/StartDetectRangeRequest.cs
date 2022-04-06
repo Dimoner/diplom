@@ -23,7 +23,9 @@ namespace AppServer.Controllers.Dto.Requests
         [Required]
         [JsonProperty("endPosition")]
         [PosNumberNoZero]
-        public int EndPosition { get; set; }
+        [MinInt(180)]
+        [MaxInt(1000)]
+        public float EndPosition { get; set; }
         
         /// <summary>
         /// Шаг измерения в нм
@@ -31,7 +33,7 @@ namespace AppServer.Controllers.Dto.Requests
         [Required]
         [JsonProperty("step")]
         [PosNumberNoZero]
-        public int Step { get; set; }
+        public float Step { get; set; }
         
         /// <summary>
         /// Кол-во измерений в точке
@@ -40,11 +42,6 @@ namespace AppServer.Controllers.Dto.Requests
         [JsonProperty("count")]
         [PosNumberNoZero]
         public int Count { get; set; }
-
-        public bool ValidationRequest()
-        {
-            return true;
-        }
 
         public IDomainItemMqttRequestBase GetMqttRequest()
         {

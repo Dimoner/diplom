@@ -22,11 +22,17 @@ export default function RangeMeasureFormComponent(props: IRangeMeasureFormCompon
                         getPropertyName<IRangeMeasureFormComponentField>(v => v.endPosition),
                         getPropertyNameToLower<IStartMeasureState>(v => v.rangeState)
                     )}
-                    style={{width: "330px"}}
+                    defaultValue={props.data.endPosition || undefined}
+                    style={{width: "230px", height: "70px"}}
                     id="standard-basic"
                     type={"number"}
                     required={true}
-                    error={props.actionResultView !== "" && props.data.endPosition <= 0}
+                    error={props.actionResultView !== "" && (props.data.endPosition <= 180 || props.data.endPosition >= 1000)}
+                    helperText={
+                        (props.actionResultView !== "" && (props.data.endPosition <= 180 || props.data.endPosition >= 1000))
+                            ? "Диапозоне от 180 до 1000 нм"
+                            : ""
+                    }
                     key={getPropertyNameToLower<IRangeMeasureFormComponentField>(v => v.endPosition)}
                     label="Конечное положение (нм):"
                     variant="standard" />
@@ -38,8 +44,14 @@ export default function RangeMeasureFormComponent(props: IRangeMeasureFormCompon
                         getPropertyNameToLower<IStartMeasureState>(v => v.rangeState)
                     )}
                     required={true}
+                    defaultValue={props.data.step || undefined}
                     error={props.actionResultView !== "" && props.data.step <= 0}
-                    style={{width: "330px"}}
+                    helperText={
+                        (props.actionResultView !== "" && props.data.step <= 0)
+                            ? "Значение должно быть больше 0"
+                            : ""
+                    }
+                    style={{width: "230px", height: "70px"}}
                     id="standard-basic"
                     label="Шаг (нм):"
                     type={"number"}
@@ -53,8 +65,14 @@ export default function RangeMeasureFormComponent(props: IRangeMeasureFormCompon
                         getPropertyNameToLower<IStartMeasureState>(v => v.rangeState)
                     )}
                     required={true}
+                    defaultValue={props.data.count || undefined}
+                    helperText={
+                        (props.actionResultView !== "" && props.data.count <= 0)
+                            ? "Значение должно быть больше 0"
+                            : ""
+                    }
                     error={props.actionResultView !== "" && props.data.count <= 0}
-                    style={{width: "330px"}}
+                    style={{width: "230px", height: "70px"}}
                     id="standard-basic"
                     type={"number"}
                     key={getPropertyNameToLower<IRangeMeasureFormComponentField>(v => v.count)}

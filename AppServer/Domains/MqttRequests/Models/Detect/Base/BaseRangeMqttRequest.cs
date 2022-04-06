@@ -18,12 +18,12 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         /// <summary>
         /// путь
         /// </summary>
-        private int _way;
+        private float _way;
 
         /// <summary>
         /// шаг для измерения
         /// </summary>
-        private int _step;
+        private float _step;
 
         /// <summary>
         /// кол-во измерений в точке

@@ -25,7 +25,7 @@ namespace AppServer.Domains.MqttRequests.Models
         /// <summary>
         /// Кол-во нм которые надо пройти
         /// </summary>
-        private int _way;
+        private float _way;
 
         public override void FromDtoApiRequest(ChangePositionRequest dto)
         {

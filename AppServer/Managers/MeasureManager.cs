@@ -42,10 +42,6 @@ namespace AppServer.Managers
         /// <inheritdoc />
         public async Task<CommandMqttResponse> ChangePositionAsync(ChangePositionRequest dto)
         {
-            if (!dto.ValidationRequest())
-            {
-                return new CommandMqttResponse(true);
-            }
             var request = dto.GetMqttRequest();
             var result = await _mqttManager.SendMessageWithResultAsync(request);
             if (!result.IsSuccess)

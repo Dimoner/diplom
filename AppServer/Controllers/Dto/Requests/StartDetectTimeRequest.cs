@@ -19,11 +19,13 @@ namespace AppServer.Controllers.Dto.Requests
     {
         /// <summary>
         /// Время измерения в сек
+        /// 0,1 - частота  > частота
         /// </summary>
         [Required]
         [JsonProperty("delay")]
         [PosNumberNoZero]
-        public int Delay { get; set; }
+        [MinInt(0.9)]
+        public float Delay { get; set; }
         
         /// <summary>
         /// Частота измерения в сек
@@ -31,7 +33,8 @@ namespace AppServer.Controllers.Dto.Requests
         [Required]
         [JsonProperty("frequency")]
         [PosNumberNoZero]
-        public int Frequency { get; set; }
+        [MinInt(0.9)]
+        public float Frequency { get; set; }
         
         /// <summary>
         /// Кол-во измерений за 1 Delay
@@ -39,6 +42,8 @@ namespace AppServer.Controllers.Dto.Requests
         [Required]
         [JsonProperty("num")]
         [PosNumberNoZero]
+        [MinInt(0)]
+        [MaxInt(1024)]
         public int Num { get; set; }
 
         /// <inheritdoc />

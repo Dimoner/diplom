@@ -90,24 +90,34 @@ export default function ChangePosition() {
                 <div className="change-position-text-simple">
                     Перемещение монохроматора в нужное положение
                 </div>
-                <div className="change-position-text-control">
+                <div className="change-position-text-control" style={{height: "75px"}}>
                     <TextField
                         onChange={(value) => {
                             setStatePosition(prevState => ({...prevState, startPosition: Number(value.target.value)}))
                         }}
-                        error={statePosition.view !== "" && statePosition.startPosition <= 0}
+                        error={statePosition.view !== "" && (statePosition.startPosition <= 180 || statePosition.startPosition >= 1000)}
+                        helperText={
+                            (statePosition.view !== "" && (statePosition.startPosition <= 180 || statePosition.startPosition >= 1000))
+                                ? "Диапозоне от 180 до 1000 нм"
+                                : ""
+                        }
                         style={{width: "330px"}}
                         id="standard-basic"
                         label="Начальное положение (нм):"
                         required={true}
                         variant="standard"/>
                 </div>
-                <div className="change-position-text-control">
+                <div className="change-position-text-control" style={{height: "75px"}}>
                     <TextField
                         onChange={(value) => {
                             setStatePosition(prevState => ({...prevState, endPosition: Number(value.target.value)}))
                         }}
-                        error={statePosition.view !== "" && statePosition.endPosition <= 0}
+                        error={statePosition.view !== "" && (statePosition.endPosition <= 180 || statePosition.endPosition >= 1000)}
+                        helperText={
+                            (statePosition.view !== "" && (statePosition.endPosition <= 180 || statePosition.endPosition >= 1000))
+                                ? "Диапозоне от 180 до 1000 нм"
+                                : ""
+                        }
                         style={{width: "330px"}}
                         id="standard-basic"
                         required={true}
