@@ -17,6 +17,8 @@ import { HubConnection } from "@microsoft/signalr";
 import * as signalR from "@microsoft/signalr";
 import moment from "moment";
 import SettingComponent from "./Setting/SettingComponent";
+import {useDispatch} from "react-redux";
+import { increment } from "../counterSlice";
 
 const pathNavigation: { label: string, key: string }[] = [
     {
@@ -58,7 +60,7 @@ const defaultStateSystem: IStateSystem = {
 
 export default function Header() {
     const [stateSystem, setStateSystem] = React.useState<IStateSystem>(defaultStateSystem);
-
+    const dispatch = useDispatch()
     const hubConnection = useRef<HubConnection>(new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5000/state")
         .configureLogging(signalR.LogLevel.Information)
@@ -268,10 +270,16 @@ export default function Header() {
                 fullWidth={true}
                 maxWidth="sm"
                 open={openSetting}
-                onClose={() => setOpenSetting(false)}
+                onClose={() => {
+                    dispatch(increment())
+                    setOpenSetting(false)
+                }}
             >
                 <SettingComponent
-                    closeSetting={() => setOpenSetting(false)}
+                    closeSetting={() => {
+                        dispatch(increment())
+                        setOpenSetting(false)
+                    }}
                 />
             </Dialog>
         </div>

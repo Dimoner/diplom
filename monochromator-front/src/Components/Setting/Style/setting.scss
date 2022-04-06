@@ -1,0 +1,62 @@
+.setting {
+  display: flex;
+  flex-direction: column;
+  .addition-info {
+    &-title {
+      margin: 0;
+      font-family: "Roboto","Helvetica","Arial",sans-serif;
+      font-weight: 500;
+      font-size: 1.2rem;
+      line-height: 1.4;
+      letter-spacing: 0.0075em;
+      text-decoration: underline;
+      padding: 8px 0;
+      -webkit-flex: 0 0 auto;
+      -ms-flex: 0 0 auto;
+      flex: 0 0 auto;
+    }
+    &-content {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+      .block {
+        display: flex;
+      }
+
+      &-line {
+        display: flex;
+        margin-bottom: 10px;
+        &-name {
+          font-size: 18px;
+          line-height: 18px;
+          position: relative;
+        }
+
+        &-name::before {
+          color: black;
+          /* UTF-8 escape sequence, соответствующая символу "Маркер списка" */
+          content:"\2022";
+          /* Делаем больше, чем основной текст в li */
+          font-size: 26px;
+          font-weight: 700;
+          /* Элемент вырван из потока, выравниваем отрицательным отступом */
+          left: -15px;
+          /* Высота строки и позиционирование необходимы для выравнивания по вертикали */
+          line-height: 18px;
+          position: absolute;
+          top: 0;
+        }
+
+        &-symbols {
+          margin-left: 10px;
+          font-weight: 600;
+          width: 39px;
+        }
+      }
+    }
+  }
+
+  .convertation {
+
+  }
+}

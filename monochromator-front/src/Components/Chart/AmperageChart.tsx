@@ -3,6 +3,8 @@ import Chart from "react-apexcharts";
 import {ApexOptions} from "apexcharts";
 import {useEffect, useState} from "react";
 import {IMeasureItem} from "../../Pages/Amperage/Interfaces/AmperagePageInterfaces";
+import {useSettingFuncAction} from "../Setting/SettingComponent";
+import {useSelector} from "react-redux";
 
 export interface IChartComponentProps {
     measure: IMeasureItem[],
@@ -10,10 +12,12 @@ export interface IChartComponentProps {
     xTitle: string,
     yTitle: string,
     yFormatter: (val: number, opts?: any) =>  string,
-    yTitleFormatter: (value: string) => string
+    yTitleFormatter: (value: string) => string,
+    type: "amperage" | "tick"
 }
 
 export default function ChartComponent(props: IChartComponentProps) {
+    const count = useSelector((state: any) => state.counter.value)
     const [chartState, setChartState] = useState<{
         option: {
             chart: ApexChart,
@@ -101,7 +105,12 @@ export default function ChartComponent(props: IChartComponentProps) {
     })
 
     useEffect(() => {
-        const measure = [...props.measure].reverse();
+        const measure = [...props.measure].map(measureValue => {
+            return {
+                ...measureValue,
+                y: Number(useSettingFuncAction(props.type, measureValue.y).toFixed(2))
+            }
+        }).reverse();
         chartState.series = [
             {
                 name: "series-1",
@@ -129,7 +138,7 @@ export default function ChartComponent(props: IChartComponentProps) {
                 ...prev,
             }
         })
-    }, [props.measure])
+    }, [props.measure, count])
 
 
     return (

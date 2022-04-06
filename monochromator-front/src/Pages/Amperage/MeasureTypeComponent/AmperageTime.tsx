@@ -6,6 +6,8 @@ import ChartComponent from "../../../Components/Chart/AmperageChart";
 import React, { Dispatch, SetStateAction } from "react";
 import MeasureStatusComponent from "./MeasureStatusComponent";
 import MeasureButtonActionComponent from "./MeasureButtonActionComponent";
+import {defaultValueSettingComponentStateFunc} from "../../../Components/Setting/SettingComponent";
+import {useSelector} from "react-redux";
 
 export interface IAmperageTime {
     measureList: IMeasureItem[],
@@ -16,12 +18,14 @@ export interface IAmperageTime {
 }
 
 export default function AmperageTime({ measureList, amperageMarks, managerMeasure, measureAdditionInfo, setStateAmperage }: IAmperageTime) {
+    const count = useSelector((state: any) => state.counter.value)
+
     return (
         <div style={{ display: "flex" }}>
             <LastMeasureComponent
                 measure={measureList}
                 leftName={"t, сек"}
-                rightName={"I, Ам"}
+                rightName={`Токовый сигнал, ${defaultValueSettingComponentStateFunc().amperageName}`}
             />
             <div className="amperage-loader">
                 <div className="amperage-loader-information">
@@ -55,9 +59,10 @@ export default function AmperageTime({ measureList, amperageMarks, managerMeasur
                     <ChartComponent
                         measure={measureList}
                         xFormatter={(seriesName: number) => `Время: ${seriesName}, сек`}
-                        yFormatter={(val: number, opts?: any) => `${val}, Ам`}
-                        yTitleFormatter={value => "Ток:"}
-                        yTitle="Ток, Ам"
+                        yFormatter={(val: number, opts?: any) => `${val}, ${defaultValueSettingComponentStateFunc().amperageName}`}
+                        yTitleFormatter={value => "Токовый сигнал:"}
+                        type={"amperage"}
+                        yTitle={`Токовый сигнал, ${defaultValueSettingComponentStateFunc().amperageName}`}
                         xTitle="Время с начала измерения, с"
                     />
                 </div>
