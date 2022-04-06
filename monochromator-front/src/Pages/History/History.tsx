@@ -15,12 +15,12 @@ import Paper from '@mui/material/Paper';
 import "./Style/history.style.scss";
 import {
     CircularProgress,
-    FormControl,
+    FormControl, IconButton,
     Input,
     InputAdornment,
     InputLabel,
     Link,
-    Pagination,
+    Pagination, Tooltip,
 } from "@mui/material";
 import { HttpServiceHelper, IErrorResponse } from "../../Helpers/HttpServiceHelper";
 import moment from "moment";
@@ -45,7 +45,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const onePageCountOfElem: number = Math.floor((window.innerHeight - 177 - 53) / 53);
+const onePageCountOfElem: number = Math.floor((window.innerHeight - 177 - 60) / 60);
 
 export default function History(){
     const [cacheHistory, setCacheHistory] = useState<{[key in string]: IHistoryPageState}>({})
@@ -177,51 +177,57 @@ export default function History(){
     }, 600, false)
 
     return (
-        <div className="history">
-            <TableContainer component={Paper}>
-                <div className="history-pagination">
-                    <div className="history-search">
-                        <div className="history-pagination-title">
-                            Поиск по истории измерений:
-                        </div>
-                        <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                            <InputLabel htmlFor="standard-adornment-amount">Название, дата, описание</InputLabel>
-                            <Input
-                                id="standard-adornment-amount"
-                                onChange={changeSearch()}
-                                startAdornment={<InputAdornment position="start">|</InputAdornment>}
-                            />
-                        </FormControl>
+        <div className="history" style={{display: "flex", flexDirection: "column"}}>
+            <div className="history-pagination">
+                <div className="history-search">
+                    <div className="history-pagination-title">
+                        Поиск по истории измерений:
                     </div>
-                    {historyState.pageCount !== 0
-                        ? <Pagination onChange={(event, page) => getMeasure(page).then(r => r)} count={historyState.pageCount} color="primary"/>
-                        : ""}
+                    <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                        <InputLabel htmlFor="standard-adornment-amount">Название, дата, описание</InputLabel>
+                        <Input
+                            id="standard-adornment-amount"
+                            onChange={changeSearch()}
+                            startAdornment={<InputAdornment position="start">|</InputAdornment>}
+                        />
+                    </FormControl>
                 </div>
-                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                {historyState.pageCount !== 0
+                    ? <Pagination onChange={(event, page) => getMeasure(page).then(r => r)} count={historyState.pageCount} color="primary"/>
+                    : ""}
+            </div>
+            <TableContainer component={Paper}>
+                <Table aria-label="customized table">
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell>Название измерение</StyledTableCell>
-                            <StyledTableCell align="right">Дата измерения</StyledTableCell>
-                            <StyledTableCell align="right">Описание измерения</StyledTableCell>
-                            <StyledTableCell align="right">Скачивание данных</StyledTableCell>
+                            <StyledTableCell align="left" style={{minWidth: 240}}>Название измерение</StyledTableCell>
+                            <StyledTableCell align="left" style={{minWidth: 240}}>Тип измерения</StyledTableCell>
+                            <StyledTableCell align="left" style={{minWidth: 240}}>Дата измерения</StyledTableCell>
+                            <StyledTableCell align="left" style={{minWidth: 240}}>Описание измерения</StyledTableCell>
+                            <StyledTableCell align="left" style={{minWidth: 240}}>Скачивание данных</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                             { !isLoad ? <>
                                 {(historyState.wasFirstLoad && historyState.history.length === 0)
-                                    ? <div className="load-history">История пустая!</div>
+                                    ? ""
                                     : historyState.history.map((historyItem) => (
                                     <StyledTableRow key={historyItem.creationDateTime}>
-                                        <StyledTableCell component="th" scope="row">
+                                        <StyledTableCell  align="left" >
                                             {historyItem.measureName}
                                         </StyledTableCell>
-                                        <StyledTableCell align="right">{moment(historyItem.creationDateTime).format("DD.MM.yyyy HH:mm")}</StyledTableCell>
-                                        <StyledTableCell style={{display: "flex"}} align="right">
-                                            <div style={{whiteSpace: "pre-line", width: "50%", textAlign: "start"}}>
-                                                {historyItem.description}
-                                            </div>
+                                        <StyledTableCell  align="left" style={{whiteSpace: "pre-line"}}>
+                                            {historyItem.measureType}
                                         </StyledTableCell>
-                                        <StyledTableCell align="right">
+                                        <StyledTableCell align="left">{moment(historyItem.creationDateTime).format("DD.MM.yyyy HH:mm")}</StyledTableCell>
+                                        <StyledTableCell  align="left">
+                                            <Tooltip title={historyItem.description}>
+                                                <IconButton>
+                                                    <svg style={{cursor:"pointer"}} xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                                                </IconButton>
+                                            </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="left">
                                             <Link href="#" onClick={() => HttpServiceHelper.downloadAsFile(historyItem.id, historyItem.measureName || historyItem.creationDateTime)}>
                                                 Скачать
                                             </Link>
@@ -229,10 +235,13 @@ export default function History(){
                                     </StyledTableRow>
 
                                 ))}
-                            </> :  <div className="load-history"><CircularProgress/></div>}
+                            </> :  ""}
                     </TableBody>
                 </Table>
             </TableContainer>
+            { !isLoad ? <> {(historyState.wasFirstLoad && historyState.history.length === 0)
+                ? <div className="load-history">История пустая!</div>
+                : ""}</> :  <div className="load-history"><CircularProgress/></div>}
         </div>
     )
 }

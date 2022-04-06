@@ -21,6 +21,12 @@ namespace AppServer.Controllers.Dto.Responses
         public DateTime CreationDateTime { get; set; }
         
         /// <summary>
+        /// Тип измерения
+        /// </summary>
+        [JsonProperty("measureType")]
+        public string MeasureType { get; set; }
+        
+        /// <summary>
         /// Описание файла
         /// </summary>
         [JsonProperty("description")]

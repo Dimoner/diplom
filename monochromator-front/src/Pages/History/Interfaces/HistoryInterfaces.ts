@@ -2,7 +2,8 @@ export interface IHistoryItem {
     id: number,
     creationDateTime: string,
     description: string,
-    measureName: string
+    measureName: string,
+    measureType: string
 }
 
 
@@ -22,5 +23,5 @@ export interface IHistoryPageState {
     history: IHistoryItem[],
     currentPage: number,
     pageCount: number,
-    wasFirstLoad: boolean
+    wasFirstLoad: boolean,
 }
