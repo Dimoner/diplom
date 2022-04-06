@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import './Style/amperage.style.scss'
+import './Style/amperage.scss'
 import {HubConnection} from "@microsoft/signalr";
 import * as signalR from "@microsoft/signalr";
 import DialogComponent from "../Components/DialogComponent";

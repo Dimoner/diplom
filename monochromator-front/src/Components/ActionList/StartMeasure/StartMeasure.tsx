@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { Button, CircularProgress, FormGroup, TextareaAutosize, TextField } from "@mui/material";
-import "../Style/start-measure.style.scss";
+import "../Style/start-measure.scss";
 import { TSubType, TType } from "../../../Types/Types";
 import RangeMeasureFormComponent from "./StartMeasureComponent/RangeMeasureFormComponent";
 import TimeMeasureFormComponent from "./StartMeasureComponent/TimeMeasureFormComponent";

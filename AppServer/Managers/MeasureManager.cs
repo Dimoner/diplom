@@ -25,6 +25,17 @@ namespace AppServer.Managers
             _mqttManager = mqttManager;
             _appSettings = appSettings;
             _historyManager = historyManager;
+            
+            // тестовый блок для измерения тока на периоде
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    var rnd = new Random();
+                    _mqttManager.SendMessageAsync($"_S_{3}-{rnd.Next(700, 10000)}-{rnd.Next(0, 1000)}-100-10К-10п", _appSettings.FromTopic);
+                    Task.Delay(1000).Wait();
+                }
+            });
         }
         
         /// <inheritdoc />

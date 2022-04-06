@@ -7,13 +7,16 @@ import {
     DialogContentText,
     DialogTitle, Divider, List, ListItem, ListItemText
 } from "@mui/material";
-import React, {useEffect} from "react";
+import React, { useEffect, useRef } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import "./Style/component.style.scss";
 import {MeasureStateManager} from "../StateManager/MeasureStateMaanger";
 import {IAmperageState} from "../Pages/Amperage/Interfaces/AmperagePageInterfaces";
-import "./Style/header.style.scss";
+import "./Style/header.scss";
 import { measureRangeInLocalStorageName, measureTimeInLocalStorageName } from "../Pages/Amperage/Amperage";
+import { HubConnection } from "@microsoft/signalr";
+import * as signalR from "@microsoft/signalr";
+import moment from "moment";
+import SettingComponent from "./Setting/SettingComponent";
 
 const pathNavigation: { label: string, key: string }[] = [
     {
@@ -30,13 +33,59 @@ const pathNavigation: { label: string, key: string }[] = [
     }
 ];
 
+export interface IStateSystemResponse {
+    actionType: number,
+    measureCount: number,
+    voltage: number,
+    position: number,
+    resistance: string,
+    capacitance: string,
+}
+
+export interface IStateSystem extends IStateSystemResponse {
+    updateDate: string
+}
+
+const defaultStateSystem: IStateSystem = {
+    actionType: 0,
+    measureCount: 0,
+    voltage: 0,
+    position: 0,
+    resistance: "",
+    capacitance: "",
+    updateDate: ""
+}
+
 export default function Header() {
+    const [stateSystem, setStateSystem] = React.useState<IStateSystem>(defaultStateSystem);
+
+    const hubConnection = useRef<HubConnection>(new signalR.HubConnectionBuilder()
+        .withUrl("http://localhost:5000/state")
+        .configureLogging(signalR.LogLevel.Information)
+        .build());
+
+    useEffect(() => {
+        hubConnection.current.start().then(a => {
+            hubConnection.current.on("state", (data: IStateSystemResponse) => {
+                setStateSystem(prev => ({
+                    ...data,
+                    updateDate: moment().format("HH:mm:ss")
+                }))
+            });
+        });
+
+        return () => {
+            hubConnection.current.stop();
+        };
+    }, []);
+
     const [value, setValue] = React.useState(-1);
 
     const navigate = useNavigate();
     const location = useLocation();
 
     const [open, setOpen] = React.useState<number>(-1);
+    const [openSetting, setOpenSetting] = React.useState<boolean>(false);
     const [awaitResponse, setAwaitResponse] = React.useState<boolean>(false);
 
     useEffect(() => {
@@ -107,19 +156,80 @@ export default function Header() {
                             </ListItem>
                         )
                     })}
+                    <ListItem
+                        button key="setting"
+                        disabled={MeasureStateManager.IsMeasure}
+                        onClick={() => {
+                            setOpenSetting(true)
+                        }}>
+                        <ListItemText primary="Настройки" />
+                    </ListItem>
                 </List>
+                <Divider />
+                <DialogTitle id="alert-dialog-title">
+                    Состояние:
+                </DialogTitle>
+                <div style={{marginBottom: "20px"}}>
+                    <div className="state-group-title">
+                        Дата обновления:
+                    </div>
+                    <div className="state-group-text" style={{marginTop: "5px"}}>
+                        {stateSystem.updateDate}
+                    </div>
+                </div>
+                <div className="state-group">
+                    <div className="state-group-title">
+                        Режим:
+                    </div>
+                    <div className="state-group-text">
+                        {stateSystem.actionType === 3 ? "Токовый" : "Счетный"}
+                    </div>
+                </div>
+                <div className="state-group">
+                    <div className="state-group-title">
+                       Значение:
+                    </div>
+                    <div className="state-group-text">
+                        {stateSystem.measureCount}
+                    </div>
+                </div>
+                <div className="state-group">
+                    <div className="state-group-title">
+                        Позиция:
+                    </div>
+                    <div className="state-group-text">
+                        {stateSystem.position},нм
+                    </div>
+                </div>
+                <div className="state-group">
+                    <div className="state-group-title">
+                        R:
+                    </div>
+                    <div className="state-group-text">
+                        {stateSystem.resistance}{" Ом"}
+                    </div>
+                </div>
+                <div className="state-group">
+                    <div className="state-group-title">
+                        C:
+                    </div>
+                    <div className="state-group-text">
+                        {stateSystem.capacitance}{" Ф"}
+                    </div>
+                </div>
+                <div className="state-group" style={{marginBottom: "20px"}}>
+                    <div className="state-group-title">
+                        U на ФЭУ:
+                    </div>
+                    <div className="state-group-text">
+                        {stateSystem.voltage}{" В"}
+                    </div>
+                </div>
                 <Divider />
                 <DialogTitle id="alert-dialog-title">
                     Действия:
                 </DialogTitle>
-                <div style={{paddingLeft: 13, paddingBottom: 17}}>
-                    <Button
-                        variant="contained"
-                        onClick={() => {}}
-                        style={{marginBottom: 17, width: "130px"}}
-                    >
-                        Положение
-                    </Button>
+                <div style={{paddingLeft: 5, paddingBottom: 17}}>
                     <Button
                         onClick={() => {
                             setOpen(value)
@@ -131,6 +241,7 @@ export default function Header() {
                     </Button>
                 </div>
             </Box>
+
             <Dialog
                 open={open !== -1}
                 onClose={() => handleClose(true)}
@@ -151,6 +262,17 @@ export default function Header() {
                         {awaitResponse ? <CircularProgress style={{marginRight: "20px"}}/> : "Сбросить"}
                     </Button>
                 </DialogActions>
+            </Dialog>
+
+            <Dialog
+                fullWidth={true}
+                maxWidth="sm"
+                open={openSetting}
+                onClose={() => setOpenSetting(false)}
+            >
+                <SettingComponent
+                    closeSetting={() => setOpenSetting(false)}
+                />
             </Dialog>
         </div>
     );

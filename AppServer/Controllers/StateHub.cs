@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.SignalR;
 namespace AppServer.Controllers
 {
     /// <summary>
-    /// Подписка на получение команд с сервера
+    /// подписка на получение статистики
     /// </summary>
-    public class MeasureHub : Hub
+    public class StateHub : Hub
     {
         public async Task Send(string message)
         {

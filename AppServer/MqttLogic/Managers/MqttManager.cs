@@ -21,7 +21,8 @@ namespace AppServer.MqttLogic.Managers
     public class MqttManager : IMqttManager
     {
         private readonly IHubContext<MeasureHub> _hubContext;
-        
+        private readonly IHubContext<StateHub> _stateHub;
+
         private static readonly Dictionary<string, Action<CommandMqttResponse>> _handlers = new Dictionary<string, Action<CommandMqttResponse>>();
         
         private ILogger<IMqttManager> _logger;
@@ -29,9 +30,15 @@ namespace AppServer.MqttLogic.Managers
         private IMqttClient _client;
         private IMqttClientOptions _pushOptions;
         
-        public MqttManager(ILogger<IMqttManager> logger, IAppSettings appSettings, IHubContext<MeasureHub> hubContext)
+        public MqttManager(
+            ILogger<IMqttManager> logger, 
+            IAppSettings appSettings, 
+            IHubContext<MeasureHub> hubContext,
+            IHubContext<StateHub> stateHub
+            )
         {
             _hubContext = hubContext;
+            _stateHub = stateHub;
             Init(logger, appSettings);
         }
         
@@ -129,7 +136,7 @@ namespace AppServer.MqttLogic.Managers
                     _logger.LogInformation("### RECEIVED APPLICATION MESSAGE ###");
                     _logger.LogInformation($"Payload = {Encoding.UTF8.GetString(e.ApplicationMessage.Payload)}");
 
-                    MqttResponseParser.ParseResponse(e.ApplicationMessage.Payload, _handlers, _hubContext);
+                    MqttResponseParser.ParseResponse(e.ApplicationMessage.Payload, _handlers, _hubContext, _stateHub);
                 });
             }
             catch (Exception e)

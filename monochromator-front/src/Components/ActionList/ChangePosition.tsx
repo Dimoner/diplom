@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, CircularProgress, TextField} from "@mui/material";
-import "./Style/change-position.style.scss"
+import "./Style/change-position.scss"
 import { IErrorResponse } from "../../Helpers/HttpServiceHelper";
 
 interface IPosition {

@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, CircularProgress} from "@mui/material";
-import "./Style/check-state.style.scss"
+import "./Style/check-state.scss"
 import { IErrorResponse } from "../../Helpers/HttpServiceHelper";
 export default function CheckState() {
     const [isLoad, setLoad] = React.useState(false);

@@ -1,0 +1,30 @@
+.header-main{
+  width: 10%;
+  height: calc(100vh - 30px);
+  border-right: 1px solid rgba(224, 224, 224, 1);
+}
+
+.state-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-right: 18px;
+
+  &-title {
+    margin: 0;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 0.00938em;
+    display: block;
+  }
+
+  &-text {
+    margin: 0;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.00938em;
+    display: block;
+  }
+}

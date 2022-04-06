@@ -64,6 +64,7 @@ namespace AppServer
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<MeasureHub>("/measure");
+                endpoints.MapHub<StateHub>("/state");
             });
         }
     }

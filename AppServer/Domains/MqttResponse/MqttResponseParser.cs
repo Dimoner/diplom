@@ -18,13 +18,14 @@ namespace AppServer.Domains.MqttResponse
         /// <summary>
         /// Парсинг ответа от брокера
         /// </summary>
-        public static void ParseResponse(byte[] payloadByteList, Dictionary<string, Action<CommandMqttResponse>> handlers, IHubContext<MeasureHub> hubContext)
+        public static void ParseResponse(byte[] payloadByteList, Dictionary<string, Action<CommandMqttResponse>> handlers, IHubContext<MeasureHub> hubContext, IHubContext<StateHub> stateHub)
         {
             // DateTime_Value.......
             var payload = Encoding.UTF8.GetString(payloadByteList);
             // Value.......
             payload = payload.Remove(0, payload.IndexOf("_", StringComparison.Ordinal) + 1);
             
+            // результат измерения
             // M_0-0-0 ||  M_STOP_0
             if (payload.StartsWith("M_"))
             {
@@ -32,15 +33,50 @@ namespace AppServer.Domains.MqttResponse
                 return;
             }
 
+            // результат выполнения операции
             // R_0_0*ERR={}_STAT={}
             if (payload.StartsWith("R_"))
             {
                 ParseCommandResponse(payload, handlers);
                 return;
             }
-           
-
+            
+            // результат поулчение состояния устройства
+            // S_{режим (3-ток/4-счет)}-{число тока или счета(число условных едениц)}-{напряжение на фэу(B)}-{положение(нм)-{сопротивление}-{емкость}}
+            if (payload.StartsWith("S_"))
+            {
+                ParseStateCommandResponse(payload, stateHub);
+                return;
+            }
+            
             throw new Exception("Обработчик не найден");
+        }
+
+        private static void ParseStateCommandResponse(string payload, IHubContext<StateHub> stateHub)
+        {
+            // {режим (3-ток/4-счет)}-{число тока или счета(число условных едениц)}-{напряжение на фэу(B)}-{положение(нм)}-{сопротивление}-{емкость}}
+            payload = payload.Remove(0, payload.IndexOf("_", StringComparison.Ordinal) + 1);
+            
+            // [
+            //     режим (3-ток/4-счет),
+            //     число тока или счета(число условных едениц),
+            //     напряжение на фэу(B),
+            //     положение(нм),
+            //     сопротивление,
+            //     емкость
+            // ]
+            var data = payload.Split("-").ToArray();
+            var response = new StateMqttResponse
+            {
+                ActionType = Convert.ToInt32(data[0]) == Convert.ToInt32(ActionTypeEnum.Amperage) ? ActionTypeEnum.Amperage : ActionTypeEnum.Tick,
+                MeasureCount = Convert.ToInt32(data[1]),
+                Voltage = Convert.ToInt32(data[2]),
+                Position = Convert.ToInt32(data[3]),
+                Resistance = data[4],
+                Capacitance = data[5],
+            };
+            
+            Task.Run(() => stateHub.Clients.All.SendAsync("state", response)).Wait();
         }
 
         /// <summary>
