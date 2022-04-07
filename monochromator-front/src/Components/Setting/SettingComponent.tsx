@@ -8,7 +8,6 @@ import {
     DialogContentText,
     DialogTitle, TextField,
 } from "@mui/material";
-import {useDispatch} from "react-redux";
 
 export interface ISettingComponent {
     closeSetting: () => void
@@ -62,6 +61,7 @@ export default function SettingComponent({closeSetting}: ISettingComponent) {
     useEffect(() => {
         localStorage.setItem(settingFuncStorageConst, JSON.stringify(settingComponentState))
     }, [settingComponentState])
+
     return (
         <div className="setting">
             <DialogTitle>Настройки математических преобразований</DialogTitle>

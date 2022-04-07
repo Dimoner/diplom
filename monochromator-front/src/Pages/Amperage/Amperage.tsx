@@ -47,6 +47,8 @@ export default function Amperage() {
 
     const [dima, setDima] = useState<string>("");
 
+    const [isRange, setIsRange] = useState<boolean>(false);
+
     useEffect(() => {
         hubConnection.current.start().then(a => {
             console.log(a)
@@ -71,6 +73,8 @@ export default function Amperage() {
         else {
             setStateAmperage({...defaultValue, alignment: stateAmperage.alignment})
         }
+
+        setIsRange(stateAmperage.alignment === "range");
     }, [stateAmperage.alignment]);
 
     const endMeasureAction = (prev: IAmperageState, message: IMeasureElemMqttResponse) => {
@@ -148,7 +152,7 @@ export default function Amperage() {
                />
             </div>
             {
-                stateAmperage.alignment === "range"
+                isRange
                     ? <AmperageRange
                         measureList={stateAmperage.measureList}
                         measureAdditionInfo={stateAmperage.measureAdditionInfo}
