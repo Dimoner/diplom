@@ -101,12 +101,12 @@ namespace AppServer.Domains.MqttResponse
             foreach (var result in payloadResult)
             {
                 // ["ERR", "{}"], ["STAT", "{}"]
-                if (result[0] == "ERR")
+                if (result[0] == DomainValueConst.ErrorText)
                 {
                     commandMqttResponse.ErrorText = result[1];
                 }
 
-                if (result[0] == "STAT")
+                if (result[0] == DomainValueConst.IsSuccess)
                 {
                     commandMqttResponse.IsSuccess = result[1] == "1";
                 }

@@ -38,7 +38,7 @@
         /// <summary>
         /// Полная остановка измерения
         /// </summary>
-        Stop = 6,
+        Stop = 7,
     }
     
     /// <summary>

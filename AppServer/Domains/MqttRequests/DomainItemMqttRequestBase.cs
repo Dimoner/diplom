@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using AppServer.Controllers.Dto.Requests.Interfaces;
 using AppServer.Domains.MqttRequests.Interfaces;
 
 namespace AppServer.Domains.MqttRequests
@@ -11,17 +9,23 @@ namespace AppServer.Domains.MqttRequests
     /// Формируем запрос проверки
     /// _{int}_{int} - ключ запроса - должен быть отправлен обратно
     /// 
-    /// DateTime_1_0 - проверка состояния
-    /// 30 + 4 + 4 + 2 + 4 + 4+ 6 + 4 + 7 + 4
-    /// DateTime_2_0*DIR={1-часовая/2-против}-WAY={нм} - смена позиции
+    /// _1_0* - проверка состояния
     /// 
-    /// DateTime_3_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм} - измерение тока на интервале
+    /// _2_0*DIR={1-часовая/2-против}-WAY={нм} - смена позиции
     /// 
-    /// DateTime_3_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY} - измерение тока в точке от времени
+    /// _3_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм} - измерение тока на интервале
+    /// 
+    /// _3_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY}-FREQ={Частота измерения в сек} - измерение тока в точке от времени
     ///
-    /// DateTime_4_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм} - измерение счетного режима на интервале
+    /// _4_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм} - измерение счетного режима на интервале
     /// 
-    /// DateTime_4_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY} - измерение счетного режима в точке от времени
+    /// _4_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY}-FREQ={Частота измерения в сек} - измерение счетного режима в точке от времени
+    ///
+    /// _5_0* - Запуск после паузы
+    ///
+    /// _6_0* - Временная остановка измерения
+    ///
+    /// _7_0* - Полная остановка измерения
     /// </summary>
     public abstract class DomainItemMqttRequestBase<T> : IDomainItemMqttRequestBase
     {
@@ -54,14 +58,9 @@ namespace AppServer.Domains.MqttRequests
                 values.Add(DomainValueConst.Id, measureId);
             }
            
-            var firstItem = false;
+            currentRequest.Append('*');
             foreach (var value in values)
             {
-                if (!firstItem)
-                {
-                    currentRequest.Append('*');
-                    firstItem = true;
-                }
                 currentRequest.Append($"{value.Key}={value.Value}-");
             }
 
