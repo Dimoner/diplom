@@ -52,7 +52,7 @@ const replaceFunc = (value: string) => value.replace("abs", "Math.abs")
 export const useSettingFuncAction = (type: string, value: number): number => {
     const funcStore = defaultValueSettingComponentStateFunc();
     const currentFormat = replaceFunc(type === "amperage" ? funcStore.amperageFunc : funcStore.tickFunc).replace("x", value.toString())
-    return Number(Number(eval(currentFormat)))
+    return Number(eval(currentFormat))
 }
 
 export default function SettingComponent({closeSetting}: ISettingComponent) {

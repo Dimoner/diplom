@@ -1,0 +1,8 @@
+CParser.c:9:8:receiveSymbol	8	static
+CParser.c:20:8:checkStartOfMessage	4	static
+CParser.c:32:8:receiveMessage	16	static
+CParser.c:51:8:parseMessage	16	static
+CParser.c:79:8:controlLED	24	static
+CParser.c:111:8:controlFunction	8	static
+CParser.c:164:8:transmitMessage	16	static
+CParser.c:178:9:getMessageLength	8	static
