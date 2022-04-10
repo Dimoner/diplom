@@ -119,12 +119,12 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "Helpers/RequestParser.c",
+			"path" : "Helpers/RequestResponseParser.c",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
-			"path" : "Helpers/RequestParser.h",
+			"path" : "Helpers/RequestResponseParser.h",
 			"sourceGroupIndex" : 1
 		},
 		{

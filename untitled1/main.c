@@ -1,4 +1,4 @@
-#include "Helpers/RequestParser.h"
+#include "Helpers/RequestResponseParser.h"
 
 /// <summary>
 /// 10 милли секунде минимальное время
@@ -7,15 +7,15 @@
 ///
 /// 1_0* - проверка состояния
 ///
-/// 2_0*DIR={1-часовая/2-против}-WAY={нм} - смена позиции
+/// 2_0*DIR={1-часовая/2-против}-WAY={нм}-ID={int32} - смена позиции
 ///
-/// 3_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм} - измерение тока на интервале
+/// 3_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм}-ID={int32} - измерение тока на интервале
 ///
-/// 3_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY} - измерение тока в точке от времени
+/// 3_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY}-ID={int32} - измерение тока в точке от времени
 ///
-/// 4_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм} - измерение счетного режима на интервале
+/// 4_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм}-ID={int32} - измерение счетного режима на интервале
 ///
-/// 4_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY} - измерение счетного режима в точке от времени
+/// 4_2*DELAY={сек, время 1 измерения}-NUM={кол-во измерений за 1 DELAY}-ID={int32} - измерение счетного режима в точке от времени
 ///
 /// 5_0* - Запуск после паузы
 ///
@@ -25,54 +25,56 @@
 /// </summary>
 
 int main() {
+    struct ResponseMeasureStruct test = { 1, 2.1, 3 };
+    SendResponseMeasure(test);
     //char months[] = "2_0*DIR=0-WAY=1111";
-    char months[] = "3_1*DIR=1-WAY=100.1-STEP=100.2-COUNT=13";
-    struct TypeStruct actionType = getTypeStruct(months);
-    char* payload = getPayload(months);
-
-    if (isCheckState(actionType)){
-        return 0;
-    }
-
-    if (isChangePosition(actionType)){
-        struct ChangePositionStruct changePositionStruct = getChangePositionStruct(payload);
-        return 0;
-    }
-
-    if (isDetectAmperageRange(actionType)){
-        struct DetectAmperageRangeStruct detectAmperageRangeStruct = getDetectAmperageRangeStruct(payload);
-        return 0;
-    }
-
-    if (isDetectAmperageTime(actionType)){
-
-        return 0;
-    }
-
-    if (isDetectTickRange(actionType)){
-
-        return 0;
-    }
-
-    if (isDetectTickTime(actionType)){
-
-        return 0;
-    }
-
-    if (isContinueMeasure(actionType)){
-
-        return 0;
-    }
-
-    if (isPauseMeasure(actionType)){
-
-        return 0;
-    }
-
-    if (isStopMeasure(actionType)){
-
-        return 0;
-    }
+//    char months[] = "3_1*DIR=1-WAY=100.1-STEP=100.2-COUNT=13";
+//    struct TypeStruct actionType = getTypeStruct(months);
+//    char* payload = getPayload(months);
+//
+//    if (isCheckState(actionType)){
+//        return 0;
+//    }
+//
+//    if (isChangePosition(actionType)){
+//        struct ChangePositionStruct changePositionStruct = getChangePositionStruct(payload);
+//        return 0;
+//    }
+//
+//    if (isDetectAmperageRange(actionType)){
+//        struct DetectAmperageRangeStruct detectAmperageRangeStruct = getDetectAmperageRangeStruct(payload);
+//        return 0;
+//    }
+//
+//    if (isDetectAmperageTime(actionType)){
+//
+//        return 0;
+//    }
+//
+//    if (isDetectTickRange(actionType)){
+//
+//        return 0;
+//    }
+//
+//    if (isDetectTickTime(actionType)){
+//
+//        return 0;
+//    }
+//
+//    if (isContinueMeasure(actionType)){
+//
+//        return 0;
+//    }
+//
+//    if (isPauseMeasure(actionType)){
+//
+//        return 0;
+//    }
+//
+//    if (isStopMeasure(actionType)){
+//
+//        return 0;
+//    }
     return 0;
 }
 

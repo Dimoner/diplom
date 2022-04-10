@@ -1,5 +1,6 @@
 #include <string.h>
-#include "RequestParser.h"
+#include <stdio.h>
+#include "RequestResponseParser.h"
 
 uint16_t str_to_uint16(const char *str) {
     char *end;
@@ -68,6 +69,13 @@ struct ChangePositionStruct getChangePositionStruct(char requestPayload[]){
     char * param = strtok(requestPayload, "-=");
     while( param != NULL ) {
 
+        if (strstr (param,"ID") != NULL){
+            param = strtok(NULL, "-=");
+            dima.id = str_to_uint16(param);
+            param = strtok(NULL, "-=");
+            continue;
+        }
+
         if (strstr (param,"DIR") != NULL){
             param = strtok(NULL, "-=");
             dima.dir = strstr (param,"1") != NULL;
@@ -98,6 +106,13 @@ struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayloa
     char * param = strtok(requestPayload, "-=");
     while( param != NULL ) {
 
+        if (strstr (param,"ID") != NULL){
+            param = strtok(NULL, "-=");
+            dima.id = str_to_uint16(param);
+            param = strtok(NULL, "-=");
+            continue;
+        }
+
         if (strstr (param,"DIR") != NULL){
             param = strtok(NULL, "-=");
             dima.dir = strstr (param,"1") != NULL;
@@ -123,8 +138,7 @@ struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayloa
 
         if (strstr (param,"COUNT") != NULL){
             param = strtok(NULL, "-=");
-            float ftemp = str_to_uint16(param);
-            dima.count = ftemp;
+            dima.count = str_to_uint16(param);
             param = strtok(NULL, "-=");
             continue;
         }
@@ -134,6 +148,40 @@ struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayloa
 
 
     return dima;
+}
+
+
+/// Ответ сервера ----------------------
+
+// отправляем команду об измерении
+void SendResponseMeasure(struct ResponseMeasureStruct dto){
+    int idLength = snprintf( NULL, 0, "%d", dto.id );
+    int xLength = snprintf( NULL, 0, "%.2f", dto.x );
+    int yLength = snprintf( NULL, 0, "%.2f", dto.y );
+
+    char resultState[idLength + xLength + yLength + 4];
+
+    sprintf(resultState, "M_%d-%.2f-%.2f", dto.id, dto.x, dto.y);
+
+   // пишем ответ в uart
+}
+
+// отправляем команду об остановке измерения окончательной
+void SendResponseStop(struct ResponseMeasureStruct dto){
+    int idLength = snprintf( NULL, 0, "%d", dto.id );
+    char resultState[idLength + 7];
+
+    sprintf(resultState, "M_STOP_%d", dto.id);
+
+    // пишем ответ в uart
+}
+
+void SendResponseResultAction(struct ResponseResultActionStruct dto){
+
+}
+
+void SendResponseStateStruct(struct ResponseStateStruct dto){
+
 }
 
 

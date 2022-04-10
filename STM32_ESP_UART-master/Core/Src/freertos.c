@@ -206,8 +206,9 @@ void StartTaskPMT(void *argument) {
 				}
 			} while (HAL_GetTick() - currentTime < 1000);
 			sprintf(PMT_State_, "PMT_ADC=%d%c", ADC_value, '\0');
-			if (HAL_UART_Transmit(&huart1, (uint8_t*) &PMT_State_,
-					strlen(PMT_State_), 1000) == HAL_OK) {
+
+			if (HAL_UART_Transmit(&huart1, (uint8_t*) &PMT_State_, strlen(PMT_State_), 1000) == HAL_OK) {
+
 			}
 		} else if (TIM_StartFlag_) {
 			HAL_TIM_Base_Start(&htim2);

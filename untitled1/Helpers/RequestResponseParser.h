@@ -16,3 +16,10 @@ struct ChangePositionStruct getChangePositionStruct(char requestPayload[]);
 
 /// получение состояния измерения тока на диапозоне длины волны
 struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayload[]);
+
+
+/// Ответ сервера -----------------
+void SendResponseMeasure(struct ResponseMeasureStruct dto);
+void SendResponseStop(struct ResponseMeasureStruct dto);
+void SendResponseResultAction(struct ResponseResultActionStruct dto);
+void SendResponseStateStruct(struct ResponseStateStruct dto);

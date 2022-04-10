@@ -3,4 +3,9 @@ project(untitled1 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(untitled1 main.c Helpers/RequestParser.c Helpers/RequestParser.h Domains/TypeStruct.c Domains/TypeStruct.h)
+add_executable(
+        untitled1
+        main.c
+        Helpers/RequestResponseParser.c Helpers/RequestResponseParser.h
+        Domains/TypeStruct.c Domains/TypeStruct.h
+)
