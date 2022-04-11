@@ -41,7 +41,8 @@ export const defaultValueSettingComponentStateFunc = (): ISettingComponentState 
     return {...defaultValueSettingComponentState}
 }
 
-const replaceFunc = (value: string) => value.replace("abs", "Math.abs")
+const replaceFunc = (value: string) => value
+    .replace("abs", "Math.abs")
     .replace("sin", "Math.sin")
     .replace("cos", "Math.cos")
     .replace("tan", "Math.tan")

@@ -17,7 +17,7 @@ export class HttpServiceHelper {
             .then(blob => {
                 let a = document.createElement("a");
                 a.href = URL.createObjectURL(blob);
-                a.download = `${fileName}.txt`;
+                a.download = `${fileName.trim()}.txt`;
                 a.click();
             })
             .catch(() => alert('oh no!'));
