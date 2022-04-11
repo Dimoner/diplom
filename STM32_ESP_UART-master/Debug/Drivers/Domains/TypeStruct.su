@@ -1,0 +1,9 @@
+TypeStruct.c:3:6:isCheckState	16	static
+TypeStruct.c:7:6:isChangePosition	16	static
+TypeStruct.c:11:6:isDetectAmperageRange	16	static
+TypeStruct.c:15:6:isDetectAmperageTime	16	static
+TypeStruct.c:19:6:isDetectTickRange	16	static
+TypeStruct.c:23:6:isDetectTickTime	16	static
+TypeStruct.c:27:6:isContinueMeasure	16	static
+TypeStruct.c:31:6:isPauseMeasure	16	static
+TypeStruct.c:35:6:isStopMeasure	16	static

@@ -1,0 +1,6 @@
+RequestResponseParser.c:4:10:str_to_uint16	32	static
+RequestResponseParser.c:12:7:stof	40	static
+RequestResponseParser.c:32:19:getTypeStruct	40	static
+RequestResponseParser.c:75:7:getPayload	24	static
+RequestResponseParser.c:82:29:getChangePositionStruct	32	static
+RequestResponseParser.c:119:34:getDetectAmperageRangeStruct	56	static

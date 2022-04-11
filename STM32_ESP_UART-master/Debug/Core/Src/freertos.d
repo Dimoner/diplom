@@ -37,11 +37,14 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- C:/STM32/STM32_Projects/ESP-01_UART/Drivers/ESP_UART_Parser/CParser.h \
+ C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/ESP_UART_Parser/CParser.h \
  ../Core/Inc/usart.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
  ../Core/Inc/adc.h \
+ C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/Domains/TypeStruct.h \
+ C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/HelpersLogic/RequestResponseParser.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
- ../Core/Inc/tim.h
+ ../Core/Inc/tim.h \
+ C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/UartDto/UartDtoService.h
 
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 
@@ -121,7 +124,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 
-C:/STM32/STM32_Projects/ESP-01_UART/Drivers/ESP_UART_Parser/CParser.h:
+C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/ESP_UART_Parser/CParser.h:
 
 ../Core/Inc/usart.h:
 
@@ -131,6 +134,12 @@ C:/STM32/STM32_Projects/ESP-01_UART/Drivers/ESP_UART_Parser/CParser.h:
 
 ../Core/Inc/adc.h:
 
+C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/Domains/TypeStruct.h:
+
+C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/HelpersLogic/RequestResponseParser.h:
+
 ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
 
 ../Core/Inc/tim.h:
+
+C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/UartDto/UartDtoService.h:

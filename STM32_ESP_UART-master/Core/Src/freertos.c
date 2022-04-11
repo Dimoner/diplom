@@ -2,10 +2,17 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-
 #include "CParser.h"
+#include "RequestResponseParser.h"
+#include "TypeStruct.h"
 #include "queue.h"
 #include "tim.h"
+#include "UartDtoService.h"
+/*
+ * Глобальное состояние устройства в данный момент
+ */
+struct GlobalStateStruct globalState;
+
 
 osThreadId_t myTaskUARTHandle;
 const osThreadAttr_t myTaskUART_attributes = { .name = "myTaskUART",
@@ -33,26 +40,6 @@ const osMessageQueueAttr_t myQueue02_attributes = { .name = "myQueue02" };
 osSemaphoreId_t myBinarySem01Handle;
 const osSemaphoreAttr_t myBinarySem01_attributes = { .name = "myBinarySem01" };
 
-
-/*
- * Эта функция нужна для отладки кода. При вызове
- * отправляет по UART сообщение об ошибке с путем к файлу
- * и номером строки, где данная функция была вызвана
- */
-void Error_Message(uint8_t *file, uint32_t line) {
-	char buf[200] = { 0 };
-	sprintf(buf, "\r Exception: Wrong parameters value: file %s on line %d\r\n", file, (int) line);
-	while (HAL_UART_Transmit(&huart1, (uint8_t*) buf, strlen(buf),
-			10 * strlen(buf)) != HAL_OK)
-		;
-	int tick = HAL_GetTick();
-	while ((HAL_GetTick() - tick) < 5000) {
-		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		HAL_Delay(100);
-	}
-	HAL_NVIC_SystemReset();
-}
-/* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
 void StartTaskUART(void *argument);
@@ -86,36 +73,32 @@ void MX_FREERTOS_Init(void) {
 	myTaskPMTHandle = osThreadNew(StartTaskPMT, NULL, &myTaskPMT_attributes);
 }
 
-/* USER CODE BEGIN Header_StartTaskUART */
-/**
- * @brief Function implementing the myTaskUART thread.
- * @param argument: Not used
- * @retval None
+/*
+ * Задача для чтения сообщения из UART
  */
-/* USER CODE END Header_StartTaskUART */
 void StartTaskUART(void *argument) {
-	/* USER CODE BEGIN StartTaskUART */
-
-	/* Infinite loop */
 	for (;;) {
-		if (receiveSymbol() == OK) {
-			if (checkStartOfMessage() == OK) {
-				if (receiveMessage() == OK) {
-					if (parseMessage() == OK) {
-						if (controlFunction() == OK) {
+		// 1 - получили символ и проверии, что это стартовый
+		bool isStartReadUart = receiveSymbol() == OK && checkStartOfMessage() == OK;
+		if (!isStartReadUart) {
+			SentError((uint8_t*) __FILE__, __LINE__);
+			continue;
+		}
 
-						}
-					} else
-						Error_Message((uint8_t*) __FILE__, __LINE__);
-				} else
-					Error_Message((uint8_t*) __FILE__, __LINE__);
-			} else
-				Error_Message((uint8_t*) __FILE__, __LINE__);
-		} else
-			Error_Message((uint8_t*) __FILE__, __LINE__);
+		// 2 - читаем остальную часть строки в receiveMessageText
+		char receiveMessageText[200];
+		bool receiveMessageResult = receiveMessage(receiveMessageText) == OK;
+		if (!receiveMessageResult) {
+			SentError((uint8_t*) __FILE__, __LINE__);
+			continue;
+		}
+
+		// 3 - записываем новое глобальное состояние систему
+		struct GlobalStateStruct parseMessageResult = getNewGlobalState(receiveMessageText);
+		globalState = parseMessageResult;
+
 		osDelay(1);
 	}
-	/* USER CODE END StartTaskUART */
 }
 
 /* USER CODE BEGIN Header_StartTaskMOTOR */
@@ -126,52 +109,53 @@ void StartTaskUART(void *argument) {
  */
 /* USER CODE END Header_StartTaskMOTOR */
 void StartTaskMOTOR(void *argument) {
-	/* USER CODE BEGIN StartTaskMOTOR */
-	MOTOR_StartFlag_ = 0;
-	int16_t diff = 0;
-	/* Infinite loop */
 	for (;;) {
-		/*
-		 * В зависимости от значения принятого угла относительно
-		 * текущего выставляем пин DIRECTION, подаем питание на пин ENABLE
-		 * и подаем импульсы на пин STEP для вращения
-		 */
-		if (MOTOR_StartFlag_) {
-			diff = newMotorRotationAngle_ - oldMotorRotationAngle_;
-			if (diff != 0 && abs(diff) != 200) {
-				if (diff < -100) {
-					diff += 200;
-					HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_RESET);
-					osDelayUntil(2);
-				} else if (diff > 100) {
-					diff = 200 - diff;
-					HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_SET);
-					osDelayUntil(2);
-				} else if (diff > 0 && diff <= 100) {
-					HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_SET);
-					osDelayUntil(2);
-				} else if (diff < 0 && diff >= -100) {
-					HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_RESET);
-					osDelayUntil(2);
-				}
-				for (uint8_t i = 0; i < diff; ++i) {
-					HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_SET);
-					osDelayUntil(2);
-					HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_RESET);
-					osDelayUntil(2);
-				}
-				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_RESET);
-				osDelayUntil(2);
-				/*
-				 * Сохраняем значение нового угла поворота
-				 */
-				oldMotorRotationAngle_ = newMotorRotationAngle_;
-				MOTOR_StartFlag_ = 0;
+		// 1 - дожидаемся пока придем команда для изменения положения шагового двигателя
+		if(isChangePosition(globalState.typeStruct) && !globalState.isExistActiveAction){
+			globalState.isExistActiveAction = true;
+
+			// 2 - устанавливаем вращение
+			// true - часовая / false - против часовой
+			if(globalState.changePositionStruct.dir){
+				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_SET);
+			} else {
+				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_SET);
 			}
+
+			// 3 - определяем кол-во шим сигналов для вращения
+			uint32_t totalRate = globalState.changePositionStruct.way * 2000;
+
+			// 4 - вращаем щаговый двигатель
+			for (uint32_t i = 0; i < totalRate; i++) {
+				HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_SET);
+				osDelay(4);
+				//HAL_Delay(1);
+				/*for (j = 0; j < 2500; j++) {
+
+				}*/
+				HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_RESET);
+				osDelay(4);
+				//HAL_Delay(1);
+				/*for (j = 0; j < 5000; j++) {
+
+				}*/
+			}
+
+			// 5 - отправляем состояние ответа по UART---------------
+			SentResultActionResponse(globalState.typeStruct, "", 1);
+
+			// ------------------------------------------------------
+
+			// 6 - сбрасываем команду -------------------------------
+			struct TypeStruct resetActionType;
+			struct ChangePositionStruct resetChangePosition;
+			globalState.isExistActiveAction = false;
+			globalState.typeStruct = resetActionType;
+			globalState.changePositionStruct = resetChangePosition;
+			// ------------------------------------------------------
 		}
 		osDelay(1);
 	}
-	/* USER CODE END StartTaskMOTOR */
 }
 
 /* USER CODE BEGIN Header_StartTaskPMT */

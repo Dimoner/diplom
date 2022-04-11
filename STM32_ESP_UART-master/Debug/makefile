@@ -13,8 +13,11 @@ RM := rm -rf
 -include Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
+-include Drivers/UartDto/subdir.mk
 -include Drivers/STM32F1xx_HAL_Driver/Src/subdir.mk
+-include Drivers/HelpersLogic/subdir.mk
 -include Drivers/ESP_UART_Parser/subdir.mk
+-include Drivers/Domains/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
 -include subdir.mk
@@ -81,8 +84,8 @@ all: main-build
 main-build: ESP-01_UART.elf secondary-outputs
 
 # Tool invocations
-ESP-01_UART.elf: $(OBJS) $(USER_OBJS) C:\STM32\STM32_Projects\ESP-01_UART\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "ESP-01_UART.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\STM32\STM32_Projects\ESP-01_UART\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ESP-01_UART.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+ESP-01_UART.elf: $(OBJS) $(USER_OBJS) C:\Users\Dima\Documents\diplom\STM32_ESP_UART-master\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "ESP-01_UART.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Dima\Documents\diplom\STM32_ESP_UART-master\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ESP-01_UART.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

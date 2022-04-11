@@ -1,5 +1,3 @@
-#include <string.h>
-#include <stdio.h>
 #include "RequestResponseParser.h"
 
 uint16_t str_to_uint16(const char *str) {
@@ -12,7 +10,7 @@ uint16_t str_to_uint16(const char *str) {
     return res;
 }
 
-struct TypeStruct getTypeStruct(char* receiveBuf){
+struct TypeStruct getTypeStruct(char receiveBuf[200]){
     char type[2];
     uint8_t typeDataIndex = 0;
 
@@ -47,7 +45,7 @@ struct TypeStruct getTypeStruct(char* receiveBuf){
         }
     }
 
-    struct TypeStruct tom = {"", ""};
+    struct TypeStruct tom;
     tom.type[0] = type[1];
     tom.type[1] = type[0];
     tom.subType[0] = subType[1];
@@ -162,8 +160,6 @@ void SendResponseMeasure(struct ResponseMeasureStruct dto){
     char resultState[idLength + xLength + yLength + 4];
 
     sprintf(resultState, "M_%d-%.2f-%.2f", dto.id, dto.x, dto.y);
-
-   // пишем ответ в uart
 }
 
 // отправляем команду об остановке измерения окончательной
@@ -177,7 +173,10 @@ void SendResponseStop(struct ResponseMeasureStruct dto){
 }
 
 void SendResponseResultAction(struct ResponseResultActionStruct dto){
+    char resultState[19];
+    size_t dd = strlen(dto.typeStruct.type);
 
+    sprintf(resultState, "R_%s_%s*ERR=-STAT=%d", dto.typeStruct.type, dto.typeStruct.subType, dto.stat);
 }
 
 void SendResponseStateStruct(struct ResponseStateStruct dto){

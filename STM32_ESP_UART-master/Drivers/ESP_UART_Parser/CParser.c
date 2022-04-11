@@ -1,8 +1,7 @@
 #include "CParser.h"
 
 Status receiveSymbol() {
-	if (HAL_UART_Receive(&huart1, (uint8_t*) &receivedSymbol_, 1,
-	HAL_MAX_DELAY) == HAL_OK)
+	if (HAL_UART_Receive(&huart1, (uint8_t*) &receivedSymbol_, 1, HAL_MAX_DELAY) == HAL_OK)
 		return OK;
 	else
 		return ERR;
@@ -23,16 +22,16 @@ Status checkStartOfMessage() {
  * в конце ставим символ конца строки и возвращаем OK
  * Если произошла ошибка при чтении, возвращаем ERR
  */
-Status receiveMessage() {
+Status receiveMessage(char* outMessage) {
 	uint8_t i = 0;
 	do {
 		if (receiveSymbol() == OK) {
-			receiveBuf_[i] = receivedSymbol_;
+			outMessage[i] = receivedSymbol_;
 			i++;
 		} else
 			return ERR;
 	} while (receivedSymbol_ != ';');
-	receiveBuf_[i] = '\0';
+	outMessage[i] = '\0';
 	messageLength_ = i;
 	return OK;
 }
@@ -42,65 +41,54 @@ Status receiveMessage() {
  * и управляющую команду, раскидываем данные по
  * соответствующим полям
  */
-Status parseMessage() {
-	uint8_t j = 0;
-	for (uint8_t k = 0; k < 10; k++) {
-		date_[j] = receiveBuf_[k];
-		j++;
+struct GlobalStateStruct getNewGlobalState(char receiveMessageText[200]) {
+	struct GlobalStateStruct newGlobalState;
+
+	struct TypeStruct actionType = getTypeStruct(receiveMessageText);
+	newGlobalState.typeStruct = actionType;
+	char* payload = getPayload(receiveMessageText);
+
+	if (isCheckState(actionType)){
+	     return newGlobalState;
 	}
-	date_[10] = '\0';
-	j = 0;
-	for (uint8_t k = 11; k < 19; k++) {
-		time_[j] = receiveBuf_[k];
-		j++;
+
+	if (isChangePosition(actionType)){
+	     newGlobalState.changePositionStruct = getChangePositionStruct(payload);
+	     return newGlobalState;
 	}
-	time_[8] = '\0';
-	j = 33;
-	uint8_t i = 0;
-	while (receiveBuf_[j] != ';') {
-		payload_[i] = receiveBuf_[j];
-		i++;
-		j++;
+
+	if (isDetectAmperageRange(actionType)){
+	     newGlobalState.detectAmperageRangeStruct = getDetectAmperageRangeStruct(payload);
+	     return newGlobalState;
 	}
-	payload_[i] = '\0';
-	return OK;
+
+	if (isDetectAmperageTime(actionType)){
+	   return newGlobalState;
+	}
+
+	if (isDetectTickRange(actionType)){
+	    return newGlobalState;
+	}
+
+	if (isDetectTickTime(actionType)){
+	   return newGlobalState;
+	}
+
+	if (isContinueMeasure(actionType)){
+	   return newGlobalState;
+	}
+
+	if (isPauseMeasure(actionType)){
+	   return newGlobalState;
+	}
+
+	if (isStopMeasure(actionType)){
+	   return newGlobalState;
+	}
+
+	return newGlobalState;
 }
 
-/*
- * В зависимости от полученной команды меняем состояние светодиода
- * и записываем его состояние для дальнейшей отправки по UART
- */
-Status controlLED() {
-	if (!strcmp(payload_, "LED1:1\0"))               //Включение 1-го светодиода
-			{
-		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-		sprintf(LED_State_, "LED1 State: ON%c", '\0');
-	} else if (!strcmp(payload_, "LED1:0\0"))       //Выключение 1-го светодиода
-			{
-		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-		sprintf(LED_State_, "LED1 State: OFF%c", '\0');
-	} else if (!strcmp(payload_, "LED2:1\0"))        //Включение 2-го светодиода
-			{
-		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-		sprintf(LED_State_, "LED2 State: ON%c", '\0');
-	} else if (!strcmp(payload_, "LED2:0\0"))       //Выключение 2-го светодиода
-			{
-		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
-		sprintf(LED_State_, "LED2 State: OFF%c", '\0');
-	} else if (!strcmp(payload_, "LED?\0"))       //Запрос состояния светодиодов
-			{
-		uint8_t led1state = (uint8_t) HAL_GPIO_ReadPin(LED1_GPIO_Port,
-		LED1_Pin);
-		uint8_t led2state = (uint8_t) HAL_GPIO_ReadPin(LED2_GPIO_Port,
-		LED2_Pin);
-		sprintf(LED_State_, "LED1:%d, LED2:%d%c", led1state, led2state, '\0');
-		if (HAL_UART_Transmit(&huart1, (uint8_t*) &LED_State_,
-				strlen(LED_State_), 1000) == HAL_OK) {
-		} else
-			return ERR;
-	}
-	return OK;
-}
 
 Status controlFunction() {
 

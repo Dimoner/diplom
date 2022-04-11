@@ -25,56 +25,60 @@
 /// </summary>
 
 int main() {
-    struct ResponseMeasureStruct test = { 1, 2.1, 3 };
-    SendResponseMeasure(test);
     //char months[] = "2_0*DIR=0-WAY=1111";
-//    char months[] = "3_1*DIR=1-WAY=100.1-STEP=100.2-COUNT=13";
-//    struct TypeStruct actionType = getTypeStruct(months);
-//    char* payload = getPayload(months);
-//
-//    if (isCheckState(actionType)){
-//        return 0;
-//    }
-//
-//    if (isChangePosition(actionType)){
-//        struct ChangePositionStruct changePositionStruct = getChangePositionStruct(payload);
-//        return 0;
-//    }
-//
-//    if (isDetectAmperageRange(actionType)){
-//        struct DetectAmperageRangeStruct detectAmperageRangeStruct = getDetectAmperageRangeStruct(payload);
-//        return 0;
-//    }
-//
-//    if (isDetectAmperageTime(actionType)){
-//
-//        return 0;
-//    }
-//
-//    if (isDetectTickRange(actionType)){
-//
-//        return 0;
-//    }
-//
-//    if (isDetectTickTime(actionType)){
-//
-//        return 0;
-//    }
-//
-//    if (isContinueMeasure(actionType)){
-//
-//        return 0;
-//    }
-//
-//    if (isPauseMeasure(actionType)){
-//
-//        return 0;
-//    }
-//
-//    if (isStopMeasure(actionType)){
-//
-//        return 0;
-//    }
+    char months[] = "3_1*DIR=1-WAY=100.1-STEP=100.2-COUNT=13";
+    struct TypeStruct actionType = getTypeStruct(months);
+
+    struct ResponseResultActionStruct dto = { actionType , "dimaaaaaaaaa", true};
+    char result[200];
+    SendResponseResultAction(dto);
+
+
+    char* payload = getPayload(months);
+
+    if (isCheckState(actionType)){
+        return 0;
+    }
+
+    if (isChangePosition(actionType)){
+        struct ChangePositionStruct changePositionStruct = getChangePositionStruct(payload);
+        return 0;
+    }
+
+    if (isDetectAmperageRange(actionType)){
+        struct DetectAmperageRangeStruct detectAmperageRangeStruct = getDetectAmperageRangeStruct(payload);
+        return 0;
+    }
+
+    if (isDetectAmperageTime(actionType)){
+
+        return 0;
+    }
+
+    if (isDetectTickRange(actionType)){
+
+        return 0;
+    }
+
+    if (isDetectTickTime(actionType)){
+
+        return 0;
+    }
+
+    if (isContinueMeasure(actionType)){
+
+        return 0;
+    }
+
+    if (isPauseMeasure(actionType)){
+
+        return 0;
+    }
+
+    if (isStopMeasure(actionType)){
+
+        return 0;
+    }
     return 0;
 }
 

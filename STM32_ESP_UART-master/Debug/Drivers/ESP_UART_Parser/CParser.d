@@ -28,7 +28,9 @@ Drivers/ESP_UART_Parser/CParser.o: ../Drivers/ESP_UART_Parser/CParser.c \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Core/Inc/usart.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
- ../Core/Inc/adc.h
+ ../Core/Inc/adc.h \
+ C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/Domains/TypeStruct.h \
+ C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/HelpersLogic/RequestResponseParser.h
 
 ../Drivers/ESP_UART_Parser/CParser.h:
 
@@ -95,3 +97,7 @@ Drivers/ESP_UART_Parser/CParser.o: ../Drivers/ESP_UART_Parser/CParser.c \
 ../Core/Inc/gpio.h:
 
 ../Core/Inc/adc.h:
+
+C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/Domains/TypeStruct.h:
+
+C:/Users/Dima/Documents/diplom/STM32_ESP_UART-master/Drivers/HelpersLogic/RequestResponseParser.h:

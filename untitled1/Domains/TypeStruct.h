@@ -70,7 +70,7 @@ struct DetectAmperageTimeStruct {
 
 /// измерение тока в точке от времени
 bool isDetectTickRange(struct TypeStruct dto);
-struct DetectTickRangeDetectTickRangeStruct {
+struct DetectTickRangeStruct {
     /// айди операции
     uint16_t id;
     /// направление
@@ -131,4 +131,12 @@ struct ResponseStateStruct {
     uint8_t Resistance;
     /// Емкость текущая на фэу
     uint8_t Capacitance;
+};
+
+/// глобальное состояние системы
+struct GlobalStateStruct {
+    /// тип выполняемой операции в данный момент
+    struct TypeStruct typeStruct;
+    /// идет ли какое-то действие сейчас
+    bool isExistActiveAction;
 };

@@ -1,8 +1,6 @@
-freertos.c:86:6:Error_Message	232	static
-freertos.c:113:6:vApplicationStackOverflowHook	16	static
-freertos.c:125:6:MX_FREERTOS_Init	8	static
-freertos.c:191:6:StartDefaultTask	16	static
-freertos.c:207:6:StartTaskUART	16	static
-freertos.c:239:6:StartTaskMOTOR	24	static
-freertos.c:295:6:StartTaskPMT	32	static
-freertos.c:339:6:HAL_TIM_PeriodElapsedCallback	24	static
+freertos.c:53:6:vApplicationStackOverflowHook	16	static
+freertos.c:64:6:MX_FREERTOS_Init	8	static
+freertos.c:79:6:StartTaskUART	304	static
+freertos.c:111:6:StartTaskMOTOR	40	static
+freertos.c:168:6:StartTaskPMT	32	static
+freertos.c:212:6:HAL_TIM_PeriodElapsedCallback	24	static

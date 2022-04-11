@@ -1,0 +1,5 @@
+UartDtoService.c:8:6:SentError	224	static
+UartDtoService.c:15:6:SentResultActionResponse	64	dynamic
+UartDtoService.c:37:6:SendResponseMeasure	88	dynamic
+UartDtoService.c:50:6:SendResponseStop	40	dynamic
+UartDtoService.c:65:6:SendResponseStateStruct	24	static

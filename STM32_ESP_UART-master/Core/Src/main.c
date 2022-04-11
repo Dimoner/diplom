@@ -19,19 +19,11 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
 
+  osKernelInitialize();
   // инициализация FreeTos
   MX_FREERTOS_Init();
-
   osKernelStart();
-
-
-  // нужно что бы программа не закончилась
-  while(1)
-  {
-
-  }
 }
-
 
 void SystemClock_Config(void)
 {
@@ -50,8 +42,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -72,13 +63,24 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   __disable_irq();
-  while(1)
+  while (1)
   {
   }
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
+/**
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+   ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
 }
-#endif
+#endif /* USE_FULL_ASSERT */
