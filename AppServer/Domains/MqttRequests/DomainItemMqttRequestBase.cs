@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using AppServer.Domains.MqttRequests.Interfaces;
 
@@ -50,8 +52,22 @@ namespace AppServer.Domains.MqttRequests
         /// <inheritdoc />
         public (string key, string message) CreateRequest(string measureId = null)
         {
-            var currentRequest = new StringBuilder(GetKey);
-            var key = currentRequest.ToString();
+            var currentKeyFilterResult = GetKey
+                .Split('_')
+                .Where(value => value != "")
+                .Select(charValue =>
+                {
+                    var newCharValue = charValue.ToString();
+                    if (newCharValue.Length == 1)
+                    {
+                        newCharValue = $"0{newCharValue}";
+                    }
+                    return newCharValue;
+                })
+                .ToArray();
+            var key = $"_{currentKeyFilterResult[0]}_{currentKeyFilterResult[1]}";
+            var currentRequest = new StringBuilder(key);
+            
             var values = GetMessageValue();
             if (!string.IsNullOrWhiteSpace(measureId))
             {
@@ -70,7 +86,7 @@ namespace AppServer.Domains.MqttRequests
                 currentRequestString = currentRequestString.Remove(currentRequestString.Length - 1);
             }
 
-            return (key, currentRequestString);
+            return (GetKey, currentRequestString);
         }
 
         /// <summary>
