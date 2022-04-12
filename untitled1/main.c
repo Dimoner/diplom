@@ -25,8 +25,8 @@
 /// </summary>
 
 int main() {
-    //char months[] = "2_0*DIR=0-WAY=1111";
-    char months[] = "3_1*DIR=1-WAY=100.1-STEP=100.2-COUNT=13";
+    //char months[] = "_2_0*DIR=0-WAY=1111";
+    char months[] = "_3_1*DIR=1-WAY=100.1-STEP=100.2-COUNT=13";
     struct TypeStruct actionType = getTypeStruct(months);
 
     struct ResponseResultActionStruct dto = { actionType , "dimaaaaaaaaa", true};

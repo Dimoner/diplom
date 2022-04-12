@@ -117,13 +117,13 @@ void StartTaskMOTOR(void *argument) {
 			// 2 - устанавливаем вращение
 			// true - часовая / false - против часовой
 			if(globalState.changePositionStruct.dir){
-				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_RESET);
 			} else {
 				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_SET);
 			}
 
 			// 3 - определяем кол-во шим сигналов для вращения
-			uint32_t totalRate = globalState.changePositionStruct.way * 2000;
+			uint32_t totalRate = globalState.changePositionStruct.way * 1000;
 
 			// 4 - вращаем щаговый двигатель
 			for (uint32_t i = 0; i < totalRate; i++) {

@@ -37,19 +37,15 @@ struct TypeStruct getTypeStruct(char receiveBuf[200]){
     uint8_t payloadDataIndex = 0;
 
     bool border = false;
-    for (int i = 0; i < strlen(receiveBuf); i++) {
+    // _0_0*
+    // пропускаем первую _, поэтому начинаем с int i = 1,
+    for (int i = 1; i < strlen(receiveBuf); i++) {
         if (receiveBuf[i] == '*'){
-            if(i != 5){
-                subType[1] = '0';
-            }
             break;
         }
 
         if (receiveBuf[i] == '_'){
             border = true;
-            if(i != 2){
-                type[1] = '0';
-            }
             continue;
         }
 
@@ -65,10 +61,10 @@ struct TypeStruct getTypeStruct(char receiveBuf[200]){
     }
 
     struct TypeStruct tom = {"", ""};
-    tom.type[0] = type[1];
-    tom.type[1] = type[0];
-    tom.subType[0] = subType[1];
-    tom.subType[1] = subType[0];
+    tom.type[0] = type[0];
+    tom.type[1] = type[1];
+    tom.subType[0] = subType[0];
+    tom.subType[1] = subType[1];
     return tom;
 }
 

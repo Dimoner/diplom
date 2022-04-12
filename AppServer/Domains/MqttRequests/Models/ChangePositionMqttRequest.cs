@@ -18,9 +18,9 @@ namespace AppServer.Domains.MqttRequests.Models
 
         /// <summary>
         /// По часовой или против вращение
-        ///  2 - против часовой, 1 - по часовой
+        /// 1 - увеличение нм/0 - уменьшение нм
         /// </summary>
-        private int _dir;
+        private bool _dir;
 
         /// <summary>
         /// Кол-во нм которые надо пройти
@@ -30,7 +30,7 @@ namespace AppServer.Domains.MqttRequests.Models
         public override void FromDtoApiRequest(ChangePositionRequest dto)
         {
             _way = Math.Abs(dto.StartPosition - dto.EndPosition);
-            _dir = dto.StartPosition > dto.EndPosition ? 2 : 1;
+            _dir = dto.StartPosition < dto.EndPosition;
         }
 
         /// <inheritdoc />
@@ -38,7 +38,7 @@ namespace AppServer.Domains.MqttRequests.Models
         {
             return new Dictionary<string, object>
             {
-                {DomainValueConst.Dir, _dir},
+                {DomainValueConst.Dir, _dir ? "1" : "0"},
                 {DomainValueConst.Way, _way},
             };
         }
