@@ -91,8 +91,16 @@ namespace AppServer.Domains.MqttResponse
             
             // ["_0_0", "ERR={}-STAT={}"]
             var values = payload.Split('*');
-            // "_0_0"
+            // "_00_00"
             var key = values[0];
+            var currentKeyFilterResult = key
+                .Split('_')
+                .Where(value => value != "")
+                .Select(charValue => Convert.ToInt32(charValue))
+                .ToArray();
+            // "_0_0"
+            key = $"_{currentKeyFilterResult[0]}_{currentKeyFilterResult[1]}";
+            
             // [["ERR", "{}"], ["STAT", "{}"]]
             var payloadResult = values[1].Split('-').Select(value => value.Split("=")).ToArray();
 
