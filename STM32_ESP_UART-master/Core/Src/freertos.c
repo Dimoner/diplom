@@ -101,6 +101,14 @@ void StartTaskUART(void *argument) {
 	}
 }
 
+// сколько всего шим сигналов
+uint32_t totalRate = 0;
+uint32_t currentRate = 0;
+// в каком сейчас состоянии пин
+bool isSetMotorPin = false;
+// сколько раз изменилось положение пина
+uint8_t countSetPin = 0;
+
 /* USER CODE BEGIN Header_StartTaskMOTOR */
 /**
  * @brief Function implementing the myTaskMotor thread.
@@ -123,36 +131,9 @@ void StartTaskMOTOR(void *argument) {
 			}
 
 			// 3 - определяем кол-во шим сигналов для вращения
-			uint32_t totalRate = globalState.changePositionStruct.way * 1000;
-
-			// 4 - вращаем щаговый двигатель
-			for (uint32_t i = 0; i < totalRate; i++) {
-				HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_SET);
-				osDelay(4);
-				//HAL_Delay(1);
-				/*for (j = 0; j < 2500; j++) {
-
-				}*/
-				HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_RESET);
-				osDelay(4);
-				//HAL_Delay(1);
-				/*for (j = 0; j < 5000; j++) {
-
-				}*/
-			}
-
-			// 5 - отправляем состояние ответа по UART---------------
-			SentResultActionResponse(globalState.typeStruct, "", 1);
-
-			// ------------------------------------------------------
-
-			// 6 - сбрасываем команду -------------------------------
-			struct TypeStruct resetActionType;
-			struct ChangePositionStruct resetChangePosition;
-			globalState.isExistActiveAction = false;
-			globalState.typeStruct = resetActionType;
-			globalState.changePositionStruct = resetChangePosition;
-			// ------------------------------------------------------
+			totalRate = globalState.changePositionStruct.way * 1000;
+			currentRate = globalState.changePositionStruct.way * 1000;
+			HAL_TIM_Base_Start_IT(&htim1);
 		}
 		osDelay(1);
 	}
@@ -208,9 +189,83 @@ void StartTaskPMT(void *argument) {
 	/* USER CODE END StartTaskPMT */
 }
 
+
+// начальная скорость
+uint32_t currentSpeed = 10000;
+// рубикон ускорения/замедления
+uint16_t changeSpeedLine = 6000;
+// шаг изменения скорости по нм
+uint8_t speedChangeStep = 100;
+// шаг изменения скорости по сигналу
+uint8_t speedChangeStepCount = 130;
+// счетчики увеличения скорости (вниз вверх)
+uint8_t speedChangeFactor = 0;
+uint8_t speedDownChangeFactor = 0;
+
 //Функция-обработчик прерываний таймеров
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+	 /* USER CODE BEGIN Callback 0 */
+	// логика вращения шаговым двигателем
+    if (htim->Instance == TIM1) {
+    	if(currentRate == 0){
+    		HAL_TIM_Base_Stop_IT(&htim1);
+			__HAL_TIM_SET_PRESCALER(&htim1, currentSpeed);
+
+    		// 5 - отправляем состояние ответа по UART---------------
+    		SentResultActionResponse(globalState.typeStruct, "", 1);
+
+    		// ------------------------------------------------------
+
+    		// 6 - сбрасываем команду -------------------------------
+    		struct TypeStruct resetActionType;
+    		struct ChangePositionStruct resetChangePosition;
+    		globalState.isExistActiveAction = false;
+    		globalState.typeStruct = resetActionType;
+    		globalState.changePositionStruct = resetChangePosition;
+    		// ------------------------------------------------------
+    		speedChangeFactor = 0;
+    		speedDownChangeFactor = 0;
+    		totalRate = 0;
+    		currentRate = 0;
+    		return;
+    	}
+
+    	if(isSetMotorPin){
+    		HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_RESET);
+    		isSetMotorPin = false;
+    		countSetPin += 1;
+    	} else {
+    		HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_SET);
+    		isSetMotorPin = true;
+    		countSetPin += 1;
+    	}
+
+    	if(countSetPin == 2){
+    		currentRate -= 1;
+    		countSetPin = 0;
+    	}
+
+    	if(totalRate > (changeSpeedLine * 2 + 100)){
+    		if(currentRate == (totalRate - (speedChangeStep * speedChangeFactor)) && currentRate >= totalRate - changeSpeedLine){
+    			__HAL_TIM_SET_PRESCALER(&htim1, currentSpeed - speedChangeStepCount - (speedChangeStepCount * speedChangeFactor));
+    		    speedChangeFactor += 1;
+    		    return;
+    		}
+
+    		 if(currentRate == (changeSpeedLine - (speedChangeStep * speedDownChangeFactor)) && currentRate <= changeSpeedLine){
+    			speedChangeFactor -= 1;
+    			__HAL_TIM_SET_PRESCALER(&htim1, currentSpeed - (speedChangeStepCount * speedChangeFactor));
+    		    speedDownChangeFactor += 1;
+    		    return;
+    		}
+
+    		return;
+    	}
+
+		return;
+    }
+
 	if (htim == &htim1) {
 		uint16_t TIM2_count = __HAL_TIM_GET_COUNTER(&htim2);
 		//Значение счетчика таймера TIM2

@@ -1,6 +1,6 @@
 freertos.c:53:6:vApplicationStackOverflowHook	16	static
 freertos.c:64:6:MX_FREERTOS_Init	8	static
 freertos.c:79:6:StartTaskUART	304	static
-freertos.c:111:6:StartTaskMOTOR	40	static
-freertos.c:168:6:StartTaskPMT	32	static
-freertos.c:212:6:HAL_TIM_PeriodElapsedCallback	24	static
+freertos.c:119:6:StartTaskMOTOR	16	static
+freertos.c:149:6:StartTaskPMT	32	static
+freertos.c:206:6:HAL_TIM_PeriodElapsedCallback	32	static
