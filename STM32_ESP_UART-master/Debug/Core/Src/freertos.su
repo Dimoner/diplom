@@ -1,6 +1,10 @@
-freertos.c:53:6:vApplicationStackOverflowHook	16	static
-freertos.c:64:6:MX_FREERTOS_Init	8	static
-freertos.c:79:6:StartTaskUART	304	static
-freertos.c:119:6:StartTaskMOTOR	16	static
-freertos.c:149:6:StartTaskPMT	32	static
-freertos.c:206:6:HAL_TIM_PeriodElapsedCallback	32	static
+freertos.c:18:6:resetGlobalState	4	static
+freertos.c:41:6:copyGlobalStateToPause	8	static
+freertos.c:45:6:copyGlobalStateFromPause	8	static
+freertos.c:86:6:vApplicationStackOverflowHook	16	static
+freertos.c:97:6:MX_FREERTOS_Init	8	static
+freertos.c:113:6:StartTaskUART	384	static
+freertos.c:186:6:StartTaskMOTOR	16	static
+freertos.c:216:10:measureAmperageRangeItem	24	static
+freertos.c:242:6:StartTaskPMT	112	static
+freertos.c:361:6:HAL_TIM_PeriodElapsedCallback	24	static

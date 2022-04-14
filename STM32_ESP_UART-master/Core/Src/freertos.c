@@ -12,7 +12,40 @@
  * Глобальное состояние устройства в данный момент
  */
 struct GlobalStateStruct globalState;
+struct GlobalStateStruct pauseState;
+bool globalStopFlag = false;
+bool globalPauseFlag = false;
+void resetGlobalState(){
+	globalStopFlag = false;
+	globalPauseFlag = false;
+	globalState.isExistActiveAction = false;
 
+	globalState.typeStruct.subType[0] = '0';
+	globalState.typeStruct.subType[1] = '0';
+	globalState.typeStruct.type[0] = '0';
+	globalState.typeStruct.type[1] = '0';
+
+	globalState.changePositionStruct.dir = false;
+	globalState.changePositionStruct.id = 0;
+	globalState.changePositionStruct.way = 0;
+
+	globalState.detectAmperageRangeStruct.id = 0;
+	globalState.detectAmperageRangeStruct.dir = false;
+	globalState.detectAmperageRangeStruct.way = 0;
+	globalState.detectAmperageRangeStruct.step = 0;
+	globalState.detectAmperageRangeStruct.count = 0;
+	globalState.detectAmperageRangeStruct.cur = 0;
+	globalState.detectAmperageRangeStruct.speed = 0;
+}
+
+void copyGlobalStateToPause(struct GlobalStateStruct from){
+	pauseState = from;
+}
+
+void copyGlobalStateFromPause(struct GlobalStateStruct from){
+	globalState = from;
+	globalState.isExistActiveAction = false;
+}
 
 osThreadId_t myTaskUARTHandle;
 const osThreadAttr_t myTaskUART_attributes = { .name = "myTaskUART",
@@ -73,6 +106,7 @@ void MX_FREERTOS_Init(void) {
 	myTaskPMTHandle = osThreadNew(StartTaskPMT, NULL, &myTaskPMT_attributes);
 }
 
+
 /*
  * Задача для чтения сообщения из UART
  */
@@ -95,6 +129,36 @@ void StartTaskUART(void *argument) {
 
 		// 3 - записываем новое глобальное состояние систему
 		struct GlobalStateStruct parseMessageResult = getNewGlobalState(receiveMessageText);
+		clean(receiveMessageText);
+
+		// 4 - если это проверка состояния сразу отвечае
+		if (isCheckState(parseMessageResult.typeStruct))
+		{
+			SentResultActionResponse(parseMessageResult.typeStruct, "", 1);
+			continue;
+		}
+
+		// 5 - если это команда стоп
+		if (isStopMeasure(parseMessageResult.typeStruct))
+		{
+			globalStopFlag = true;
+			continue;
+		}
+
+		// 6 - если это команда паузы
+		if (isPauseMeasure(parseMessageResult.typeStruct))
+		{
+			globalPauseFlag = true;
+			continue;
+		}
+
+		// 6 - если это команда продолжения после паузы
+		if (isContinueMeasure(parseMessageResult.typeStruct))
+		{
+			copyGlobalStateFromPause(pauseState);
+			continue;
+		}
+
 		globalState = parseMessageResult;
 
 		osDelay(1);
@@ -106,6 +170,9 @@ uint32_t totalRate = 0;
 uint32_t currentRate = 0;
 // в каком сейчас состоянии пин
 bool isSetMotorPin = false;
+// счетчики увеличения скорости (вниз вверх)
+uint8_t speedChangeFactor = 0;
+uint8_t speedDownChangeFactor = 0;
 // сколько раз изменилось положение пина
 uint8_t countSetPin = 0;
 
@@ -120,6 +187,11 @@ void StartTaskMOTOR(void *argument) {
 	for (;;) {
 		// 1 - дожидаемся пока придем команда для изменения положения шагового двигателя
 		if(isChangePosition(globalState.typeStruct) && !globalState.isExistActiveAction){
+			speedChangeFactor = 0;
+			speedDownChangeFactor = 0;
+			isSetMotorPin = false;
+			totalRate = 0;
+			currentRate = 0;
 			globalState.isExistActiveAction = true;
 
 			// 2 - устанавливаем вращение
@@ -135,8 +207,29 @@ void StartTaskMOTOR(void *argument) {
 			currentRate = globalState.changePositionStruct.way * 1000;
 			HAL_TIM_Base_Start_IT(&htim1);
 		}
+
 		osDelay(1);
 	}
+}
+
+// логика измерения с усреднением
+uint32_t measureAmperageRangeItem(uint16_t count){
+	uint32_t ADC_value = 0;
+	//HAL_GPIO_WritePin(Relay_OUT_GPIO_Port, Relay_OUT_Pin, GPIO_PIN_SET);
+	for (int i = 1; i < count; i++) {
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, 100);
+		if(ADC_value == 0){
+			ADC_value = HAL_ADC_GetValue(&hadc1);
+	    }else {
+			ADC_value = (HAL_ADC_GetValue(&hadc1) + ADC_value) / 2;
+		}
+
+	    HAL_ADC_Stop(&hadc1);
+	}
+
+
+	return ADC_value;
 }
 
 /* USER CODE BEGIN Header_StartTaskPMT */
@@ -148,42 +241,108 @@ void StartTaskMOTOR(void *argument) {
 /* USER CODE END Header_StartTaskPMT */
 void StartTaskPMT(void *argument) {
 	/* USER CODE BEGIN StartTaskPMT */
-	uint16_t ADC_value = 0;
-	uint8_t averageFactor = 0;
-	uint16_t ADC_oldValue = 0;
-	HAL_ADCEx_Calibration_Start(&hadc1);
 
 	/* Infinite loop */
-
 	for (;;) {
-		if (ADC_StartFlag_) {
+		//ток на промежутке
+		if (isDetectAmperageRange(globalState.typeStruct) && !globalState.isExistActiveAction)
+		{
+			globalState.isExistActiveAction = true;
+			// 1 - выполняем измерение в 1 точке
+			SendResponseMeasure(
+					globalState.detectAmperageRangeStruct.id,
+					globalState.detectAmperageRangeStruct.cur,
+					measureAmperageRangeItem(globalState.detectAmperageRangeStruct.count));
 
-			HAL_GPIO_WritePin(Relay_OUT_GPIO_Port, Relay_OUT_Pin, GPIO_PIN_SET);
-			uint32_t currentTime = HAL_GetTick();
-			do {
-				HAL_ADC_Start(&hadc1);
-				ADC_value = (uint16_t) HAL_ADC_GetValue(&hadc1);
-				HAL_ADC_Stop(&hadc1);
-				if (averageFactor > 0) {
-					ADC_oldValue = ADC_value;
-					ADC_value = (uint16_t) ((ADC_oldValue * (averageFactor - 1)
-							+ ADC_value) / averageFactor);
-				}
-			} while (HAL_GetTick() - currentTime < 1000);
-			sprintf(PMT_State_, "PMT_ADC=%d%c", ADC_value, '\0');
-
-			if (HAL_UART_Transmit(&huart1, (uint8_t*) &PMT_State_, strlen(PMT_State_), 1000) == HAL_OK) {
-
+			// 2 - задаем направление последующих измерений
+			if(globalState.detectAmperageRangeStruct.dir){
+				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_RESET);
+			} else {
+				HAL_GPIO_WritePin(MOTOR_Port, DIR_Pin, GPIO_PIN_SET);
 			}
-		} else if (TIM_StartFlag_) {
+
+			// 3 - высчитываем сколько шагов надо совершить
+			uint32_t totalMeasureWay =  globalState.detectAmperageRangeStruct.way * 1000;
+
+			// 4 - определяем на каком кол-ве сигналов надо снять измерение
+			uint32_t stepCount = globalState.detectAmperageRangeStruct.step * 1000;
+
+			// 5 - задаем текущий счетчик
+			uint32_t currentCount = 0;
+
+			// 6 - запускам процесс преодаления промежутка
+			for (int i = 0; i < totalMeasureWay; i++) {
+				// если пришла команда на закончить, то завершаем все действия
+				if(globalStopFlag){
+					i = totalMeasureWay + 1;
+					continue;
+				}
+				// если пришла команда на паузу, то заканчиваем все, но сохраняем предыдушее состояние
+				if(globalPauseFlag){
+					globalState.detectAmperageRangeStruct.cur = globalState.detectAmperageRangeStruct.cur + (i / 10);
+					globalState.detectAmperageRangeStruct.way = (totalMeasureWay - i + (stepCount - currentCount)) / 1000;
+					copyGlobalStateToPause(globalState);
+					i = totalMeasureWay + 1;
+					continue;
+				}
+				HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_RESET);
+                osDelay(globalState.detectAmperageRangeStruct.speed);
+                HAL_GPIO_WritePin(MOTOR_Port, STEP_Pin, GPIO_PIN_SET);
+                osDelay(globalState.detectAmperageRangeStruct.speed);
+
+                if(currentCount == stepCount){
+                	SendResponseMeasure(
+                			globalState.detectAmperageRangeStruct.id,
+							globalState.detectAmperageRangeStruct.cur + (i / 10),
+							measureAmperageRangeItem(globalState.detectAmperageRangeStruct.count)
+							);
+                	currentCount = 0;
+                	// нм --- шаги --- ответ по x
+                	// 0,01   10       1
+                	// 1      1000     100
+                	// 10     10000    1000
+                }
+                currentCount += 1;
+			}
+
+			if(globalPauseFlag == false){
+				// финальный замер
+				SendResponseMeasure(
+					globalState.detectAmperageRangeStruct.id,
+					globalState.detectAmperageRangeStruct.cur + totalMeasureWay,
+					measureAmperageRangeItem(globalState.detectAmperageRangeStruct.count)
+				);
+
+				// 7 - сообщяем об окончании процесса измерения
+				SendResponseStop(globalState.detectAmperageRangeStruct.id);
+			}
+
+			// 8 - сбрасываем состояния в конце измерения
+			resetGlobalState();
+		}
+
+		// ток в точке от времени
+		if (isDetectAmperageTime(globalState.typeStruct) && !globalState.isExistActiveAction)
+		{
+		}
+
+		// счет на промежутке
+		if (isDetectTickRange(globalState.typeStruct) && !globalState.isExistActiveAction)
+		{
 			HAL_TIM_Base_Start(&htim2);
 			HAL_TIM_Base_Start(&htim3);
 			HAL_TIM_Base_Start_IT(&htim1);
 			sprintf(PMT_State_, "PMT_TIM=%d%c", freq_, '\0');
-			if (HAL_UART_Transmit(&huart1, (uint8_t*) &PMT_State_,
-					strlen(PMT_State_), 1000) == HAL_OK) {
+			if (HAL_UART_Transmit(&huart1, (uint8_t *)&PMT_State_, strlen(PMT_State_), 1000) == HAL_OK)
+			{
 			}
 		}
+
+		// счет в точке от времени
+		if (isDetectTickTime(globalState.typeStruct) && !globalState.isExistActiveAction)
+		{
+		}
+
 		osDelay(1);
 	}
 	/* USER CODE END StartTaskPMT */
@@ -191,24 +350,21 @@ void StartTaskPMT(void *argument) {
 
 
 // начальная скорость
-uint32_t currentSpeed = 10000;
+const uint32_t currentSpeed = 10000;
 // рубикон ускорения/замедления
-uint16_t changeSpeedLine = 6000;
+const uint16_t changeSpeedLine = 6000;
 // шаг изменения скорости по нм
-uint8_t speedChangeStep = 100;
+const uint8_t speedChangeStep = 100;
 // шаг изменения скорости по сигналу
-uint8_t speedChangeStepCount = 130;
-// счетчики увеличения скорости (вниз вверх)
-uint8_t speedChangeFactor = 0;
-uint8_t speedDownChangeFactor = 0;
-
+const uint8_t speedChangeStepCount = 130;
 //Функция-обработчик прерываний таймеров
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	 /* USER CODE BEGIN Callback 0 */
 	// логика вращения шаговым двигателем
     if (htim->Instance == TIM1) {
-    	if(currentRate == 0){
+    	// если прошли путь или получили глобальную команду на остановку
+    	if(currentRate == 0 || globalStopFlag){
     		HAL_TIM_Base_Stop_IT(&htim1);
 			__HAL_TIM_SET_PRESCALER(&htim1, currentSpeed);
 
@@ -218,11 +374,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     		// ------------------------------------------------------
 
     		// 6 - сбрасываем команду -------------------------------
-    		struct TypeStruct resetActionType;
-    		struct ChangePositionStruct resetChangePosition;
-    		globalState.isExistActiveAction = false;
-    		globalState.typeStruct = resetActionType;
-    		globalState.changePositionStruct = resetChangePosition;
+    		resetGlobalState();
     		// ------------------------------------------------------
     		speedChangeFactor = 0;
     		speedDownChangeFactor = 0;

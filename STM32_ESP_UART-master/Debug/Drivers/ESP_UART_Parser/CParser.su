@@ -1,7 +1,4 @@
 CParser.c:3:8:receiveSymbol	8	static
 CParser.c:13:8:checkStartOfMessage	4	static
 CParser.c:25:8:receiveMessage	24	static
-CParser.c:44:26:getNewGlobalState	136	static
-CParser.c:93:8:controlFunction	8	static
-CParser.c:146:8:transmitMessage	16	static
-CParser.c:160:9:getMessageLength	8	static
+CParser.c:43:26:getNewGlobalState	152	static

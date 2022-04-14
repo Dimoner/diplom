@@ -57,6 +57,10 @@ struct DetectAmperageRangeStruct {
     float step;
     /// кол-во измерений
     uint16_t count;
+    /// текущее положение в нм
+    uint16_t cur;
+    /// скорость измерения (максимум)1 -> 255(минимум)
+    uint32_t speed;
 };
 
 /// измерение тока в точке от времени

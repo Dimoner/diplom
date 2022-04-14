@@ -31,7 +31,6 @@ uint8_t getMessageLength();         //Получить длину принято
 struct GlobalStateStruct getNewGlobalState(char receiveMessageText[200]);               //Парсинг сообщения
 
 //Буфер для записи состояния светодиода
-char LED_State_[20];
 char PMT_State_[20];
 //Буфер для отправляемого сообщения (для отладки)
 char transmitBuf_[200];
@@ -39,20 +38,7 @@ char transmitBuf_[200];
 char receiveBuf_[200];
 //Принимаемый символ по UART
 char receivedSymbol_;
-//Длина принятого сообщения
-uint8_t messageLength_;
 
 /*Данные, полученные после парсинга принятого сообщения*/
-
-char date_[15];               //Дата
-char time_[15];               //Время
-char payload_[15];               //Данные
-
-uint8_t oldMotorRotationAngle_;
-uint8_t newMotorRotationAngle_;
-
-uint8_t MOTOR_StartFlag_;
-uint8_t ADC_StartFlag_;
-uint8_t TIM_StartFlag_;
 int freq_;
 #endif /* CPARSER_H_ */

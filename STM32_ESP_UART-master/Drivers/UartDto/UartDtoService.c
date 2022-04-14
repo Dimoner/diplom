@@ -26,7 +26,7 @@ void SentResultActionResponse(struct TypeStruct typeStruct, char err[255], bool 
 	         stat);
 
 	while (
-			HAL_UART_Transmit(&huart1, (uint8_t*) resultState, strlen(resultState),10 * strlen(resultState)
+			HAL_UART_Transmit(&huart1, (uint8_t*) resultState, strlen(resultState), 10 * strlen(resultState)
 	) != HAL_OK);
 }
 
@@ -34,26 +34,20 @@ void SentResultActionResponse(struct TypeStruct typeStruct, char err[255], bool 
 /// id - айди операции
 /// x - измерения по х (длина волны/время)
 /// y - измерения по y (счет/токовый сигнал)
-void SendResponseMeasure(uint16_t id, float x, float y){
-    int idLength = snprintf( NULL, 0, "%d", id );
-    int xLength = snprintf( NULL, 0, "%.2f", x );
-    int yLength = snprintf( NULL, 0, "%.2f", y );
-
-    char resultState[idLength + xLength + yLength + 4];
-
-    sprintf(resultState, "M_%d-%.2f-%.2f", id, x, y);
-
-   // пишем ответ в uart
+void SendResponseMeasure(uint16_t id, uint16_t x, uint32_t y){
+    char measureResult[20];
+    sprintf(measureResult, "M_%d-%d-%d", id, x, y);
+    HAL_UART_Transmit(&huart1, (uint8_t*) measureResult, strlen(measureResult), 10 * strlen(measureResult));
 }
 
 // отправляем команду об остановке измерения окончательной
 void SendResponseStop(uint16_t id){
-    int idLength = snprintf( NULL, 0, "%d", id );
-    char resultState[idLength + 7];
+
+    char resultState[snprintf( NULL, 0, "%d", id ) + 7];
 
     sprintf(resultState, "M_STOP_%d", id);
 
-    // пишем ответ в uart
+    HAL_UART_Transmit(&huart1, (uint8_t*) resultState, strlen(resultState),10 * strlen(resultState));
 }
 
 /// отправляем состояние устройства

@@ -10,7 +10,7 @@
 #include "TypeStruct.h"
 #include <stdint.h>
 /// Ответ сервера -----------------
-void SendResponseMeasure(uint16_t id, float x, float y);
+void SendResponseMeasure(uint16_t id, uint16_t x, uint32_t y);
 void SendResponseStop(uint16_t id);
 void SentResultActionResponse(struct TypeStruct typeStruct, char err[255], bool stat);
 void SendResponseStateStruct(struct TypeStruct typeStruct,

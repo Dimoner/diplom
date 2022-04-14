@@ -62,9 +62,9 @@ void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
-
+	//Выполняет автоматическую самокалибровку АЦП. Функция должна вызываться при отключенном АЦП.
+	HAL_ADCEx_Calibration_Start(&hadc1);
   /* USER CODE END ADC1_Init 2 */
-
 }
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)

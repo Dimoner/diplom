@@ -4,8 +4,14 @@
 uint16_t str_to_uint16(const char *str) {
     char *end;
     long val = strtol(str, &end, 10);
-    uint16_t res = (uint16_t)val;
-    return res;
+    return (uint16_t)val;
+}
+
+// char[] -> uint8_t
+uint32_t str_to_uint32(const char *str) {
+    char *end;
+    long val = strtol(str, &end, 10);
+    return (uint32_t)val;
 }
 
 // char[] -> float
@@ -28,6 +34,15 @@ float stof(const char* s){
     };
     return rez * fact;
 };
+
+// зануление всех элементов char[]
+void clean(char *var) {
+	uint32_t i = 0;
+    while(var[i] != '\0') {
+        var[i] = '\0';
+        i++;
+    }
+}
 
 struct TypeStruct getTypeStruct(char receiveBuf[200]){
     char type[2];
@@ -74,7 +89,7 @@ char* getPayload(char requestPayload[]){
     return token;
 }
 
-/// DIR=1-WAY=111.1
+/// DIR=1-WAY=111.1-ID={int}
 struct ChangePositionStruct getChangePositionStruct(char requestPayload[]){
     struct ChangePositionStruct dima = { false, 0 };
 
@@ -111,7 +126,7 @@ struct ChangePositionStruct getChangePositionStruct(char requestPayload[]){
     return dima;
 }
 
-/// 3_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм}
+/// 3_1*DIR={1-часовая/2-против}-WAY={нм}-STEP={нм}-COUNT={нм}-ID={int}-CUR={float}-SPE=2
 struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayload[]){
     struct DetectAmperageRangeStruct dima = { false, 0,0,0 };
 
@@ -149,9 +164,24 @@ struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayloa
             continue;
         }
 
+        if (strstr (param,"CUR") != NULL){
+            param = strtok(NULL, "-=");
+            float ftemp = str_to_uint16(param);
+            dima.cur = ftemp;
+            param = strtok(NULL, "-=");
+            continue;
+         }
+
         if (strstr (param,"COUNT") != NULL){
             param = strtok(NULL, "-=");
             dima.count = str_to_uint16(param);
+            param = strtok(NULL, "-=");
+            continue;
+        }
+
+        if (strstr (param,"SPE") != NULL){
+            param = strtok(NULL, "-=");
+            dima.speed = str_to_uint32(param);
             param = strtok(NULL, "-=");
             continue;
         }

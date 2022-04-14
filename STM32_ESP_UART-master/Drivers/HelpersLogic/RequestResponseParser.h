@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// зануление всех элементов char[]
+void clean(char *var);
+
 /// Парсим тип и подтип из запроса (2_0*DIR={1-часовая/2-против}-WAY={нм} ----> typeStruct)
 /// \param receiveBuf
 /// \return
