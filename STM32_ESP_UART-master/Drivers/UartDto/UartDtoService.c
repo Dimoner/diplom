@@ -35,9 +35,19 @@ void SentResultActionResponse(struct TypeStruct typeStruct, char err[255], bool 
 /// x - измерения по х (длина волны/время)
 /// y - измерения по y (счет/токовый сигнал)
 void SendResponseMeasure(uint16_t id, uint16_t x, uint32_t y){
-    char measureResult[20];
+    static char measureResult[20];
     sprintf(measureResult, "M_%d-%d-%d", id, x, y);
-    HAL_UART_Transmit(&huart1, (uint8_t*) measureResult, strlen(measureResult), 10 * strlen(measureResult));
+    HAL_UART_Transmit(&huart1, measureResult, strlen(measureResult), strlen(measureResult) * 10);
+}
+
+// отправляем команду об измерении
+/// id - айди операции
+/// x - измерения по х (длина волны/время)
+/// y - измерения по y (счет/токовый сигнал)
+void SendResponseMeasureIT(uint16_t id, uint16_t x, uint32_t y){
+    static char measureResult[20];
+    sprintf(measureResult, "M_%d-%d-%d", id, x, y);
+    HAL_UART_Transmit_IT(&huart1, measureResult, strlen(measureResult));
 }
 
 // отправляем команду об остановке измерения окончательной

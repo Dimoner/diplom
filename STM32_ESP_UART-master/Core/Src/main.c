@@ -3,6 +3,7 @@
 #include "adc.h"
 #include "tim.h"
 #include "usart.h"
+#include "dma.h"
 #include "gpio.h"
 
 void SystemClock_Config(void);
@@ -58,6 +59,14 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+          if(huart == &huart1)
+          {
+                  // можно установить какой-то флаг, сообщающий об окончании отправки
+          }
 }
 
 void Error_Handler(void)

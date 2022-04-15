@@ -215,20 +215,17 @@ void StartTaskMOTOR(void *argument) {
 // логика измерения с усреднением
 uint32_t measureAmperageRangeItem(uint16_t count){
 	uint32_t ADC_value = 0;
-	//HAL_GPIO_WritePin(Relay_OUT_GPIO_Port, Relay_OUT_Pin, GPIO_PIN_SET);
-	for (int i = 1; i < count; i++) {
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, 100);
+	HAL_ADC_Start(&hadc1);
+	//HAL_ADC_PollForConversion(&hadc1, 100);
+	for (int i = 0; i < count; i++) {
+
 		if(ADC_value == 0){
 			ADC_value = HAL_ADC_GetValue(&hadc1);
 	    }else {
 			ADC_value = (HAL_ADC_GetValue(&hadc1) + ADC_value) / 2;
 		}
-
-	    HAL_ADC_Stop(&hadc1);
 	}
-
-
+	HAL_ADC_Stop(&hadc1);
 	return ADC_value;
 }
 
@@ -247,6 +244,9 @@ void StartTaskPMT(void *argument) {
 		//ток на промежутке
 		if (isDetectAmperageRange(globalState.typeStruct) && !globalState.isExistActiveAction)
 		{
+			// 0 - отправляем команду о начале измерения
+			SentResultActionResponse(globalState.typeStruct, "", 1);
+
 			globalState.isExistActiveAction = true;
 			// 1 - выполняем измерение в 1 точке
 			SendResponseMeasure(
@@ -279,7 +279,12 @@ void StartTaskPMT(void *argument) {
 				}
 				// если пришла команда на паузу, то заканчиваем все, но сохраняем предыдушее состояние
 				if(globalPauseFlag){
-					globalState.detectAmperageRangeStruct.cur = globalState.detectAmperageRangeStruct.cur + (i / 10);
+					if(globalState.detectAmperageRangeStruct.dir){
+						globalState.detectAmperageRangeStruct.cur = globalState.detectAmperageRangeStruct.cur + (i / 10);
+					} else {
+						globalState.detectAmperageRangeStruct.cur = globalState.detectAmperageRangeStruct.cur - (i / 10);
+					}
+
 					globalState.detectAmperageRangeStruct.way = (totalMeasureWay - i + (stepCount - currentCount)) / 1000;
 					copyGlobalStateToPause(globalState);
 					i = totalMeasureWay + 1;
@@ -291,7 +296,7 @@ void StartTaskPMT(void *argument) {
                 osDelay(globalState.detectAmperageRangeStruct.speed);
 
                 if(currentCount == stepCount){
-                	SendResponseMeasure(
+                	SendResponseMeasureIT(
                 			globalState.detectAmperageRangeStruct.id,
 							globalState.detectAmperageRangeStruct.cur + (i / 10),
 							measureAmperageRangeItem(globalState.detectAmperageRangeStruct.count)
@@ -304,6 +309,7 @@ void StartTaskPMT(void *argument) {
                 }
                 currentCount += 1;
 			}
+
 
 			if(globalPauseFlag == false){
 				// финальный замер

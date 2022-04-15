@@ -6,5 +6,5 @@ freertos.c:97:6:MX_FREERTOS_Init	8	static
 freertos.c:113:6:StartTaskUART	384	static
 freertos.c:186:6:StartTaskMOTOR	16	static
 freertos.c:216:10:measureAmperageRangeItem	24	static
-freertos.c:242:6:StartTaskPMT	112	static
-freertos.c:361:6:HAL_TIM_PeriodElapsedCallback	24	static
+freertos.c:239:6:StartTaskPMT	112	static
+freertos.c:364:6:HAL_TIM_PeriodElapsedCallback	24	static
