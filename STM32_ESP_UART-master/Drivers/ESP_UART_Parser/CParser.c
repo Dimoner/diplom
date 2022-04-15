@@ -43,45 +43,33 @@ Status receiveMessage(char* outMessage) {
 struct GlobalStateStruct getNewGlobalState(char receiveMessageText[200]) {
 	struct GlobalStateStruct newGlobalState;
 
-	struct TypeStruct actionType = getTypeStruct(receiveMessageText);
-	newGlobalState.typeStruct = actionType;
+	newGlobalState.typeStruct = getTypeStruct(receiveMessageText);
 	char* payload = getPayload(receiveMessageText);
 
-	if (isCheckState(actionType)){
+	if (isCheckState(newGlobalState.typeStruct)){
 	     return newGlobalState;
 	}
 
-	if (isChangePosition(actionType)){
+	if (isChangePosition(newGlobalState.typeStruct)){
 	     newGlobalState.changePositionStruct = getChangePositionStruct(payload);
 	     return newGlobalState;
 	}
 
-	if (isDetectAmperageRange(actionType)){
+	if (isDetectAmperageRange(newGlobalState.typeStruct)){
 	     newGlobalState.detectAmperageRangeStruct = getDetectAmperageRangeStruct(payload);
 	     return newGlobalState;
 	}
 
-	if (isDetectAmperageTime(actionType)){
-	   return newGlobalState;
-	}
-
-	if (isDetectTickRange(actionType)){
+	if (isDetectAmperageTime(newGlobalState.typeStruct)){
+		newGlobalState.detectAmperageTimeStruct = getDetectAmperageTimeStruct(payload);
 	    return newGlobalState;
 	}
 
-	if (isDetectTickTime(actionType)){
-	   return newGlobalState;
+	if (isDetectTickRange(newGlobalState.typeStruct)){
+	    return newGlobalState;
 	}
 
-	if (isContinueMeasure(actionType)){
-	   return newGlobalState;
-	}
-
-	if (isPauseMeasure(actionType)){
-	   return newGlobalState;
-	}
-
-	if (isStopMeasure(actionType)){
+	if (isDetectTickTime(newGlobalState.typeStruct)){
 	   return newGlobalState;
 	}
 

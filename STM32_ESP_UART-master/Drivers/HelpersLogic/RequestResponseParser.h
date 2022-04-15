@@ -23,4 +23,7 @@ struct ChangePositionStruct getChangePositionStruct(char requestPayload[]);
 
 /// получение состояния измерения тока на диапозоне длины волны
 struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayload[]);
+
+/// получение состояния измерения тока в 1 точке от времени
+struct DetectAmperageTimeStruct getDetectAmperageTimeStruct(char requestPayload[]);
 #endif /* HELPERSLOGIC_REQUESTRESPONSEPARSER_H_ */

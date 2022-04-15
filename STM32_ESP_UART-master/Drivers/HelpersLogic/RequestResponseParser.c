@@ -193,6 +193,48 @@ struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayloa
     return dima;
 }
 
+/// _03_02*DELAY=10000-NUM=1-FREQ=1000-ID=1
+struct DetectAmperageTimeStruct getDetectAmperageTimeStruct(char requestPayload[]){
+    struct DetectAmperageTimeStruct dima = { 0, 0, 0, 0 };
+
+    char * param = strtok(requestPayload, "-=");
+    while( param != NULL ) {
+        if (strstr (param,"ID") != NULL){
+            param = strtok(NULL, "-=");
+            dima.id = str_to_uint16(param);
+            param = strtok(NULL, "-=");
+            continue;
+        }
+
+        if (strstr (param, "POINT") != NULL){
+            param = strtok(NULL, "-=");
+            dima.pointCount = str_to_uint32(param);
+            param = strtok(NULL, "-=");
+            continue;
+        }
+
+        if (strstr (param,"FREQ") != NULL){
+            param = strtok(NULL, "-=");
+            float ftemp = stof(param);
+            dima.freq = str_to_uint32(param);
+            param = strtok(NULL, "-=");
+            continue;
+        }
+
+        if (strstr (param,"COUNT") != NULL){
+            param = strtok(NULL, "-=");
+            dima.count = str_to_uint16(param);
+            param = strtok(NULL, "-=");
+            continue;
+        }
+
+        param = strtok(NULL, "-=");
+    }
+
+
+    return dima;
+}
+
 
 
 

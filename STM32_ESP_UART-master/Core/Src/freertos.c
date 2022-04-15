@@ -36,6 +36,11 @@ void resetGlobalState(){
 	globalState.detectAmperageRangeStruct.count = 0;
 	globalState.detectAmperageRangeStruct.cur = 0;
 	globalState.detectAmperageRangeStruct.speed = 0;
+
+	globalState.detectAmperageTimeStruct.id = 0;
+	globalState.detectAmperageTimeStruct.count = 0;
+	globalState.detectAmperageTimeStruct.pointCount = 0;
+	globalState.detectAmperageTimeStruct.freq = 0;
 }
 
 void copyGlobalStateToPause(struct GlobalStateStruct from){
@@ -241,8 +246,12 @@ void StartTaskPMT(void *argument) {
 
 	/* Infinite loop */
 	for (;;) {
+		if(globalState.isExistActiveAction){
+			continue;
+		}
+
 		//ток на промежутке
-		if (isDetectAmperageRange(globalState.typeStruct) && !globalState.isExistActiveAction)
+		if (isDetectAmperageRange(globalState.typeStruct))
 		{
 			// 0 - отправляем команду о начале измерения
 			SentResultActionResponse(globalState.typeStruct, "", 1);
@@ -271,7 +280,7 @@ void StartTaskPMT(void *argument) {
 			uint32_t currentCount = 0;
 
 			// 6 - запускам процесс преодаления промежутка
-			for (int i = 0; i < totalMeasureWay; i++) {
+			for (uint32_t i = 0; i < totalMeasureWay; i++) {
 				// если пришла команда на закончить, то завершаем все действия
 				if(globalStopFlag){
 					i = totalMeasureWay + 1;
@@ -328,12 +337,60 @@ void StartTaskPMT(void *argument) {
 		}
 
 		// ток в точке от времени
-		if (isDetectAmperageTime(globalState.typeStruct) && !globalState.isExistActiveAction)
+		if (isDetectAmperageTime(globalState.typeStruct))
 		{
+			// 0 - отправляем команду о начале измерения
+			SentResultActionResponse(globalState.typeStruct, "", 1);
+
+			globalState.isExistActiveAction = true;
+			// 1 - выполняем измерение в 1 точке
+			SendResponseMeasure(
+					globalState.detectAmperageTimeStruct.id,
+					0,
+					measureAmperageRangeItem(globalState.detectAmperageTimeStruct.count)
+			);
+
+			// 6 - запускам процесс преодаления промежутка
+			for (uint32_t i = 0; i < globalState.detectAmperageTimeStruct.pointCount; i++) {
+				// если пришла команда на закончить, то завершаем все действия
+				if(globalStopFlag){
+					break;
+				}
+
+				// если пришла команда на паузу, то заканчиваем все, но сохраняем предыдушее состояние
+				if(globalPauseFlag){
+					globalState.detectAmperageTimeStruct.pointCount -= i;
+					copyGlobalStateToPause(globalState);
+					break;
+				}
+
+			    osDelay(globalState.detectAmperageTimeStruct.freq);
+
+			    SendResponseMeasure(
+			    	globalState.detectAmperageTimeStruct.id,
+			    	0,
+			    	measureAmperageRangeItem(globalState.detectAmperageTimeStruct.count)
+			    );
+			}
+
+			if(globalPauseFlag == false){
+				// финальный замер
+				SendResponseMeasure(
+					globalState.detectAmperageTimeStruct.id,
+					0,
+					measureAmperageRangeItem(globalState.detectAmperageTimeStruct.count)
+				);
+
+				// 7 - сообщяем об окончании процесса измерения
+				SendResponseStop(globalState.detectAmperageTimeStruct.id);
+			}
+
+			// 8 - сбрасываем состояния в конце измерения
+			resetGlobalState();
 		}
 
 		// счет на промежутке
-		if (isDetectTickRange(globalState.typeStruct) && !globalState.isExistActiveAction)
+		if (isDetectTickRange(globalState.typeStruct))
 		{
 			HAL_TIM_Base_Start(&htim2);
 			HAL_TIM_Base_Start(&htim3);
@@ -345,7 +402,7 @@ void StartTaskPMT(void *argument) {
 		}
 
 		// счет в точке от времени
-		if (isDetectTickTime(globalState.typeStruct) && !globalState.isExistActiveAction)
+		if (isDetectTickTime(globalState.typeStruct))
 		{
 		}
 

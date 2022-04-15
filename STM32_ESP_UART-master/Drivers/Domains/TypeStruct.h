@@ -68,12 +68,12 @@ bool isDetectAmperageTime(struct TypeStruct dto);
 struct DetectAmperageTimeStruct {
     /// айди операции
     uint16_t id;
-    /// сек, время 1 измерения
-    float delay;
+    /// точек надо измерить
+    uint32_t pointCount;
     /// кол-во измерений за 1 DELAY
-    int16_t num;
-    /// Частота измерения в сек
-    float freq;
+    int16_t count;
+    /// временной промежуток между измерениями от 1 osDelay
+    uint32_t freq;
 };
 
 /// измерение тока в точке от времени

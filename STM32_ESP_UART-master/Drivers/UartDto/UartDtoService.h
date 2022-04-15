@@ -12,7 +12,7 @@
 /// Ответ сервера -----------------
 // отправить измерение
 void SendResponseMeasure(uint16_t id, uint16_t x, uint32_t y);
-
+void SendResponseMeasureIT(uint16_t id, uint16_t x, uint32_t y);
 // отправить стоп
 void SendResponseStop(uint16_t id);
 
