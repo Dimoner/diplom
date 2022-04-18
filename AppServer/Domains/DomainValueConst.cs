@@ -5,11 +5,6 @@
     /// </summary>
     public class DomainValueConst
     {
-        /// <summary>
-        /// 1нм - колличество сигналов на двигатель
-        /// </summary>
-        public const int OneStep = 2000;
-
         #region ResponseCommand
 
         /// <summary>
@@ -64,6 +59,18 @@
         /// Кол-во измерений за 1 DELAY
         /// </summary>
         public const string Num = "NUM";
+        
+        /// <summary>
+        /// текущее положение с умножением на 100, что бы дроби не делать
+        /// Испольхуется для отправки измерения с корректными значениями от stm32
+        /// </summary>
+        public const string Cur = "CUR";
+
+        /// <summary>
+        /// скорость вращения во время режима измерения на промежутке
+        /// </summary>
+        public const string Speed = "SPE";
+
         #endregion
     }
 }

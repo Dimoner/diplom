@@ -30,6 +30,7 @@ const defaultValue: IStartMeasureState = {
         endPosition: 0,
         step: 0,
         count: 0,
+        speed: 10
     },
     timeState: {
         delay: 0,
@@ -101,7 +102,8 @@ export default function StartMeasure(props: IStartMeasureProps) {
             count: mainFrom.rangeState?.count,
             delay: mainFrom.timeState?.delay,
             num: mainFrom.timeState?.num,
-            frequency: mainFrom.timeState?.frequency
+            frequency: mainFrom.timeState?.frequency,
+            speed: mainFrom.rangeState?.speed,
         }
 
         const uri = `http://localhost:5000/logic/${props.subType === "time" ? 'start-detect-time' : 'start-detect-range'}`;
@@ -122,11 +124,11 @@ export default function StartMeasure(props: IStartMeasureProps) {
         setActionResultView(response.errorBody?.errorText || "Произошла неизвестная ошибка");
     };
 
-    const setValueForForm = (name: string, innerName: string = "") => (value: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const setValueForForm = (name: string, innerName: string = "") => (value: ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>) => {
         let valueCurrent: string | number = value.target.value;
         if (
             name !== getPropertyNameToLower<IStartMeasureState>(v => v.description) &&
-            name !==getPropertyNameToLower<IStartMeasureState>(v => v.measureName)
+            name !== getPropertyNameToLower<IStartMeasureState>(v => v.measureName)
         )
         {
             valueCurrent = Number(value.target.value)

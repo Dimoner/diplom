@@ -42,6 +42,16 @@ namespace AppServer.Controllers.Dto.Requests
         [JsonProperty("count")]
         [PosNumberNoZero]
         public int Count { get; set; }
+        
+        /// <summary>
+        /// Скорость измерения
+        /// в тиках
+        /// 1 тик = 0,1 мс
+        /// </summary>
+        [Required]
+        [JsonProperty("speed")]
+        [PosNumberNoZero]
+        public int Speed { get; set; }
 
         public IDomainItemMqttRequestBase GetMqttRequest()
         {

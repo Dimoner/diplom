@@ -16,6 +16,8 @@ export interface IRangeMeasureFormComponentField {
     endPosition: number,
     step: number,
     count: number,
+    // скорость вращения в тиках
+    speed: number
 }
 
 // для измерения в точке от времени
@@ -43,5 +45,7 @@ export interface IStartMeasureRequest {
     count?: number,
     delay?: number,
     num?: number,
-    frequency?: number
+    frequency?: number,
+    // скорость вращения в тиках
+    speed: number
 }
