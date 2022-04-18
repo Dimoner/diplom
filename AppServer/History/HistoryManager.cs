@@ -22,7 +22,7 @@ namespace AppServer.History
         /// </summary>
         private static readonly string _directoryPath = "./History/Files";
 
-        public static void WireInFile(MeasureMqttResponse mqttResponse)
+        public static FileHistoryModel WireInFile(MeasureMqttResponse mqttResponse)
         {
             var files = GetFilesFromDirectory();
             var currentFile = files.FirstOrDefault(info =>
@@ -30,13 +30,20 @@ namespace AppServer.History
                 var names = info.Name.Split('_');
                 return names[0] == mqttResponse.Id.ToString();
             });
-
+            
+            var fileItem = GetFileHistory(currentFile);
+            if (fileItem.SubType == SubActionTypeEnum.Range)
+            {
+                mqttResponse.X /= 100;
+            }
             if (currentFile != null)
             {
                 var xValue = BaseDetectRequest.GetMeasureCurrentFormat(mqttResponse.X);
                 var yValue = BaseDetectRequest.GetMeasureCurrentFormat(mqttResponse.Y);
                 File.AppendAllText(currentFile.FullName, $"\r{xValue}|{yValue}");
             }
+            
+            return fileItem;
         }
 
         /// <inheritdoc />
@@ -44,23 +51,7 @@ namespace AppServer.History
         {
             var baseFiles = GetFilesFromDirectory();
             var afterFilterData = baseFiles
-                .Select(file =>
-                {
-                    var text = File.ReadAllText(file.FullName);
-                    var description = text.GetPartOfString("Description:", "-----------------------------------------");
-                    var measureType = text.GetPartOfString("MeasureType:", "-----------------------------------------");
-                    var measureName = text.GetPartOfString("Name:", "-----------------------------------------");
-                    var names = file.Name.Split('_');
-
-                    return new FileHistoryModel
-                    {
-                        Id = Convert.ToInt32(names[0]),
-                        MeasureType = measureType,
-                        CreationDateTime = MeasureHelper.GetCurrentDateTimeFromMeasureDate(names[1]),
-                        Description = description,
-                        MeasureName = measureName
-                    };
-                })
+                .Select(GetFileHistory)
                 .Where(file =>
                 {
                     if (string.IsNullOrWhiteSpace(name))
@@ -114,20 +105,14 @@ namespace AppServer.History
 
             var fullFileName = _directoryPath + $"/{fileName}";
             File.Create(fullFileName).Dispose();
-            var measureTypeString = dto.ActionType == ActionTypeEnum.Amperage
-                ? "Режим: токовый"
-                : "Режим: счетный";
-            var measureSubTypeString = dto.GetType() == typeof(StartDetectRangeRequest)
-                ? "Тип: на промежутке"
-                : "Тип: от времени";
             File.WriteAllText(fullFileName, $@"Name: 
 {dto.MeasureName}
 -----------------------------------------
-Date: {DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss")} 
+Date: {DateTime.Now:dd.MM.yyyy HH-mm-ss} 
 -----------------------------------------
-MeasureType:
-{measureTypeString} 
-{measureSubTypeString}
+MeasureType: {dto.ActionType}
+-----------------------------------------
+MeasureSubType: {(dto.GetType() == typeof(StartDetectRangeRequest) ? SubActionTypeEnum.Range : SubActionTypeEnum.Time)}
 -----------------------------------------
 Description:
 {dto.Description}
@@ -160,6 +145,38 @@ Measure:
             }).Max();
 
             return fileIdListList;
+        }
+
+        /// <summary>
+        /// Загрузка истории по 1 файлу
+        /// </summary>
+        private static FileHistoryModel GetFileHistory(FileInfo file)
+        {
+            var text = File.ReadAllText(file.FullName);
+            var description = text.GetPartOfString("Description:", "-----------------------------------------");
+            var measureType = text.GetPartOfString("MeasureType:", "-----------------------------------------");
+            var measureSubType =
+                text.GetPartOfString("MeasureSubType:", "-----------------------------------------");
+            var measureName = text.GetPartOfString("Name:", "-----------------------------------------");
+            var names = file.Name.Split('_');
+
+            var measureTypeString = measureType == ActionTypeEnum.Amperage.ToString()
+                ? "Режим: токовый"
+                : "Режим: счетный";
+            var measureSubTypeString = measureSubType == SubActionTypeEnum.Range.ToString()
+                ? "Тип: на промежутке"
+                : "Тип: от времени";
+
+            return new FileHistoryModel
+            {
+                Id = Convert.ToInt32(names[0]),
+                SubType = measureSubType == SubActionTypeEnum.Range.ToString() ? SubActionTypeEnum.Range : SubActionTypeEnum.Time,
+                TypeAction = measureType == ActionTypeEnum.Amperage.ToString() ? ActionTypeEnum.Amperage : ActionTypeEnum.Tick,
+                MeasureType = $"{measureTypeString} \n {measureSubTypeString}",
+                CreationDateTime = MeasureHelper.GetCurrentDateTimeFromMeasureDate(names[1]),
+                Description = description,
+                MeasureName = measureName
+            };
         }
 
         private static FileInfo[] GetFilesFromDirectory()

@@ -1,4 +1,5 @@
 ﻿using System;
+using AppServer.Domains;
 
 namespace AppServer.History.Models
 {
@@ -31,5 +32,15 @@ namespace AppServer.History.Models
         /// Описание файла
         /// </summary>
         public string Description { get; set; }
+        
+        /// <summary>
+        /// Способы измерения действия
+        /// </summary>
+        public SubActionTypeEnum SubType { get; set; }
+        
+        /// <summary>
+        /// Типы действий
+        /// </summary>
+        public ActionTypeEnum TypeAction { get; set; }
     }
 }

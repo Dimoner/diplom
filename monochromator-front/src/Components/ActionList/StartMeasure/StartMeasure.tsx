@@ -33,8 +33,8 @@ const defaultValue: IStartMeasureState = {
         speed: 10
     },
     timeState: {
-        delay: 0,
-        num: 0,
+        pointCount: 0,
+        count: 0,
         frequency: 0
     }
 };
@@ -99,9 +99,8 @@ export default function StartMeasure(props: IStartMeasureProps) {
             measureName: mainFrom.measureName,
             endPosition: mainFrom.rangeState?.endPosition,
             step: mainFrom.rangeState?.step,
-            count: mainFrom.rangeState?.count,
-            delay: mainFrom.timeState?.delay,
-            num: mainFrom.timeState?.num,
+            count: mainFrom.rangeState?.count === 0 ? mainFrom.timeState?.count : mainFrom.rangeState?.count,
+            pointCount: mainFrom.timeState?.pointCount,
             frequency: mainFrom.timeState?.frequency,
             speed: mainFrom.rangeState?.speed,
         }
@@ -168,7 +167,7 @@ export default function StartMeasure(props: IStartMeasureProps) {
                         key={getPropertyNameToLower<IStartMeasureState>(v => v.measureName)}
                         variant="standard"/>
                 </div>
-                <div style={{ marginTop: 22 }}>
+                <div style={{ marginTop: 22, marginBottom: 9 }}>
                     Технические характеристики измерения:
                 </div>
                 <div style={{display: "flex", justifyContent: "space-between"}}>

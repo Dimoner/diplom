@@ -20,20 +20,20 @@ export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponen
             <div className="start-measure-text-control">
                 <TextField
                     onChange={props.setValue(
-                        getPropertyName<ITimeMeasureFormComponentField>(v => v.delay),
+                        getPropertyName<ITimeMeasureFormComponentField>(v => v.pointCount),
                         getPropertyNameToLower<IStartMeasureState>(v => v.timeState)
                     )}
                     required={true}
-                    error={props.actionResultView !== "" && props.data.delay <= 0.9}
+                    error={props.actionResultView !== "" && (props.data.pointCount <= 0 || props.data.pointCount > 65000)}
                     helperText={
-                        (props.actionResultView !== "" && props.data.delay <= 0.9)
-                            ? "Больше > 0.9"
+                        (props.actionResultView !== "" && (props.data.pointCount <= 0 || props.data.pointCount > 65000))
+                            ? "Условие: > 0 и < 65000"
                             : ""
                     }
                     style={{width: "230px", height: "70px"}}
-                    defaultValue={props.data.delay || undefined}
+                    defaultValue={props.data.pointCount || undefined}
                     id="standard-basic"
-                    label="Время измерения, сек"
+                    label="Кол-во точек"
                     variant="standard" />
             </div>
             <div className="start-measure-text-control">
@@ -45,7 +45,7 @@ export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponen
                     error={props.actionResultView !== "" && props.data.frequency <= 0.9}
                     helperText={
                         (props.actionResultView !== "" && props.data.frequency <= 0.9)
-                            ? "Больше > 0.9"
+                            ? "Больше > 0"
                             : ""
                     }
                     required={true}
@@ -53,27 +53,27 @@ export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponen
                     style={{width: "230px", height: "70px"}}
                     id="standard-basic"
                     key={getPropertyNameToLower<ITimeMeasureFormComponentField>(v => v.frequency)}
-                    label="Частота измерения"
+                    label="Частота (1 тик - 0,1 мс), тик"
                     variant="standard" />
             </div>
             <div className="start-measure-text-control">
                 <TextField
                     onChange={props.setValue(
-                        getPropertyName<ITimeMeasureFormComponentField>(v => v.num),
+                        getPropertyName<ITimeMeasureFormComponentField>(v => v.count),
                         getPropertyNameToLower<IStartMeasureState>(v => v.timeState)
                     )}
                     required={true}
                     style={{width: "230px", height: "70px"}}
                     helperText={
-                        (props.actionResultView !== "" && (props.data.num <= 0 || props.data.num > 1024))
+                        (props.actionResultView !== "" && (props.data.count <= 0 || props.data.count > 1024))
                             ? "Диапозоне от 1 до 1024 раз"
                             : ""
                     }
-                    defaultValue={props.data.num || undefined}
-                    error={props.actionResultView !== "" && props.data.num <= 0}
+                    defaultValue={props.data.count || undefined}
+                    error={props.actionResultView !== "" && props.data.count <= 0}
                     id="standard-basic"
-                    key={getPropertyNameToLower<ITimeMeasureFormComponentField>(v => v.num)}
-                    label="Кол-во измерений за 1 период"
+                    key={getPropertyNameToLower<ITimeMeasureFormComponentField>(v => v.count)}
+                    label="Кол-во усреднений"
                     variant="standard" />
             </div>
         </div>

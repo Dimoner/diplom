@@ -176,7 +176,7 @@ namespace AppServer.Domains.MqttResponse
                 IsStop = false,
                 Id = Convert.ToInt32(xAndYList[0]),
                 // тк с контроллера приходжит без дробной части
-                X = Convert.ToDouble(xAndYList[1]) / 100, 
+                X = Convert.ToDouble(xAndYList[1]), 
                 Y = Convert.ToDouble(xAndYList[2])
             };
 

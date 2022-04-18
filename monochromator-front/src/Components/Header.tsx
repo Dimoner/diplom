@@ -17,7 +17,7 @@ import { HubConnection } from "@microsoft/signalr";
 import * as signalR from "@microsoft/signalr";
 import moment from "moment";
 import SettingComponent from "./Setting/SettingComponent";
-import {useDispatch} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { increment } from "../counterSlice";
 
 const pathNavigation: { label: string, key: string }[] = [
@@ -61,6 +61,8 @@ const defaultStateSystem: IStateSystem = {
 export default function Header() {
     const [stateSystem, setStateSystem] = React.useState<IStateSystem>(defaultStateSystem);
     const dispatch = useDispatch()
+    // важно для перерендера при изменении localstorage
+    const dima = useSelector((state: any) => state.counter.dima)
     const hubConnection = useRef<HubConnection>(new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5000/state")
         .configureLogging(signalR.LogLevel.Information)

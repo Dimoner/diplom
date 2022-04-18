@@ -15,17 +15,17 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         protected override SubActionTypeEnum ActionSubType => SubActionTypeEnum.Time;
 
         /// <summary>
-        /// Время измерения в сек
+        /// Сколько точек
         /// </summary>
-        private float _delay;
+        private int _pointCount;
 
         /// <summary>
-        /// Кол-во измерений за 1 _delay
+        /// кол-во измерений в точке
         /// </summary>
-        private int _num;
+        private int _count;
         
         /// <summary>
-        /// Частота измерения в сек
+        /// кол-во тиков между точками
         /// </summary>
         private float _frequency { get; set; }
         
@@ -34,8 +34,8 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         /// </summary>
         public override void FromDtoApiRequest(StartDetectTimeRequest dto)
         {
-            _num = dto.Num;
-            _delay = dto.Delay;
+            _pointCount = dto.PointCount;
+            _count = dto.Count;
             _frequency = dto.Frequency;
         }
 
@@ -43,8 +43,8 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         {
             return new Dictionary<string, object>
             {
-                {DomainValueConst.Delay, _delay},
-                {DomainValueConst.Num, _num},
+                {DomainValueConst.PointCount, _pointCount},
+                {DomainValueConst.Count, _count},
                 {DomainValueConst.Freq, _frequency},
             };
         }

@@ -22,17 +22,29 @@ const a11yProps = (index: number) => {
 }
 
 export default function AmperageActionBlock({ alignment, setStateAmperage }: IAmperageActionBlock) {
-    const getNewMarks = (xStart: number, xEnd: number) => {
+    const labelFormat = (value: number, tickTime: number) => {
+        if(alignment === "range") {
+            return value.toFixed(0).toString();
+        }
+
+        if (alignment === "time") {
+            return moment.utc(value * tickTime * 0.1).format('HH:mm:ss.SSS')
+        }
+
+        return value.toString();
+    }
+
+    const getNewMarks = (xStart: number, xEnd: number, tickTime: number) => {
         return [
-            { value: 0, label: xStart.toString() },
+            { value: 0, label: labelFormat(xStart, tickTime) },
             ...[10, 20, 30, 40, 50, 60, 70, 80, 90].map((value: number, index: number) => {
-                const label = (xStart + (((xEnd - xStart) / 10) * (index + 1))).toFixed(0).toString()
+                const label = (xStart + (((xEnd - xStart) / 10) * (index + 1)))
                 return {
                     value: value,
-                    label: label
+                    label: labelFormat(label, tickTime)
                 }
             }),
-            { value: 100, label: xEnd.toString() }
+            { value: 100, label: labelFormat(xEnd, tickTime) }
             ];
     }
 
@@ -41,7 +53,7 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
             localStorage.removeItem(measureRangeInLocalStorageName);
             const sub = startMeasure.endPosition - startMeasure.startPosition;
 
-            const newMarks: IAmperageMarks[] = getNewMarks(startMeasure.startPosition, startMeasure.endPosition);
+            const newMarks: IAmperageMarks[] = getNewMarks(startMeasure.startPosition, startMeasure.endPosition, 0);
             setStateAmperage((prev: IAmperageState): IAmperageState => ({
                 ...prev,
                 measureList: [],
@@ -55,7 +67,8 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
                     measureId: 0,
                     status: MeasureStatusEnum.Measuring,
                     measureName: startMeasure.measureName,
-                    measureDate: moment().format("DD.MM.yyyy HH:mm")
+                    measureDate: moment().format("DD.MM.yyyy HH:mm"),
+                    frequency: 0
                 },
                 managerMeasure: {
                     ...prev.managerMeasure,
@@ -66,15 +79,15 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
             return;
         }
 
-        if (alignment === "time" && startMeasure.delay !== undefined){
+        if (alignment === "time" && startMeasure.pointCount !== undefined){
             localStorage.removeItem(measureTimeInLocalStorageName);
 
-            const newMarks: IAmperageMarks[] = getNewMarks(0, startMeasure.delay);
+            const newMarks: IAmperageMarks[] = getNewMarks(0, startMeasure.pointCount as number, startMeasure.frequency as number);
             setStateAmperage(prev => ({
                 ...prev,
                 measureList: [],
-                amperageMarks: { marks: [...newMarks], value: 0, maxValue: (startMeasure.delay as number) },
-                rangeWave: (startMeasure.delay as number),
+                amperageMarks: { marks: [...newMarks], value: 0, maxValue: (startMeasure.pointCount as number) },
+                rangeWave: (startMeasure.pointCount as number),
                 startWave: 0,
                 measureId: startMeasure.measureId.toString(),
                 open: false,
@@ -83,7 +96,8 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
                     measureId: 0,
                     status: MeasureStatusEnum.Measuring,
                     measureName: startMeasure.measureName,
-                    measureDate: moment().format("DD.MM.yyyy HH:mm")
+                    measureDate: moment().format("DD.MM.yyyy HH:mm"),
+                    frequency:  startMeasure.frequency as number
                 },
                 managerMeasure: {
                     ...prev.managerMeasure,

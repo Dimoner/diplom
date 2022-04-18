@@ -18,39 +18,31 @@ namespace AppServer.Controllers.Dto.Requests
     public class StartDetectTimeRequest : BaseDetectRequest, IBaseApiRequest
     {
         /// <summary>
-        /// Время измерения в сек
-        /// 0,1 - частота  > частота
+        /// Кол-во точек, которые надо измерить
         /// </summary>
         [Required]
-        [JsonProperty("delay")]
+        [JsonProperty("pointCount")]
         [PosNumberNoZero]
-        [MinInt(0.9)]
-        public float Delay { get; set; }
+        [MaxInt(65000)]
+        public int PointCount { get; set; }
         
         /// <summary>
-        /// Частота измерения в сек
+        /// кол-во тиков между точками
         /// </summary>
         [Required]
         [JsonProperty("frequency")]
         [PosNumberNoZero]
-        [MinInt(0.9)]
-        public float Frequency { get; set; }
+        public int Frequency { get; set; }
         
         /// <summary>
         /// Кол-во измерений за 1 Delay
         /// </summary>
         [Required]
-        [JsonProperty("num")]
+        [JsonProperty("count")]
         [PosNumberNoZero]
         [MinInt(0)]
         [MaxInt(1024)]
-        public int Num { get; set; }
-
-        /// <inheritdoc />
-        public bool ValidationRequest()
-        {
-            return true;
-        }
+        public int Count { get; set; }
 
         /// <inheritdoc />
         public IDomainItemMqttRequestBase GetMqttRequest()

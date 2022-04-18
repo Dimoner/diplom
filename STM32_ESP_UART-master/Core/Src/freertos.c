@@ -40,6 +40,7 @@ void resetGlobalState(){
 	globalState.detectAmperageTimeStruct.id = 0;
 	globalState.detectAmperageTimeStruct.count = 0;
 	globalState.detectAmperageTimeStruct.pointCount = 0;
+	globalState.detectAmperageTimeStruct.currentPointCount = 0;
 	globalState.detectAmperageTimeStruct.freq = 0;
 }
 
@@ -351,7 +352,7 @@ void StartTaskPMT(void *argument) {
 			);
 
 			// 6 - запускам процесс преодаления промежутка
-			for (uint32_t i = 0; i < globalState.detectAmperageTimeStruct.pointCount; i++) {
+			for (uint32_t i = globalState.detectAmperageTimeStruct.currentPointCount; i < globalState.detectAmperageTimeStruct.pointCount; i++) {
 				// если пришла команда на закончить, то завершаем все действия
 				if(globalStopFlag){
 					break;
@@ -359,7 +360,7 @@ void StartTaskPMT(void *argument) {
 
 				// если пришла команда на паузу, то заканчиваем все, но сохраняем предыдушее состояние
 				if(globalPauseFlag){
-					globalState.detectAmperageTimeStruct.pointCount -= i;
+					globalState.detectAmperageTimeStruct.currentPointCount = i;
 					copyGlobalStateToPause(globalState);
 					break;
 				}
@@ -368,7 +369,7 @@ void StartTaskPMT(void *argument) {
 
 			    SendResponseMeasure(
 			    	globalState.detectAmperageTimeStruct.id,
-			    	0,
+			    	i,
 			    	measureAmperageRangeItem(globalState.detectAmperageTimeStruct.count)
 			    );
 			}
@@ -377,7 +378,7 @@ void StartTaskPMT(void *argument) {
 				// финальный замер
 				SendResponseMeasure(
 					globalState.detectAmperageTimeStruct.id,
-					0,
+					globalState.detectAmperageTimeStruct.pointCount,
 					measureAmperageRangeItem(globalState.detectAmperageTimeStruct.count)
 				);
 

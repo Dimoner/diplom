@@ -42,7 +42,8 @@ export interface IOldMeasureState {
     status: MeasureStatusEnum,
     measureDate: string,
     measureName: string,
-    measureId: number
+    measureId: number,
+    frequency: number
 }
 
 export enum MeasureStatusEnum {

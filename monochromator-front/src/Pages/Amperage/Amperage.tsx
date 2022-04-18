@@ -9,6 +9,8 @@ import {MeasureStateManager} from "../../StateManager/MeasureStateMaanger";
 import AmperageRange from "./MeasureTypeComponent/AmperageRange";
 import AmperageTime from "./MeasureTypeComponent/AmperageTime";
 import { TSubType } from "../../Types/Types";
+import { useDispatch } from "react-redux";
+import { incrementDima } from "../../counterSlice";
 
 export const measureRangeInLocalStorageName: string = "measure-range";
 export const measureTimeInLocalStorageName: string = "measure-time";
@@ -25,7 +27,8 @@ const defaultValue: IAmperageState = {
         status: MeasureStatusEnum.None,
         measureDate: "",
         measureId: 0,
-        measureName: ""
+        measureName: "",
+        frequency: 0
     },
     managerMeasure: {
         isPause: false,
@@ -38,7 +41,7 @@ export default function Amperage() {
         .withUrl("http://localhost:5000/measure")
         .configureLogging(signalR.LogLevel.Information)
         .build());
-
+    const dispatch = useDispatch()
     const getDefaultValue = (): IAmperageState => {
         return defaultValue;
     }
@@ -96,17 +99,17 @@ export default function Amperage() {
         localStorage.setItem(stateAmperage.alignment === "range"
             ? measureRangeInLocalStorageName
             : measureTimeInLocalStorageName, JSON.stringify(prev))
+        dispatch(incrementDima());
     }
 
     const continueMeasureAction = (prev: IAmperageState, message: IMeasureElemMqttResponse): IAmperageState => {
         MeasureStateManager.IsMeasure = true;
-
+        dispatch(incrementDima());
         const result = {
             ...prev,
-            measureList: [{ x: message.x, y: message.y }, ...prev.measureList],
             amperageMarks: {
+                ...prev.amperageMarks,
                 marks: [...prev.amperageMarks.marks],
-                value: ((message.x - prev.startWave) * 100 / prev.rangeWave),
                 maxValue: prev.amperageMarks.maxValue
             },
             measureAdditionInfo: {
@@ -114,10 +117,20 @@ export default function Amperage() {
                 status: MeasureStatusEnum.Measuring,
             }
         }
+        result.measureList = [{ x: message.x, y: message.y }, ...prev.measureList];
 
-        localStorage.setItem(stateAmperage.alignment === "range"
-            ? measureRangeInLocalStorageName
-            : measureTimeInLocalStorageName, JSON.stringify(result))
+        if (stateAmperage.alignment === "range") {
+            result.amperageMarks.value = ((message.x - prev.startWave) * 100 / prev.rangeWave);
+
+            localStorage.setItem(measureRangeInLocalStorageName, JSON.stringify(result));
+            return result;
+        }
+
+        if(stateAmperage.alignment === "time") {
+            result.amperageMarks.value = (message.x  * 100 / prev.rangeWave);
+            localStorage.setItem(measureTimeInLocalStorageName, JSON.stringify(result))
+            return result;
+        }
 
         return result;
     }
@@ -159,14 +172,18 @@ export default function Amperage() {
                         amperageMarks={stateAmperage.amperageMarks}
                         managerMeasure={stateAmperage.managerMeasure}
                         setStateAmperage={setStateAmperage}
-                    /> :
-                    <AmperageTime
+                    />
+                    : <>
+                    {stateAmperage.measureAdditionInfo.frequency === 0
+                        ? <></>
+                        : <AmperageTime
                         measureList={stateAmperage.measureList}
                         amperageMarks={stateAmperage.amperageMarks}
                         measureAdditionInfo={stateAmperage.measureAdditionInfo}
                         managerMeasure={stateAmperage.managerMeasure}
                         setStateAmperage={setStateAmperage}
-                    />
+                        />
+                    }</>
             }
            <DialogComponent
                onClickAction={() => {

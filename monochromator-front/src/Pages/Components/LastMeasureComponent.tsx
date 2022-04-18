@@ -60,8 +60,8 @@ export default function LastMeasureComponent(props: ILastMeasureComponent) {
                                     key={Math.random()}
                                     sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                 >
-                                    <TableCell align="right">{row.x}</TableCell>
-                                    <TableCell align="right">{row.y}</TableCell>
+                                    <TableCell style={{minWidth: "88px"}} align="right">{row.x}</TableCell>
+                                    <TableCell style={{minWidth: "95px"}} align="right">{row.y}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

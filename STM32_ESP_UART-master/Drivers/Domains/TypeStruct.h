@@ -70,6 +70,8 @@ struct DetectAmperageTimeStruct {
     uint16_t id;
     /// точек надо измерить
     uint32_t pointCount;
+    /// точек надо измерить
+    uint32_t currentPointCount;
     /// кол-во измерений за 1 DELAY
     int16_t count;
     /// временной промежуток между измерениями от 1 osDelay

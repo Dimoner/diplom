@@ -46,20 +46,15 @@
         public const string Count = "COUNT";
 
         /// <summary>
-        /// Время 1 измерения при временном режиме в сек
+        /// Сколько точек надо измерить в счетном режиме
         /// </summary>
-        public const string Delay = "DELAY";
+        public const string PointCount = "POINT";
         
         /// <summary>
         ///  Частота измерения в сек
         /// </summary>
         public const string Freq = "FREQ";
 
-        /// <summary>
-        /// Кол-во измерений за 1 DELAY
-        /// </summary>
-        public const string Num = "NUM";
-        
         /// <summary>
         /// текущее положение с умножением на 100, что бы дроби не делать
         /// Испольхуется для отправки измерения с корректными значениями от stm32

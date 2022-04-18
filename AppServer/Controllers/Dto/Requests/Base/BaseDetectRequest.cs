@@ -48,6 +48,7 @@ namespace AppServer.Controllers.Dto.Requests.Base
         /// Название измерения
         /// </summary>
         [JsonProperty("measureName")]
+        [Required]
         public string MeasureName { get; set; }
 
         /// <summary>

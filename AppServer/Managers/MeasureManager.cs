@@ -27,7 +27,7 @@ namespace AppServer.Managers
             _historyManager = historyManager;
             
             // тестовый блок для измерения тока на периоде
-            Task.Run(() =>
+            /*Task.Run(() =>
             {
                 while (true)
                 {
@@ -35,7 +35,7 @@ namespace AppServer.Managers
                     _mqttManager.SendMessageAsync($"_S_{3}-{rnd.Next(700, 10000)}-{rnd.Next(0, 1000)}-100-10К-10п", _appSettings.FromTopic);
                     Task.Delay(1000).Wait();
                 }
-            });
+            });*/
         }
         
         /// <inheritdoc />
@@ -83,6 +83,7 @@ namespace AppServer.Managers
             // тестовый блок для измерения тока на периоде
             Task.Run(() =>
             {
+                Task.Delay(2000).Wait();
                 var rnd = new Random();
                 for (int i = 210; i <= 310; i += 10)
                 {
