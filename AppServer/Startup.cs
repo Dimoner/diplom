@@ -5,6 +5,7 @@ using AppServer.History.Interfaces;
 using AppServer.Managers;
 using AppServer.Managers.Interfaces;
 using AppServer.MqttLogic;
+using AppServer.MqttLogic.Managers;
 using AppServer.Settings;
 using AppServer.Settings.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -66,6 +67,9 @@ namespace AppServer
                 endpoints.MapHub<MeasureHub>("/measure");
                 endpoints.MapHub<StateHub>("/state");
             });
+            
+            var scope = app.ApplicationServices.CreateScope().ServiceProvider;
+            MqttManager.Init(scope);
         }
     }
 }

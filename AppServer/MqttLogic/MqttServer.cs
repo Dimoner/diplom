@@ -11,6 +11,7 @@ namespace AppServer.MqttLogic
 {
     public static class MqttServer
     {
+        public static IMqttServer Server;
         public static void StartMqttServer(this IAppSettings appSettings)
         {
               var optionsBuilder = new MqttServerOptionsBuilder()
@@ -29,20 +30,18 @@ namespace AppServer.MqttLogic
                 })
                 .WithApplicationMessageInterceptor(context =>
                 {
-                    Console.WriteLine("WithApplicationMessageInterceptor block merging data");
-                    var newData = Encoding.UTF8.GetBytes(DateTime.Now.ToString("O"));
-                    var oldData = context.ApplicationMessage.Payload;
-                    var mergedData = newData.Concat(oldData).ToArray();
-                    context.ApplicationMessage.Payload = mergedData;
+                    Console.WriteLine("Get message with: \n");
+                    Console.WriteLine("Topic:" + context.ApplicationMessage.Topic);
+                    Console.WriteLine("Data:" + context.ApplicationMessage.Topic);
                 })
                 .WithConnectionBacklog(100)
                 .WithDefaultEndpointPort(appSettings.ServerPort);
 
 
             //start server
-            var mqttServer = new MqttFactory().CreateMqttServer();
-            mqttServer.StartAsync(optionsBuilder.Build()).Wait();
-            Console.WriteLine($"Broker is Running: Host: {mqttServer.Options.DefaultEndpointOptions.BoundInterNetworkAddress} Port: {mqttServer.Options.DefaultEndpointOptions.Port}");
+            Server = new MqttFactory().CreateMqttServer();
+            Server.StartAsync(optionsBuilder.Build()).Wait();
+            Console.WriteLine($"Broker is Running: Host: {Server.Options.DefaultEndpointOptions.BoundInterNetworkAddress} Port: {Server.Options.DefaultEndpointOptions.Port}");
         }
     }
 }

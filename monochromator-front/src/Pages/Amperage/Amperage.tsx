@@ -1,11 +1,11 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './Style/amperage.scss'
-import {HubConnection} from "@microsoft/signalr";
+import { HubConnection } from "@microsoft/signalr";
 import * as signalR from "@microsoft/signalr";
 import DialogComponent from "../Components/DialogComponent";
 import { IAmperageState, IMeasureElemMqttResponse, MeasureStatusEnum } from "./Interfaces/AmperagePageInterfaces";
 import AmperageActionBlock from "./Components/AmperageActionBlock";
-import {MeasureStateManager} from "../../StateManager/MeasureStateMaanger";
+import { MeasureStateManager } from "../../StateManager/MeasureStateMaanger";
 import AmperageRange from "./MeasureTypeComponent/AmperageRange";
 import AmperageTime from "./MeasureTypeComponent/AmperageTime";
 import { TSubType } from "../../Types/Types";
@@ -17,7 +17,7 @@ export const measureTimeInLocalStorageName: string = "measure-time";
 
 const defaultValue: IAmperageState = {
     measureList: [],
-    amperageMarks: {marks: [], value: 0, maxValue: 0},
+    amperageMarks: { marks: [], value: 0, maxValue: 0 },
     rangeWave: 0,
     startWave: 0,
     measureId: "0",
@@ -69,12 +69,12 @@ export default function Amperage() {
             ? measureRangeInLocalStorageName
             : measureTimeInLocalStorageName)
 
-        if (existHistory !== undefined && existHistory !== "" && existHistory !== null){
+        if (existHistory !== undefined && existHistory !== "" && existHistory !== null) {
             const parseHistory: IAmperageState = JSON.parse(existHistory)
             setStateAmperage(prev => parseHistory)
         }
         else {
-            setStateAmperage({...defaultValue, alignment: stateAmperage.alignment})
+            setStateAmperage({ ...defaultValue, alignment: stateAmperage.alignment })
         }
 
         setIsRange(stateAmperage.alignment === "range");
@@ -120,14 +120,16 @@ export default function Amperage() {
         result.measureList = [{ x: message.x, y: message.y }, ...prev.measureList];
 
         if (stateAmperage.alignment === "range") {
+            result.measureList = [{ x: (message.x / 100), y: message.y }, ...prev.measureList];
             result.amperageMarks.value = ((message.x - prev.startWave) * 100 / prev.rangeWave);
 
             localStorage.setItem(measureRangeInLocalStorageName, JSON.stringify(result));
             return result;
         }
 
-        if(stateAmperage.alignment === "time") {
-            result.amperageMarks.value = (message.x  * 100 / prev.rangeWave);
+        if (stateAmperage.alignment === "time") {
+            result.measureList = [{ x: message.x, y: message.y }, ...prev.measureList];
+            result.amperageMarks.value = (message.x * 100 / prev.rangeWave);
             localStorage.setItem(measureTimeInLocalStorageName, JSON.stringify(result))
             return result;
         }
@@ -137,9 +139,9 @@ export default function Amperage() {
 
     const action = (message: IMeasureElemMqttResponse) => {
         setStateAmperage(prev => {
-            if(message.isStop){
+            if (message.isStop) {
                 endMeasureAction(prev, message)
-                return {...prev, open: true};
+                return { ...prev, open: true };
             }
 
             return continueMeasureAction(prev, message);
@@ -150,19 +152,19 @@ export default function Amperage() {
     useEffect(() => {
         if (hubConnection?.current !== null && hubConnection?.current !== undefined && stateAmperage.measureId !== "0") {
             hubConnection.current.on(stateAmperage.measureId, action);
-            window.onbeforeunload = function() {
+            window.onbeforeunload = function () {
                 return "Измерение еще не завершено, вы уверены, что хотите закрыть приложение?";
             };
         }
     }, [stateAmperage.measureId]);
 
     return (
-        <div style={{ width: "90%", marginLeft: "-5px"}}>
+        <div style={{ width: "90%", marginLeft: "-5px" }}>
             <div className="amperage-container">
-               <AmperageActionBlock
-                   alignment={stateAmperage.alignment}
-                   setStateAmperage={setStateAmperage}
-               />
+                <AmperageActionBlock
+                    alignment={stateAmperage.alignment}
+                    setStateAmperage={setStateAmperage}
+                />
             </div>
             {
                 isRange
@@ -174,31 +176,31 @@ export default function Amperage() {
                         setStateAmperage={setStateAmperage}
                     />
                     : <>
-                    {stateAmperage.measureAdditionInfo.frequency === 0
-                        ? <></>
-                        : <AmperageTime
-                        measureList={stateAmperage.measureList}
-                        amperageMarks={stateAmperage.amperageMarks}
-                        measureAdditionInfo={stateAmperage.measureAdditionInfo}
-                        managerMeasure={stateAmperage.managerMeasure}
-                        setStateAmperage={setStateAmperage}
-                        />
-                    }</>
+                        {stateAmperage.measureAdditionInfo.frequency === 0
+                            ? <></>
+                            : <AmperageTime
+                                measureList={stateAmperage.measureList}
+                                amperageMarks={stateAmperage.amperageMarks}
+                                measureAdditionInfo={stateAmperage.measureAdditionInfo}
+                                managerMeasure={stateAmperage.managerMeasure}
+                                setStateAmperage={setStateAmperage}
+                            />
+                        }</>
             }
-           <DialogComponent
-               onClickAction={() => {
-                   setStateAmperage(prev => ({
-                       ...prev,
-                       open: false
-                   }))
-               }}
-               onCloseAction={() => {
-                   setStateAmperage(prev => ({
-                       ...prev,
-                       open: false
-                   }))
-               }}
-               openState={stateAmperage.open}/>
+            <DialogComponent
+                onClickAction={() => {
+                    setStateAmperage(prev => ({
+                        ...prev,
+                        open: false
+                    }))
+                }}
+                onCloseAction={() => {
+                    setStateAmperage(prev => ({
+                        ...prev,
+                        open: false
+                    }))
+                }}
+                openState={stateAmperage.open} />
         </div>
     );
 }

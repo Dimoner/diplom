@@ -121,7 +121,7 @@ void StartTaskUART(void *argument) {
 		// 1 - получили символ и проверии, что это стартовый
 		bool isStartReadUart = receiveSymbol() == OK && checkStartOfMessage() == OK;
 		if (!isStartReadUart) {
-			SentError((uint8_t*) __FILE__, __LINE__);
+			//SentError((uint8_t*) __FILE__, __LINE__);
 			continue;
 		}
 
@@ -281,7 +281,7 @@ void StartTaskPMT(void *argument) {
 			uint32_t currentCount = 0;
 
 			// 6 - запускам процесс преодаления промежутка
-			for (uint32_t i = 0; i < totalMeasureWay; i++) {
+			for (uint32_t i = 0; i <= totalMeasureWay; i++) {
 				// если пришла команда на закончить, то завершаем все действия
 				if(globalStopFlag){
 					i = totalMeasureWay + 1;
@@ -320,16 +320,18 @@ void StartTaskPMT(void *argument) {
                 currentCount += 1;
 			}
 
-
+		//	SentResultActionResponse(globalState.typeStruct, "", 1);
 			if(globalPauseFlag == false){
 				// финальный замер
-				SendResponseMeasure(
-					globalState.detectAmperageRangeStruct.id,
-					globalState.detectAmperageRangeStruct.cur + totalMeasureWay,
-					measureAmperageRangeItem(globalState.detectAmperageRangeStruct.count)
-				);
+//				SendResponseMeasure(
+//					globalState.detectAmperageRangeStruct.id,
+//					globalState.detectAmperageRangeStruct.cur + totalMeasureWay,
+//					measureAmperageRangeItem(globalState.detectAmperageRangeStruct.count)
+//				);
+
 
 				// 7 - сообщяем об окончании процесса измерения
+				osDelay(10);
 				SendResponseStop(globalState.detectAmperageRangeStruct.id);
 			}
 

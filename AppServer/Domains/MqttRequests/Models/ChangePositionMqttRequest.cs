@@ -27,10 +27,17 @@ namespace AppServer.Domains.MqttRequests.Models
         /// </summary>
         private float _way;
 
+        /// <summary>
+        /// идентификатор операции
+        /// пока не используется для этой команды
+        /// </summary>
+        private int _id;
+
         public override void FromDtoApiRequest(ChangePositionRequest dto)
         {
             _way = Math.Abs(dto.StartPosition - dto.EndPosition);
             _dir = dto.StartPosition < dto.EndPosition;
+            _id = 0;
         }
 
         /// <inheritdoc />
@@ -40,6 +47,7 @@ namespace AppServer.Domains.MqttRequests.Models
             {
                 {DomainValueConst.Dir, _dir ? "1" : "0"},
                 {DomainValueConst.Way, _way},
+                {DomainValueConst.Id, _id},
             };
         }
 

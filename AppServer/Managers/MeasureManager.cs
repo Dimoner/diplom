@@ -81,18 +81,18 @@ namespace AppServer.Managers
             }
             
             // тестовый блок для измерения тока на периоде
-            Task.Run(() =>
-            {
-                Task.Delay(2000).Wait();
-                var rnd = new Random();
-                for (int i = 210; i <= 310; i += 10)
-                {
-                    _mqttManager.SendMessageAsync($"_M_{fileId}-{i}-{rnd.Next(10, 100)}", _appSettings.FromTopic);
-                    Task.Delay(1000).Wait();
-                }
-                
-                _mqttManager.SendMessageAsync($"_M_STOP_{fileId}", _appSettings.FromTopic);
-            });
+            // Task.Run(() =>
+            // {
+            //     Task.Delay(2000).Wait();
+            //     var rnd = new Random();
+            //     for (int i = 210; i <= 310; i += 10)
+            //     {
+            //         _mqttManager.SendMessageAsync($"_M_{fileId}-{i}-{rnd.Next(10, 100)}", _appSettings.FromTopic);
+            //         Task.Delay(1000).Wait();
+            //     }
+            //     
+            //     _mqttManager.SendMessageAsync($"_M_STOP_{fileId}", _appSettings.FromTopic);
+            // });
             // тестовый блок 
             
             return new MeasureCommandMqttResponse

@@ -10,7 +10,9 @@ using AppServer.Domains.MqttResponse;
 using AppServer.Domains.MqttResponse.Models;
 using AppServer.MqttLogic.Managers.Interfaces;
 using AppServer.Settings.Interfaces;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
@@ -20,26 +22,95 @@ namespace AppServer.MqttLogic.Managers
 {
     public class MqttManager : IMqttManager
     {
-        private readonly IHubContext<MeasureHub> _hubContext;
-        private readonly IHubContext<StateHub> _stateHub;
-
-        private static readonly Dictionary<string, Action<CommandMqttResponse>> _handlers = new Dictionary<string, Action<CommandMqttResponse>>();
+        private static readonly Dictionary<string, Action<CommandMqttResponse>> _handlers = new ();
         
-        private ILogger<IMqttManager> _logger;
-        private IAppSettings _appSettings;
-        private IMqttClient _client;
-        private IMqttClientOptions _pushOptions;
+        private static ILogger<IMqttManager> _logger;
         
-        public MqttManager(
-            ILogger<IMqttManager> logger, 
-            IAppSettings appSettings, 
-            IHubContext<MeasureHub> hubContext,
-            IHubContext<StateHub> stateHub
-            )
+        private static IAppSettings _appSettings;
+        
+        private static IMqttClient _client;
+        
+        /// <summary>
+        /// Инициализация подписки на брокер
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+         public static void Init(IServiceProvider serviceProvider)
         {
-            _hubContext = hubContext;
-            _stateHub = stateHub;
-            Init(logger, appSettings);
+            _logger = serviceProvider.GetRequiredService<ILogger<IMqttManager>>();
+            _appSettings = serviceProvider.GetRequiredService<IAppSettings>();
+            
+            var hubMeasure = serviceProvider.GetRequiredService<IHubContext<MeasureHub>>();
+            var hubState = serviceProvider.GetRequiredService<IHubContext<StateHub>>();
+            
+            var factory = new MqttFactory();
+            _client = factory.CreateMqttClient();
+
+            //configure options
+            var pushOptions = new MqttClientOptionsBuilder()
+                .WithClientId(_appSettings.ClientName)
+                .WithTcpServer(_appSettings.ServerUrl, _appSettings.ServerPort)
+                .WithCredentials(_appSettings.CredentialLogin, _appSettings.CredentialPassword)
+                .WithCleanSession()
+                .Build();
+            
+            _client.UseConnectedHandler(e =>
+            {
+                _logger.LogInformation("Connected successfully with MQTT Brokers.");
+                
+                var topicFilter = new TopicFilterBuilder();
+                _client.SubscribeAsync(topicFilter.WithTopic(_appSettings.FromTopic).Build()).Wait();
+            });
+            
+            _client.UseDisconnectedHandler(e =>
+            {
+                _logger.LogInformation("Disconnected from MQTT Brokers.");
+                Init(serviceProvider);
+            });
+            
+             try
+            {
+                _client.UseApplicationMessageReceivedHandler(e =>
+                {
+                    try
+                    {
+                        var topic = e.ApplicationMessage.Topic;
+                        _logger.LogInformation(topic);
+                        if (!string.IsNullOrWhiteSpace(topic))
+                        {
+                            var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                            _logger.LogInformation($"Topic: {topic}. Message Received: {payload}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogInformation(ex.Message, ex);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(e.Message);
+                throw;
+            }
+
+            try
+            {
+                _client.UseApplicationMessageReceivedHandler(e =>
+                {
+                    _logger.LogInformation("### RECEIVED APPLICATION MESSAGE ###");
+                    var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                    _logger.LogInformation($"Payload = {payload}");
+
+                    MqttResponseParser.ParseResponse(payload, _handlers, hubMeasure, hubState, _logger);
+                });
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(e.Message);
+                throw;
+            }
+            
+            _client.ConnectAsync(pushOptions).Wait();
         }
         
         /// <inheritdoc />
@@ -60,7 +131,7 @@ namespace AppServer.MqttLogic.Managers
 
             await SendMessageAsync(requestData.message, _appSettings.ToTopic);
 
-            await TestCallBackAsync(request.TestCallBack());
+            //await TestCallBackAsync(request.TestCallBack());
             
             return await awaitAnswer.Task.ContinueWith(res =>
             {
@@ -87,93 +158,6 @@ namespace AppServer.MqttLogic.Managers
             else
             {
                 _logger.LogError("Error with connection"); 
-            }
-        }
-
-        private void Init(ILogger<IMqttManager> logger, IAppSettings appSettings)
-        {
-            _logger = logger;
-            _appSettings = appSettings;
-            var factory = new MqttFactory();
-            _client = factory.CreateMqttClient();
-
-            //configure options
-            _pushOptions = new MqttClientOptionsBuilder()
-                .WithClientId(_appSettings.ClientName)
-                .WithTcpServer(_appSettings.ServerUrl, _appSettings.ServerPort)
-                .WithCredentials(_appSettings.CredentialLogin, _appSettings.CredentialPassword)
-                .WithCleanSession()
-                .Build();
-            
-            _client.UseConnectedHandler(e =>
-            {
-                _logger.LogInformation("Connected successfully with MQTT Brokers.");
-                
-                var topicFilter = new TopicFilterBuilder();
-                _client.SubscribeAsync(topicFilter.WithTopic(_appSettings.FromTopic).Build()).Wait();
-            });
-            
-            _client.UseDisconnectedHandler(e =>
-            {
-                _logger.LogInformation("Disconnected from MQTT Brokers.");
-            });
-            
-            CreatePush();
-            CreateSubscriber();
-            
-            _client.ConnectAsync(_pushOptions).Wait();
-        }
-
-        /// <summary>
-        /// Создаем подписку
-        /// </summary>
-        private void CreateSubscriber()
-        {
-            try
-            {
-                _client.UseApplicationMessageReceivedHandler(e =>
-                {
-                    _logger.LogInformation("### RECEIVED APPLICATION MESSAGE ###");
-                    _logger.LogInformation($"Payload = {Encoding.UTF8.GetString(e.ApplicationMessage.Payload)}");
-
-                    MqttResponseParser.ParseResponse(e.ApplicationMessage.Payload, _handlers, _hubContext, _stateHub);
-                });
-            }
-            catch (Exception e)
-            {
-                _logger.LogInformation(e.Message);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Создаем pusher
-        /// </summary>
-        private void CreatePush()
-        {
-            try
-            {
-                _client.UseApplicationMessageReceivedHandler(e =>
-                {
-                    try
-                    {
-                        var topic = e.ApplicationMessage.Topic;
-                        if (string.IsNullOrWhiteSpace(topic) == false)
-                        {
-                            var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-                            _logger.LogInformation($"Topic: {topic}. Message Received: {payload}");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogInformation(ex.Message, ex);
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                _logger.LogInformation(e.Message);
-                throw;
             }
         }
         

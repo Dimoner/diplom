@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AppServer.Controllers;
 using AppServer.Domains.MqttResponse.Models;
 using AppServer.History;
+using AppServer.MqttLogic.Managers.Interfaces;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace AppServer.Domains.MqttResponse
 {
@@ -18,12 +21,28 @@ namespace AppServer.Domains.MqttResponse
         /// <summary>
         /// Парсинг ответа от брокера
         /// </summary>
-        public static void ParseResponse(byte[] payloadByteList, Dictionary<string, Action<CommandMqttResponse>> handlers, IHubContext<MeasureHub> hubContext, IHubContext<StateHub> stateHub)
+        public static void ParseResponse(
+            string payloadStr, 
+            Dictionary<string, Action<CommandMqttResponse>> handlers, 
+            IHubContext<MeasureHub> hubContext, 
+            IHubContext<StateHub> stateHub,
+            ILogger<IMqttManager> logger)
         {
-            // DateTime_Value.......
-            var payload = Encoding.UTF8.GetString(payloadByteList);
-            // Value.......
-            payload = payload.Remove(0, payload.IndexOf("_", StringComparison.Ordinal) + 1);
+            // Value;.......
+            //var payload = string.Join("", payloadStr.Reverse().Where(charSymbol => charSymbol != '0').Reverse().ToArray());
+            bool isStartUSe = false;
+            var payload = string.Join("", payloadStr.Reverse().Where(charSymbol =>
+            {
+                if (charSymbol != '0' && !isStartUSe)
+                {
+                    isStartUSe = true;
+                }
+
+                return isStartUSe;
+            }).Reverse().ToArray());
+            
+            // Value
+            //payload = payload.Remove(0, payload.IndexOf("_", StringComparison.Ordinal) + 1);
             
             // результат измерения
             // M_0-0-0 ||  M_STOP_0
@@ -49,7 +68,7 @@ namespace AppServer.Domains.MqttResponse
                 return;
             }
             
-            throw new Exception("Обработчик не найден");
+            logger.LogError("Обработчик не найден, data:" + payload);
         }
 
         private static void ParseStateCommandResponse(string payload, IHubContext<StateHub> stateHub)
@@ -147,6 +166,7 @@ namespace AppServer.Domains.MqttResponse
         {
             var response = GetMeasureResponseHandler(payload);
             HistoryManager.WireInFile(response);
+            Console.WriteLine(response.X + "/" + response.Y + "\n\r");
             Task.Run(() => hubContext.Clients.All.SendAsync(response.Id.ToString(), response)).Wait();
         }
 

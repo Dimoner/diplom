@@ -47,7 +47,7 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
             _dir = dto.StartPosition > dto.EndPosition ? 2 : 1;
             _step = dto.Step;
             _count = dto.Count;
-            _curPosition = (int)(dto.EndPosition * 100);
+            _curPosition = (int)(dto.StartPosition * 100);
             _speed = dto.Speed;
         }
 
