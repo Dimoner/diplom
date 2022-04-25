@@ -23,8 +23,8 @@ const a11yProps = (index: number) => {
 
 export default function AmperageActionBlock({ alignment, setStateAmperage }: IAmperageActionBlock) {
     const labelFormat = (value: number, tickTime: number) => {
-        if(alignment === "range") {
-            return value.toFixed(0).toString();
+        if (alignment === "range") {
+            return value.toFixed(2).toString();
         }
 
         if (alignment === "time") {
@@ -45,11 +45,11 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
                 }
             }),
             { value: 100, label: labelFormat(xEnd, tickTime) }
-            ];
+        ];
     }
 
     const startMeasureAction = (startMeasure: IStartMeasureResponse) => {
-        if (alignment === "range" && startMeasure.endPosition !== undefined){
+        if (alignment === "range" && startMeasure.endPosition !== undefined) {
             localStorage.removeItem(measureRangeInLocalStorageName);
             const sub = startMeasure.endPosition - startMeasure.startPosition;
 
@@ -79,7 +79,7 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
             return;
         }
 
-        if (alignment === "time" && startMeasure.pointCount !== undefined){
+        if (alignment === "time" && startMeasure.pointCount !== undefined) {
             localStorage.removeItem(measureTimeInLocalStorageName);
 
             const newMarks: IAmperageMarks[] = getNewMarks(0, startMeasure.pointCount as number, startMeasure.frequency as number);
@@ -97,7 +97,7 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
                     status: MeasureStatusEnum.Measuring,
                     measureName: startMeasure.measureName,
                     measureDate: moment().format("DD.MM.yyyy HH:mm"),
-                    frequency:  startMeasure.frequency as number
+                    frequency: startMeasure.frequency as number
                 },
                 managerMeasure: {
                     ...prev.managerMeasure,
@@ -137,7 +137,7 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
                         })}
                     </Tabs>
                 </Box>
-                <Actions startMeasure={startMeasureAction} type={"amp"} subType={alignment}/>
+                <Actions startMeasure={startMeasureAction} type={"amp"} subType={alignment} />
             </div>
         </div>
     )

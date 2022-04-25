@@ -52,9 +52,9 @@ struct DetectAmperageRangeStruct {
     /// направление
     bool dir;
     /// сколько нм надо преодалеть
-    float way;
+    uint32_t way;
     /// шаг в нм
-    float step;
+    uint32_t step;
     /// кол-во измерений
     uint16_t count;
     /// текущее положение в нм

@@ -18,12 +18,12 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         /// <summary>
         /// путь
         /// </summary>
-        private float _way;
+        private int _way;
 
         /// <summary>
         /// шаг для измерения
         /// </summary>
-        private float _step;
+        private int _step;
 
         /// <summary>
         /// кол-во измерений в точке
@@ -43,9 +43,9 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         
         public override void FromDtoApiRequest(StartDetectRangeRequest dto)
         {
-            _way = Math.Abs(dto.StartPosition - dto.EndPosition);
+            _way = (int)(Math.Abs(dto.StartPosition - dto.EndPosition) * 100);
             _dir = dto.StartPosition > dto.EndPosition ? 2 : 1;
-            _step = dto.Step;
+            _step = (int)(dto.Step * 100);
             _count = dto.Count;
             _curPosition = (int)(dto.StartPosition * 100);
             _speed = dto.Speed;
@@ -62,6 +62,15 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
                 {DomainValueConst.Cur, _curPosition},
                 {DomainValueConst.Speed, _speed},
             };
+        }
+        
+        /// <summary>
+        /// Округление до 2 знаков после запятой
+        /// </summary>
+        public float RoundUp(float input, int places)
+        {
+            var multiplier = Math.Pow(10, Convert.ToDouble(places));
+            return (float)(Math.Ceiling(input * multiplier) / multiplier);
         }
     }
 }

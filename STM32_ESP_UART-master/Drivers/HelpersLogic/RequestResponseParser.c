@@ -150,16 +150,14 @@ struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayloa
 
         if (strstr (param,"WAY") != NULL){
             param = strtok(NULL, "-=");
-            float ftemp = stof(param);
-            dima.way = ftemp;
+            dima.way = str_to_uint32(param);
             param = strtok(NULL, "-=");
             continue;
         }
 
         if (strstr (param,"STEP") != NULL){
             param = strtok(NULL, "-=");
-            float ftemp = stof(param);
-            dima.step = ftemp;
+            dima.step = str_to_uint32(param);
             param = strtok(NULL, "-=");
             continue;
         }

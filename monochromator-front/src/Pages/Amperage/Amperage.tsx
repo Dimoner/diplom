@@ -36,6 +36,8 @@ const defaultValue: IAmperageState = {
     }
 };
 
+let intervalOrReconnection: number;
+
 export default function Amperage() {
     const hubConnection = useRef<HubConnection>(new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5000/measure")
@@ -53,8 +55,13 @@ export default function Amperage() {
     const [isRange, setIsRange] = useState<boolean>(false);
 
     useEffect(() => {
-        hubConnection.current.start().then(a => {
-            console.log(a)
+        connectAction()
+
+        hubConnection.current.onclose(a => {
+            // @ts-ignore
+            intervalOrReconnection = setInterval(() => {
+                connectAction()
+            }, 1000)
         });
 
         return () => {
@@ -117,11 +124,10 @@ export default function Amperage() {
                 status: MeasureStatusEnum.Measuring,
             }
         }
-        result.measureList = [{ x: message.x, y: message.y }, ...prev.measureList];
 
         if (stateAmperage.alignment === "range") {
             result.measureList = [{ x: (message.x / 100), y: message.y }, ...prev.measureList];
-            result.amperageMarks.value = ((message.x - prev.startWave) * 100 / prev.rangeWave);
+            result.amperageMarks.value = (((message.x / 100) - prev.startWave) * 100 / prev.rangeWave);
 
             localStorage.setItem(measureRangeInLocalStorageName, JSON.stringify(result));
             return result;
@@ -157,6 +163,16 @@ export default function Amperage() {
             };
         }
     }, [stateAmperage.measureId]);
+
+    const connectAction = () => {
+        hubConnection.current.start().then(a => {
+            console.log(a)
+            window.clearInterval(intervalOrReconnection);
+            if (stateAmperage.measureId !== "" && stateAmperage.measureId !== undefined && stateAmperage.measureId !== null) {
+                hubConnection.current.on(stateAmperage.measureId, action);
+            }
+        });
+    }
 
     return (
         <div style={{ width: "90%", marginLeft: "-5px" }}>

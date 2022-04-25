@@ -272,10 +272,10 @@ void StartTaskPMT(void *argument) {
 			}
 
 			// 3 - высчитываем сколько шагов надо совершить
-			uint32_t totalMeasureWay =  globalState.detectAmperageRangeStruct.way * 1000;
+			uint32_t totalMeasureWay =  globalState.detectAmperageRangeStruct.way * 10;
 
 			// 4 - определяем на каком кол-ве сигналов надо снять измерение
-			uint32_t stepCount = globalState.detectAmperageRangeStruct.step * 1000;
+			uint32_t stepCount = globalState.detectAmperageRangeStruct.step * 10;
 
 			// 5 - задаем текущий счетчик
 			uint32_t currentCount = 0;
@@ -295,7 +295,7 @@ void StartTaskPMT(void *argument) {
 						globalState.detectAmperageRangeStruct.cur = globalState.detectAmperageRangeStruct.cur - (i / 10);
 					}
 
-					globalState.detectAmperageRangeStruct.way = (totalMeasureWay - i + (stepCount - currentCount)) / 1000;
+					globalState.detectAmperageRangeStruct.way = (totalMeasureWay - i + currentCount) / 10;
 					copyGlobalStateToPause(globalState);
 					i = totalMeasureWay + 1;
 					continue;

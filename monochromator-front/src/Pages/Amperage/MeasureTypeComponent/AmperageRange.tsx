@@ -1,7 +1,7 @@
 import { Slider } from "@mui/material";
 import { IAmperageMarks, IAmperageSlider } from "../Interfaces/IAmperageSlider";
 import ChartComponent from "../../../Components/Chart/AmperageChart";
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import LastMeasureComponent from "../../Components/LastMeasureComponent";
 import { IAmperageState, IManagerMeasure, IMeasureItem, IOldMeasureState } from "../Interfaces/AmperagePageInterfaces";
 import MeasureStatusComponent from "./MeasureStatusComponent";
@@ -11,7 +11,7 @@ import {
     ISettingComponentState,
     settingFuncStorageConst
 } from "../../../Components/Setting/SettingComponent";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 
 export interface IAmperageRange {
     measureList: IMeasureItem[],
@@ -34,7 +34,7 @@ export default function AmperageRange({ measureList, amperageMarks, managerMeasu
             />
             <div className="amperage-loader">
                 <div className="amperage-loader-information">
-                    <MeasureStatusComponent measureAdditionInfo={measureAdditionInfo}/>
+                    <MeasureStatusComponent measureAdditionInfo={measureAdditionInfo} />
                     <div className="amperage-loader-information-slider">
                         <div className={"control-measure-title"}>
                             Прогресс измерения:
@@ -43,7 +43,7 @@ export default function AmperageRange({ measureList, amperageMarks, managerMeasu
                             aria-label="Custom marks"
                             value={amperageMarks.value}
                             marks={amperageMarks.marks.map((value: IAmperageMarks, index: number) => {
-                                if (index === 0 || index === 3 || index === 6 || index === 8 || index === 10) {
+                                if (index === 0 || index === 3 || index === 6 || index === 10) {
                                     value.label = value.label.replace("сек", "нм")
                                     if (value.label.includes("нм")) {
                                         return value;
@@ -58,7 +58,7 @@ export default function AmperageRange({ measureList, amperageMarks, managerMeasu
                             })}
                         />
                     </div>
-                    <MeasureButtonActionComponent managerMeasure={managerMeasure} setStateAmperage={setStateAmperage}/>
+                    <MeasureButtonActionComponent managerMeasure={managerMeasure} setStateAmperage={setStateAmperage} />
                 </div>
                 <div>
                     <ChartComponent

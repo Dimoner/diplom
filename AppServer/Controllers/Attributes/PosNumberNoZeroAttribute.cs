@@ -15,8 +15,8 @@ namespace AppServer.Controllers.Attributes
             if (value == null) {
                 return true;
             }
-            int getal;
-            if (int.TryParse(value.ToString(), out getal)) {
+            float getal;
+            if (float.TryParse(value.ToString(), out getal)) {
 
                 if (getal == 0)
                     return false;
