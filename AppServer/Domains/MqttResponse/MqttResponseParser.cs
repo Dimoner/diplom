@@ -33,9 +33,10 @@ namespace AppServer.Domains.MqttResponse
             bool isStartUSe = false;
             var payload = string.Join("", payloadStr.Reverse().Where(charSymbol =>
             {
-                if (charSymbol != '0' && !isStartUSe)
+                if (charSymbol != ':' && !isStartUSe)
                 {
                     isStartUSe = true;
+                    return false;
                 }
 
                 return isStartUSe;
@@ -105,10 +106,10 @@ namespace AppServer.Domains.MqttResponse
         /// <param name="handlers">ожидающие обработчики</param>
         private static void ParseCommandResponse(string payload, Dictionary<string, Action<CommandMqttResponse>> handlers)
         {
-            // _0_0*ERR={}-STAT={}
+            // _0_0*E={}-S={}
             payload = payload.Remove(0, payload.IndexOf("R", StringComparison.Ordinal) + 1);
             
-            // ["_0_0", "ERR={}-STAT={}"]
+            // ["_0_0", "E={}-S={}"]
             var values = payload.Split('*');
             // "_00_00"
             var key = values[0];
@@ -120,14 +121,14 @@ namespace AppServer.Domains.MqttResponse
             // "_0_0"
             key = $"_{currentKeyFilterResult[0]}_{currentKeyFilterResult[1]}";
             
-            // [["ERR", "{}"], ["STAT", "{}"]]
+            // [["E", "{}"], ["S", "{}"]]
             var payloadResult = values[1].Split('-').Select(value => value.Split("=")).ToArray();
 
             var commandMqttResponse = new CommandMqttResponse();
             
             foreach (var result in payloadResult)
             {
-                // ["ERR", "{}"], ["STAT", "{}"]
+                // ["E", "{}"], ["S", "{}"]
                 if (result[0] == DomainValueConst.ErrorText)
                 {
                     commandMqttResponse.ErrorText = result[1];

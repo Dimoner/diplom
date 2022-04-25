@@ -10,12 +10,12 @@
         /// <summary>
         /// Тест с ошибкой
         /// </summary>
-        public const string ErrorText = "ERR";
+        public const string ErrorText = "E";
 
         /// <summary>
         /// Результат выполнения команды
         /// </summary>
-        public const string IsSuccess = "STAT";
+        public const string IsSuccess = "S";
         
         #endregion
 
