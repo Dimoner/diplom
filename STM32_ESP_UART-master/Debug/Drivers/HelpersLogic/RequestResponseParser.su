@@ -5,5 +5,5 @@ RequestResponseParser.c:39:6:clean	24	static
 RequestResponseParser.c:47:19:getTypeStruct	40	static
 RequestResponseParser.c:86:7:getPayload	24	static
 RequestResponseParser.c:93:29:getChangePositionStruct	32	static
-RequestResponseParser.c:130:34:getDetectAmperageRangeStruct	56	static
-RequestResponseParser.c:195:33:getDetectAmperageTimeStruct	56	static
+RequestResponseParser.c:129:34:getDetectAmperageRangeStruct	56	static
+RequestResponseParser.c:194:33:getDetectAmperageTimeStruct	56	static

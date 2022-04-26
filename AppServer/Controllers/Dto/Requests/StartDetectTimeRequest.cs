@@ -32,7 +32,9 @@ namespace AppServer.Controllers.Dto.Requests
         [Required]
         [JsonProperty("frequency")]
         [PosNumberNoZero]
-        public int Frequency { get; set; }
+        [MinInt(0)]
+        [MaxInt(100)]
+        public float Frequency { get; set; }
         
         /// <summary>
         /// Кол-во измерений за 1 Delay

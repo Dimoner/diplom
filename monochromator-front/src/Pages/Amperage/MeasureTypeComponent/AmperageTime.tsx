@@ -6,8 +6,8 @@ import ChartComponent from "../../../Components/Chart/AmperageChart";
 import React, { Dispatch, SetStateAction } from "react";
 import MeasureStatusComponent from "./MeasureStatusComponent";
 import MeasureButtonActionComponent from "./MeasureButtonActionComponent";
-import {defaultValueSettingComponentStateFunc} from "../../../Components/Setting/SettingComponent";
-import {useSelector} from "react-redux";
+import { defaultValueSettingComponentStateFunc } from "../../../Components/Setting/SettingComponent";
+import { useSelector } from "react-redux";
 import moment from "moment";
 
 export interface IAmperageTime {
@@ -31,9 +31,9 @@ export default function AmperageTime({ measureList, amperageMarks, managerMeasur
                         y: 0
                     };
 
-                    if(typeof value.x === "number"){
+                    if (typeof value.x === "number") {
                         newValue.x = (moment.utc(value.x * measureAdditionInfo.frequency * 0.1).format('HH:mm:ss.SSS') as any as number)
-                    }else {
+                    } else {
                         newValue.x = value.x;
                     }
                     newValue.y = value.y;
@@ -44,7 +44,7 @@ export default function AmperageTime({ measureList, amperageMarks, managerMeasur
             />
             <div className="amperage-loader">
                 <div className="amperage-loader-information">
-                    <MeasureStatusComponent measureAdditionInfo={measureAdditionInfo}/>
+                    <MeasureStatusComponent measureAdditionInfo={measureAdditionInfo} />
                     <div className="amperage-loader-information-slider">
                         <div className={"control-measure-title"}>
                             Прогресс измерения:
@@ -53,7 +53,7 @@ export default function AmperageTime({ measureList, amperageMarks, managerMeasur
                             aria-label="Custom marks"
                             value={amperageMarks.value}
                             marks={amperageMarks.marks.map((value: IAmperageMarks, index: number) => {
-                                if (index === 0 || index === 3 || index === 6  || index === 10) {
+                                if (index === 0 || index === 3 || index === 6 || index === 10) {
                                     value.label = value.label.replace("нм", "")
                                     return value;
                                 }
@@ -63,7 +63,7 @@ export default function AmperageTime({ measureList, amperageMarks, managerMeasur
                             })}
                         />
                     </div>
-                    <MeasureButtonActionComponent managerMeasure={managerMeasure} setStateAmperage={setStateAmperage}/>
+                    <MeasureButtonActionComponent managerMeasure={managerMeasure} setStateAmperage={setStateAmperage} />
                 </div>
                 <div>
                     <ChartComponent
@@ -75,7 +75,7 @@ export default function AmperageTime({ measureList, amperageMarks, managerMeasur
                         yTitleFormatter={value => "Токовый сигнал:"}
                         type={"amperage"}
                         yTitle={`Токовый сигнал, ${defaultValueSettingComponentStateFunc().amperageName}`}
-                        xTitle="Время с начала измерения, тики (1 = 0,1 мс)"
+                        xTitle="Время с начала измерения, сек"
                     />
                 </div>
             </div>

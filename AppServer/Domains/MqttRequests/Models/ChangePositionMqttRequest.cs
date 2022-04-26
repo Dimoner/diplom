@@ -25,7 +25,7 @@ namespace AppServer.Domains.MqttRequests.Models
         /// <summary>
         /// Кол-во нм которые надо пройти
         /// </summary>
-        private float _way;
+        private int _way;
 
         /// <summary>
         /// идентификатор операции
@@ -35,7 +35,7 @@ namespace AppServer.Domains.MqttRequests.Models
 
         public override void FromDtoApiRequest(ChangePositionRequest dto)
         {
-            _way = Math.Abs(dto.StartPosition - dto.EndPosition);
+            _way = (int)(Math.Abs(dto.StartPosition - dto.EndPosition) * 100);
             _dir = dto.StartPosition < dto.EndPosition;
             _id = 0;
         }

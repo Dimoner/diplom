@@ -209,8 +209,8 @@ void StartTaskMOTOR(void *argument) {
 			}
 
 			// 3 - определяем кол-во шим сигналов для вращения
-			totalRate = globalState.changePositionStruct.way * 1000;
-			currentRate = globalState.changePositionStruct.way * 1000;
+			totalRate = globalState.changePositionStruct.way * 10;
+			currentRate = globalState.changePositionStruct.way * 10;
 			HAL_TIM_Base_Start_IT(&htim1);
 		}
 
@@ -256,8 +256,11 @@ void StartTaskPMT(void *argument) {
 		{
 			// 0 - отправляем команду о начале измерения
 			SentResultActionResponse(globalState.typeStruct, "", 1);
-
 			globalState.isExistActiveAction = true;
+
+			// что бы 1 точка успела собрать с ацп сигнал сразу
+			uint32_t start = measureAmperageRangeItem(3);
+
 			// 1 - выполняем измерение в 1 точке
 			SendResponseMeasure(
 					globalState.detectAmperageRangeStruct.id,
@@ -346,12 +349,8 @@ void StartTaskPMT(void *argument) {
 			SentResultActionResponse(globalState.typeStruct, "", 1);
 
 			globalState.isExistActiveAction = true;
-			// 1 - выполняем измерение в 1 точке
-			SendResponseMeasure(
-					globalState.detectAmperageTimeStruct.id,
-					0,
-					measureAmperageRangeItem(globalState.detectAmperageTimeStruct.count)
-			);
+			// что бы 1 точка успела собрать с ацп сигнал сразу
+			uint32_t start = measureAmperageRangeItem(3);
 
 			// 6 - запускам процесс преодаления промежутка
 			for (uint32_t i = globalState.detectAmperageTimeStruct.currentPointCount; i < globalState.detectAmperageTimeStruct.pointCount; i++) {
@@ -377,13 +376,6 @@ void StartTaskPMT(void *argument) {
 			}
 
 			if(globalPauseFlag == false){
-				// финальный замер
-				SendResponseMeasure(
-					globalState.detectAmperageTimeStruct.id,
-					globalState.detectAmperageTimeStruct.pointCount,
-					measureAmperageRangeItem(globalState.detectAmperageTimeStruct.count)
-				);
-
 				// 7 - сообщяем об окончании процесса измерения
 				SendResponseStop(globalState.detectAmperageTimeStruct.id);
 			}

@@ -42,10 +42,10 @@ export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponen
                         getPropertyName<ITimeMeasureFormComponentField>(v => v.frequency),
                         getPropertyNameToLower<IStartMeasureState>(v => v.timeState)
                     )}
-                    error={props.actionResultView !== "" && props.data.frequency <= 0.9}
+                    error={props.actionResultView !== "" && (props.data.frequency <= 0 || props.data.frequency > 100)}
                     helperText={
-                        (props.actionResultView !== "" && props.data.frequency <= 0.9)
-                            ? "Больше > 0"
+                        props.actionResultView !== "" && (props.data.frequency <= 0 || props.data.frequency > 100)
+                            ? "Больше > 0, Меньше < 101"
                             : ""
                     }
                     required={true}
@@ -53,7 +53,7 @@ export default function TimeMeasureFormComponent(props: ITimeMeasureFormComponen
                     style={{width: "230px", height: "70px"}}
                     id="standard-basic"
                     key={getPropertyNameToLower<ITimeMeasureFormComponentField>(v => v.frequency)}
-                    label="Частота (1 тик - 0,1 мс), тик"
+                    label="t между измер., сек"
                     variant="standard" />
             </div>
             <div className="start-measure-text-control">

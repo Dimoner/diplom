@@ -33,7 +33,7 @@ namespace AppServer.Domains.MqttResponse
             bool isStartUSe = false;
             var payload = string.Join("", payloadStr.Reverse().Where(charSymbol =>
             {
-                if (charSymbol != ':' && !isStartUSe)
+                if (charSymbol == ':' && !isStartUSe)
                 {
                     isStartUSe = true;
                     return false;

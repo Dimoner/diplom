@@ -27,7 +27,7 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         /// <summary>
         /// кол-во тиков между точками
         /// </summary>
-        private float _frequency { get; set; }
+        private int _frequency { get; set; }
         
         /// <summary>
         /// Парсинг сообщения с фронта
@@ -36,7 +36,7 @@ namespace AppServer.Domains.MqttRequests.Models.Detect.Base
         {
             _pointCount = dto.PointCount;
             _count = dto.Count;
-            _frequency = dto.Frequency;
+            _frequency = (int)(dto.Frequency * 10000);
         }
 
         protected override Dictionary<string, object> GetMessageValue()

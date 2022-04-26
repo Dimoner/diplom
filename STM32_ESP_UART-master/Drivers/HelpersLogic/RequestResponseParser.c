@@ -113,8 +113,7 @@ struct ChangePositionStruct getChangePositionStruct(char requestPayload[]){
 
         if (strstr (param,"WAY") != NULL){
             param = strtok(NULL, "-=");
-            float ftemp = atof(param);
-            dima.way = ftemp;
+            dima.way = str_to_uint32(param);
             param = strtok(NULL, "-=");
             continue;
         }

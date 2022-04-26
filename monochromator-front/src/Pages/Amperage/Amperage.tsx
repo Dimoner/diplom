@@ -134,6 +134,7 @@ export default function Amperage() {
         }
 
         if (stateAmperage.alignment === "time") {
+            message.x =  message.x + 1;
             result.measureList = [{ x: message.x, y: message.y }, ...prev.measureList];
             result.amperageMarks.value = (message.x * 100 / prev.rangeWave);
             localStorage.setItem(measureTimeInLocalStorageName, JSON.stringify(result))

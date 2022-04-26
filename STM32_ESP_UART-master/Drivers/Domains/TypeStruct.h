@@ -41,7 +41,7 @@ struct ChangePositionStruct {
     /// направление
     bool dir;
     /// сколько нм надо преодалеть
-    float way;
+    uint32_t way;
 };
 
 /// измерение тока на интервале

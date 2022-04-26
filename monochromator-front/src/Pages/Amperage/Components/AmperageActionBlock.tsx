@@ -81,7 +81,7 @@ export default function AmperageActionBlock({ alignment, setStateAmperage }: IAm
 
         if (alignment === "time" && startMeasure.pointCount !== undefined) {
             localStorage.removeItem(measureTimeInLocalStorageName);
-
+            startMeasure.frequency = (startMeasure.frequency as number) * 10000;
             const newMarks: IAmperageMarks[] = getNewMarks(0, startMeasure.pointCount as number, startMeasure.frequency as number);
             setStateAmperage(prev => ({
                 ...prev,
