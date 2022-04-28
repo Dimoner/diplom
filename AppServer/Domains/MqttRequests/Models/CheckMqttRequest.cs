@@ -26,7 +26,7 @@ namespace AppServer.Domains.MqttRequests.Models
 
         public override string TestCallBack()
         {
-            return $"_R_{(int)ActionType}_{(int)ActionSubType}*ERR=Странная ошибка -STAT=0";
+            return $"R_{(int)ActionType}_{(int)ActionSubType}*E=Странная ошибка -S=0:";
             //return "";
         }
     }

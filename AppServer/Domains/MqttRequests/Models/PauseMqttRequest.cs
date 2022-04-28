@@ -26,7 +26,7 @@ namespace AppServer.Domains.MqttRequests.Models
 
         public override string TestCallBack()
         {
-            return $"_R_{(int)ActionType}_{(int)ActionSubType}*ERR=-STAT=1";
+            return $"R_{(int)ActionType}_{(int)ActionSubType}*E=-S=1:";
             //return "";
         }
     }

@@ -136,7 +136,7 @@ namespace AppServer.MqttLogic.Managers
 
             await SendMessageAsync(requestData.message, _appSettings.ToTopic);
 
-            //await TestCallBackAsync(request.TestCallBack());
+            await TestCallBackAsync(request.TestCallBack());
             
             return await awaitAnswer.Task.ContinueWith(res =>
             {
