@@ -163,7 +163,7 @@ struct DetectAmperageRangeStruct getDetectAmperageRangeStruct(char requestPayloa
 
         if (strstr (param,"CUR") != NULL){
             param = strtok(NULL, "-=");
-            float ftemp = str_to_uint16(param);
+            float ftemp = str_to_uint32(param);
             dima.cur = ftemp;
             param = strtok(NULL, "-=");
             continue;

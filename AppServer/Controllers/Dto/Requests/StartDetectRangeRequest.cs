@@ -73,7 +73,12 @@ namespace AppServer.Controllers.Dto.Requests
         
         public override string CreateTableHeader()
         {
-            return $"Wave, нм    | {(ActionType == ActionTypeEnum.Tick ? "Cont" : "Amperage, Am")}  ";
+            return $"Wave, нм    ,{(ActionType == ActionTypeEnum.Tick ? "Cont" : "Amperage")}";
+        }
+        
+        public override string CreateTableMeasureHeader()
+        {
+            return $"нм            у.е  ";
         }
     }
 }

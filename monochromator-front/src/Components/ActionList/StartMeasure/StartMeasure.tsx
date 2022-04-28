@@ -77,8 +77,19 @@ export default function StartMeasure(props: IStartMeasureProps) {
 
     const [mainFrom, setMainForm] = React.useState<IStartMeasureState>(getDefaultValue(props.type, props.subType));
 
-    const savePrevForm = () => {
+    const savePrevForm = (typeSave: 'start-detect-time' | 'start-detect-range') => {
         const form = {...mainFrom}
+        if(typeSave === 'start-detect-time'){
+            form.currentPosition = form.startPosition;
+            form.startPosition = 0;
+        }
+
+        if(typeSave === 'start-detect-range'){
+            form.currentPosition = form.rangeState.endPosition;
+            form.startPosition = 0;
+            form.rangeState.endPosition = 0;
+        }
+
         form.measureName = "";
         form.description = "";
         const jsonFormat = JSON.stringify(form);
@@ -105,11 +116,12 @@ export default function StartMeasure(props: IStartMeasureProps) {
             speed: mainFrom.rangeState?.speed,
         }
 
-        const uri = `http://localhost:5000/logic/${props.subType === "time" ? 'start-detect-time' : 'start-detect-range'}`;
+        const requestType = props.subType === "time" ? 'start-detect-time' : 'start-detect-range';
+        const uri = `http://localhost:5000/logic/${requestType}`;
 
         const response = await HttpServiceHelper.SendPostRequest<IStartMeasureRequest, { measureId: number }>(uri, requestBody);
         if (response.errorBody === undefined) {
-            savePrevForm();
+            savePrevForm(requestType);
             const result: IStartMeasureResponse = {
                 ...(response.body as { measureId: number }),
                 ...requestBody

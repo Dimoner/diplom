@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AppServer.Controllers;
 using AppServer.Domains;
 using AppServer.Domains.MqttRequests.Interfaces;
+using AppServer.Domains.MqttRequests.Models;
 using AppServer.Domains.MqttResponse;
 using AppServer.Domains.MqttResponse.Models;
 using AppServer.MqttLogic.Managers.Interfaces;
@@ -120,7 +121,11 @@ namespace AppServer.MqttLogic.Managers
             var existCommand = _handlers.GetValueOrDefault(requestData.key);
             if (existCommand != null)
             {
-                throw new Exception("Комманда уже существует");
+                // если команда уже существует, удаляем старую, отправляем запрос на удаление в контроллере 
+                // немного ждем на всякий случа и отправляем новую
+                await SendMessageAsync(new StopMqttRequest().CreateRequest().message, _appSettings.ToTopic);
+                _handlers.Remove(requestData.key);
+                await Task.Delay(1000);
             }
             var awaitAnswer = new TaskCompletionSource<CommandMqttResponse>();
             

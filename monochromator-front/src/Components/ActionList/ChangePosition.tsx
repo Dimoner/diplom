@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, CircularProgress, TextField} from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import "./Style/change-position.scss"
 import { IErrorResponse } from "../../Helpers/HttpServiceHelper";
 
@@ -63,12 +63,16 @@ export default function ChangePosition() {
             }
 
             if (response.ok) {
-                setStatePosition(prevState => ({
-                    ...prevState,
-                    isLoad: false,
-                    view: "Длина волны монохроматора изменена",
-                    isSuccess: true
-                }))
+                setStatePosition(prevState => {
+                    return {
+                        ...prevState,
+                        isLoad: false,
+                        view: "Длина волны монохроматора изменена",
+                        isSuccess: true,
+                        startPosition: prevState.endPosition,
+                        endPosition: 0
+                    }
+                })
                 return;
             }
 
@@ -90,10 +94,10 @@ export default function ChangePosition() {
                 <div className="change-position-text-simple">
                     Перемещение монохроматора в нужное положение
                 </div>
-                <div className="change-position-text-control" style={{height: "75px"}}>
+                <div className="change-position-text-control" style={{ height: "75px" }}>
                     <TextField
                         onChange={(value) => {
-                            setStatePosition(prevState => ({...prevState, startPosition: Number(value.target.value)}))
+                            setStatePosition(prevState => ({ ...prevState, startPosition: Number(value.target.value) }))
                         }}
                         error={statePosition.view !== "" && (statePosition.startPosition <= 180 || statePosition.startPosition >= 1000)}
                         helperText={
@@ -101,16 +105,18 @@ export default function ChangePosition() {
                                 ? "Диапозоне от 180 до 1000 нм"
                                 : ""
                         }
-                        style={{width: "330px"}}
+                        value={statePosition.startPosition === 0 ? undefined : statePosition.startPosition}
+                        style={{ width: "330px" }}
                         id="standard-basic"
                         label="Начальное положение (нм):"
                         required={true}
-                        variant="standard"/>
+                        type={"number"}
+                        variant="standard" />
                 </div>
-                <div className="change-position-text-control" style={{height: "75px"}}>
+                <div className="change-position-text-control" style={{ height: "75px" }}>
                     <TextField
                         onChange={(value) => {
-                            setStatePosition(prevState => ({...prevState, endPosition: Number(value.target.value)}))
+                            setStatePosition(prevState => ({ ...prevState, endPosition: Number(value.target.value) }))
                         }}
                         error={statePosition.view !== "" && (statePosition.endPosition <= 180 || statePosition.endPosition >= 1000)}
                         helperText={
@@ -118,22 +124,24 @@ export default function ChangePosition() {
                                 ? "Диапозоне от 180 до 1000 нм"
                                 : ""
                         }
-                        style={{width: "330px"}}
+                        value={statePosition.endPosition}
+                        style={{ width: "330px" }}
                         id="standard-basic"
+                        type={"number"}
                         required={true}
                         label="Конечное положение (нм):"
-                        variant="standard"/>
+                        variant="standard" />
                 </div>
             </div>
             <div className="change-position-action">
                 {
                     !statePosition.isLoad
                         ? <Button onClick={sendRequest} variant="outlined">Запрос</Button>
-                        : <CircularProgress/>
+                        : <CircularProgress />
                 }
             </div>
             {!statePosition.isLoad && statePosition.view !== "" ?
-                <div className="change-position-result" style={{color: statePosition.isSuccess ? "green" : "red"}}>
+                <div className="change-position-result" style={{ color: statePosition.isSuccess ? "green" : "red" }}>
                     {statePosition.view}
                 </div> : ""}
         </div>

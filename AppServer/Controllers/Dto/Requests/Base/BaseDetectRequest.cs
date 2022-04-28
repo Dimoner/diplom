@@ -57,6 +57,12 @@ namespace AppServer.Controllers.Dto.Requests.Base
         /// </summary>
         /// <returns></returns>
         public abstract string CreateTableHeader();
+
+        /// <summary>
+        /// Добавляем к заголвоку единицы измерения
+        /// </summary>
+        /// <returns></returns>
+        public abstract string CreateTableMeasureHeader();
         
         /// <summary>
         /// Преобразуем под размер ячейки блоки

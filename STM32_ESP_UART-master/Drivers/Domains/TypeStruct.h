@@ -58,7 +58,7 @@ struct DetectAmperageRangeStruct {
     /// кол-во измерений
     uint16_t count;
     /// текущее положение в нм
-    uint16_t cur;
+    uint32_t cur;
     /// скорость измерения (максимум)1 -> 255(минимум)
     uint32_t speed;
 };

@@ -1,17 +1,17 @@
 import * as React from 'react';
 import Chart from "react-apexcharts";
-import {ApexOptions} from "apexcharts";
-import {useEffect, useState} from "react";
-import {IMeasureItem} from "../../Pages/Amperage/Interfaces/AmperagePageInterfaces";
-import {useSettingFuncAction} from "../Setting/SettingComponent";
-import {useSelector} from "react-redux";
+import { ApexOptions } from "apexcharts";
+import { useEffect, useState } from "react";
+import { IMeasureItem } from "../../Pages/Amperage/Interfaces/AmperagePageInterfaces";
+import { useSettingFuncAction } from "../Setting/SettingComponent";
+import { useSelector } from "react-redux";
 
 export interface IChartComponentProps {
     measure: IMeasureItem[],
-    xFormatter: (seriesName: number) =>  string,
+    xFormatter: (seriesName: number) => string,
     xTitle: string,
     yTitle: string,
-    yFormatter: (val: number, opts?: any) =>  string,
+    yFormatter: (val: number, opts?: any) => string,
     yTitleFormatter: (value: string) => string,
     type: "amperage" | "tick"
 }
@@ -24,9 +24,10 @@ export default function ChartComponent(props: IChartComponentProps) {
             xaxis: ApexXAxis,
             yaxis: ApexYAxis,
             markers: ApexMarkers,
-            tooltip: ApexTooltip
+            tooltip: ApexTooltip,
+            stroke: ApexStroke
         },
-        series:  ApexOptions['series']
+        series: ApexOptions['series']
     }>({
         option: {
             chart: {
@@ -46,7 +47,6 @@ export default function ChartComponent(props: IChartComponentProps) {
                 },
             },
             markers: {
-                size: 5,
             },
             xaxis: {
                 title: {
@@ -64,7 +64,7 @@ export default function ChartComponent(props: IChartComponentProps) {
             tooltip: {
                 enabled: true,
                 style: {
-                    fontSize: '12px',
+                    fontSize: '14px',
                     fontFamily: undefined
                 },
                 onDatasetHover: {
@@ -76,10 +76,10 @@ export default function ChartComponent(props: IChartComponentProps) {
                 },
                 y: {
                     formatter(val: number, opts?: any): string {
-                        return  props.yFormatter(val, opts)
+                        return props.yFormatter(val, opts)
                     },
                     title: {
-                        formatter: (seriesName) =>  props.yTitleFormatter(seriesName),
+                        formatter: (seriesName) => props.yTitleFormatter(seriesName),
                     }
                 },
                 marker: {
@@ -94,9 +94,13 @@ export default function ChartComponent(props: IChartComponentProps) {
                     offsetX: 0,
                     offsetY: 0,
                 },
-            }
+            },
+            stroke: {
+                width: [2, 2]
+            },
         },
-        series:[
+
+        series: [
             {
                 name: "Ток: ",
                 data: []
@@ -116,7 +120,7 @@ export default function ChartComponent(props: IChartComponentProps) {
                 name: "series-1",
                 data: [...measure.map(value => {
                     return {
-                        x : value.x,
+                        x: value.x,
                         y: value.y
                     }
                 })]
@@ -142,7 +146,7 @@ export default function ChartComponent(props: IChartComponentProps) {
 
 
     return (
-        <div style={{width: "88%"}}>
+        <div style={{ width: "88%" }}>
             <Chart
                 options={chartState.option}
                 series={chartState.series}

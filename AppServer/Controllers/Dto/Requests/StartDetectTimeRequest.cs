@@ -67,7 +67,12 @@ namespace AppServer.Controllers.Dto.Requests
 
         public override string CreateTableHeader()
         {
-            return $"Time, сек   | {(ActionType == ActionTypeEnum.Tick ? "Cont" : "Amperage, Am")}  ";
+            return $"Time,       , {(ActionType == ActionTypeEnum.Tick ? "Cont        " : "Amperage    ")}";
+        }
+
+        public override string CreateTableMeasureHeader()
+        {
+            return $"сек           у.е  ";
         }
     }
 }

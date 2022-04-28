@@ -40,7 +40,7 @@ namespace AppServer.History
             {
                 var xValue = BaseDetectRequest.GetMeasureCurrentFormat(mqttResponse.X);
                 var yValue = BaseDetectRequest.GetMeasureCurrentFormat(mqttResponse.Y);
-                File.AppendAllText(currentFile.FullName, $"\r{xValue}|{yValue}");
+                File.AppendAllText(currentFile.FullName, $"\r{xValue},{yValue}");
             }
             
             return fileItem;
@@ -119,6 +119,7 @@ Description:
 -----------------------------------------
 Measure:
 {dto.CreateTableHeader()}
+{dto.CreateTableMeasureHeader()}
 -----------------------------------------");
 
 

@@ -4,12 +4,12 @@
 
 /************************* Параметры WiFi *********************************/
 
-#define WLAN_SSID       "Keenetic-0558"     //SSID точки доступа WiFi
-#define WLAN_PASS       "Egorov1974"             //Пароль к точке доступа
+#define WLAN_SSID       "iPhone (SERGEY)"     //SSID точки доступа WiFi
+#define WLAN_PASS       "365328199"             //Пароль к точке доступа
 
 /************************* Параметры MQTT *********************************/
 
-#define SERVER      "192.168.1.42"          //Адрес сервера
+#define SERVER      "172.20.10.3"          //Адрес сервера
 #define SERVERPORT  1883                  //Порт
 #define SERVERID    "esp"                 //ID сервера
 #define USERNAME    "bud"                  //Имя пользователя
