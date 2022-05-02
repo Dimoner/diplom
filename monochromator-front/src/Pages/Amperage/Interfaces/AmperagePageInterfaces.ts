@@ -23,6 +23,10 @@ export interface IMeasureItem {
     y: number
 }
 
+export interface IMeasureFullMqttResponse {
+    dataList: IMeasureElemMqttResponse[]
+}
+
 // элемент 1 измерения через mqtt
 export interface IMeasureElemMqttResponse {
     // измерение по oX

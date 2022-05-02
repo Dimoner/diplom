@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using AppServer.Controllers;
 using AppServer.Domains.MqttResponse.Models;
@@ -10,6 +12,7 @@ using AppServer.History;
 using AppServer.MqttLogic.Managers.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Timer = System.Timers.Timer;
 
 namespace AppServer.Domains.MqttResponse
 {
@@ -19,13 +22,66 @@ namespace AppServer.Domains.MqttResponse
     public static class MqttResponseParser
     {
         /// <summary>
+        /// сбор измерений для пакетированной отправки
+        /// блокирует потоки на запись во время чтения
+        /// </summary>
+        private static ConcurrentBag<MeasureMqttResponse> SendMeasureList = new ();
+        
+        /// <summary>
+        /// отправка пакета раз в n время
+        /// </summary>
+        private static Timer _timer; 
+        
+        /// <summary>
+        /// логика отправки пакета с измерениями
+        /// </summary>
+        private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            var id = SendMeasureList.FirstOrDefault()?.Id;
+            if (id != null)
+            {
+                Task.Run(() => _hubContext.Clients.All.SendAsync(id.ToString(), new MeasureMqttFullResponse
+                {
+                    DataList = SendMeasureList.OrderByDescending(value => value.X).ToArray()
+                })).Wait();
+                SendMeasureList.Clear();
+            }
+        }
+        
+        /// <summary>
+        /// инициализация таймера с отправкой данныъх
+        /// </summary>
+        static MqttResponseParser()
+        {
+            _timer = new Timer();
+
+            // Setting up Timer
+            _timer.Interval = 1000;
+            _timer.Elapsed += OnTimedEvent;
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
+        }
+
+        private static IHubContext<MeasureHub> _hubContext;
+        private static IHubContext<StateHub> _stateHub;
+
+        /// <summary>
+        /// инициализация хабов с соеденением с фронтом
+        /// </summary>
+        /// <param name="hubContext">для получения измерений</param>
+        /// <param name="stateHub">для получения состояния устрйоства</param>
+        public static void Init(IHubContext<MeasureHub> hubContext, IHubContext<StateHub> stateHub)
+        {
+            _hubContext = hubContext;
+            _stateHub = stateHub;
+        }
+        
+        /// <summary>
         /// Парсинг ответа от брокера
         /// </summary>
         public static void ParseResponse(
             string payloadStr, 
-            Dictionary<string, Action<CommandMqttResponse>> handlers, 
-            IHubContext<MeasureHub> hubContext, 
-            IHubContext<StateHub> stateHub,
+            Dictionary<string, Action<CommandMqttResponse>> handlers,
             ILogger<IMqttManager> logger)
         {
             // Value;.......
@@ -49,7 +105,7 @@ namespace AppServer.Domains.MqttResponse
             // M_0-0-0 ||  M_STOP_0
             if (payload.StartsWith("M_"))
             {
-                ParseMeasureResponse(payload, hubContext);
+                ParseMeasureResponse(payload);
                 return;
             }
 
@@ -65,14 +121,14 @@ namespace AppServer.Domains.MqttResponse
             // S_{режим (3-ток/4-счет)}-{число тока или счета(число условных едениц)}-{напряжение на фэу(B)}-положение(нм)-{сопротивление}-{емкость}
             if (payload.StartsWith("S_"))
             {
-                ParseStateCommandResponse(payload, stateHub);
+                ParseStateCommandResponse(payload);
                 return;
             }
             
             logger.LogError("Обработчик не найден, data:" + payload);
         }
 
-        private static void ParseStateCommandResponse(string payload, IHubContext<StateHub> stateHub)
+        private static void ParseStateCommandResponse(string payload)
         {
             // {режим (3-ток/4-счет)}-{число тока или счета(число условных едениц)}-{напряжение на фэу(B)}-{положение(нм)}-{сопротивление}-{емкость}}
             payload = payload.Remove(0, payload.IndexOf("_", StringComparison.Ordinal) + 1);
@@ -96,7 +152,7 @@ namespace AppServer.Domains.MqttResponse
                 Capacitance = data[5],
             };
             
-            Task.Run(() => stateHub.Clients.All.SendAsync("state", response)).Wait();
+            Task.Run(() => _stateHub.Clients.All.SendAsync("state", response)).Wait();
         }
 
         /// <summary>
@@ -163,12 +219,12 @@ namespace AppServer.Domains.MqttResponse
         /// [2] - Y
         /// </param>
         /// <param name="hubContext">брокер веб сокета</param>
-        private static void ParseMeasureResponse(string payload, IHubContext<MeasureHub> hubContext)
+        private static void ParseMeasureResponse(string payload)
         {
             var response = GetMeasureResponseHandler(payload);
+            SendMeasureList.Add(response);
             HistoryManager.WireInFile(response);
             Console.WriteLine(response.X + "/" + response.Y + "\n\r");
-            Task.Run(() => hubContext.Clients.All.SendAsync(response.Id.ToString(), response)).Wait();
         }
 
         /// <summary>

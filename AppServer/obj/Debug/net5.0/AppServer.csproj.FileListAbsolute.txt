@@ -59,19 +59,16 @@ C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\AppServer.deps.json
 C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\AppServer.runtimeconfig.json
 C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\AppServer.runtimeconfig.dev.json
 C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\AppServer.dll
-C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\ref\AppServer.dll
 C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\AppServer.pdb
 C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\AppServer.Views.dll
 C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\MQTTnet.dll
 C:\Users\Dima\Documents\diplom\AppServer\bin\Debug\net5.0\Newtonsoft.Json.dll
-C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.csprojAssemblyReference.cache
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.AssemblyInfoInputs.cache
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.AssemblyInfo.cs
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.csproj.CoreCompileInputs.cache
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\staticwebassets\AppServer.StaticWebAssets.Manifest.cache
-C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\staticwebassets\AppServer.StaticWebAssets.xml
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\scopedcss\bundle\AppServer.styles.css
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.RazorTargetAssemblyInfo.cache
 C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.csproj.CopyComplete
@@ -133,3 +130,5 @@ C:\Users\user\Documents\diplom\AppServer\obj\Debug\net5.0\refint\AppServer.dll
 C:\Users\user\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.pdb
 C:\Users\user\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.genruntimeconfig.cache
 C:\Users\user\Documents\diplom\AppServer\obj\Debug\net5.0\ref\AppServer.dll
+C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\AppServer.csproj.AssemblyReference.cache
+C:\Users\Dima\Documents\diplom\AppServer\obj\Debug\net5.0\refint\AppServer.dll

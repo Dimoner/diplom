@@ -69,13 +69,16 @@ export default function AmperageTime({ measureList, amperageMarks, managerMeasur
                     <ChartComponent
                         measure={measureList}
                         xFormatter={(seriesName: number) => {
-                            return `Время: ${moment.utc(Number(seriesName) * measureAdditionInfo.frequency * 0.1).format('HH:mm:ss.SSS')}, сек`
+                            return `
+                            Точка: ${seriesName} ||
+                            Время: ${moment.utc(Number(seriesName) * measureAdditionInfo.frequency * 0.1).format('HH:mm:ss.SSS')}, сек
+                            `
                         }}
                         yFormatter={(val: number, opts?: any) => `${val}, ${defaultValueSettingComponentStateFunc().amperageName}`}
                         yTitleFormatter={value => "Токовый сигнал:"}
                         type={"amperage"}
                         yTitle={`Токовый сигнал, ${defaultValueSettingComponentStateFunc().amperageName}`}
-                        xTitle="Время с начала измерения, сек"
+                        xTitle="Точка с начала измерения, номер"
                     />
                 </div>
             </div>

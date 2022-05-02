@@ -3,7 +3,7 @@ import './Style/amperage.scss'
 import { HubConnection } from "@microsoft/signalr";
 import * as signalR from "@microsoft/signalr";
 import DialogComponent from "../Components/DialogComponent";
-import { IAmperageState, IMeasureElemMqttResponse, MeasureStatusEnum } from "./Interfaces/AmperagePageInterfaces";
+import { IAmperageState, IMeasureElemMqttResponse, IMeasureFullMqttResponse, MeasureStatusEnum } from "./Interfaces/AmperagePageInterfaces";
 import AmperageActionBlock from "./Components/AmperageActionBlock";
 import { MeasureStateManager } from "../../StateManager/MeasureStateMaanger";
 import AmperageRange from "./MeasureTypeComponent/AmperageRange";
@@ -109,7 +109,7 @@ export default function Amperage() {
         dispatch(incrementDima());
     }
 
-    const continueMeasureAction = (prev: IAmperageState, message: IMeasureElemMqttResponse): IAmperageState => {
+    const continueMeasureAction = (prev: IAmperageState, message: IMeasureElemMqttResponse[]): IAmperageState => {
         MeasureStateManager.IsMeasure = true;
         dispatch(incrementDima());
         const result = {
@@ -126,17 +126,28 @@ export default function Amperage() {
         }
 
         if (stateAmperage.alignment === "range") {
-            result.measureList = [{ x: (message.x / 100), y: message.y }, ...prev.measureList];
-            result.amperageMarks.value = (((message.x / 100) - prev.startWave) * 100 / prev.rangeWave);
+            result.measureList = [...message.map(valeu => {
+                return { x: (valeu.x / 100), y: valeu.y }
+            }), ...prev.measureList];
+
+            result.amperageMarks.value = (((message[message.length - 1].x / 100) - prev.startWave) * 100 / prev.rangeWave);
 
             localStorage.setItem(measureRangeInLocalStorageName, JSON.stringify(result));
             return result;
         }
 
         if (stateAmperage.alignment === "time") {
-            message.x =  message.x + 1;
-            result.measureList = [{ x: message.x, y: message.y }, ...prev.measureList];
-            result.amperageMarks.value = (message.x * 100 / prev.rangeWave);
+
+            message = message.map(value => {
+                value.x = value.x + 1;
+                return value;
+            })
+
+            result.measureList = [...message.map(value => {
+                return { x: value.x, y: value.y };
+            }), ...prev.measureList];
+
+            result.amperageMarks.value = (message[message.length - 1].x * 100 / prev.rangeWave);
             localStorage.setItem(measureTimeInLocalStorageName, JSON.stringify(result))
             return result;
         }
@@ -144,15 +155,24 @@ export default function Amperage() {
         return result;
     }
 
-    const action = (message: IMeasureElemMqttResponse) => {
-        setStateAmperage(prev => {
-            if (message.isStop) {
-                endMeasureAction(prev, message)
-                return { ...prev, open: true };
-            }
+    const action = (message: IMeasureFullMqttResponse) => {
+        const isStopValue = message.dataList.find(value => value.isStop);
+        if (isStopValue === undefined) {
+            setStateAmperage(prev => {
+                return continueMeasureAction(prev, message.dataList);
+            })
+        } else {
+            const withoutStop = message.dataList.filter(data => !data.isStop)
+            setStateAmperage(prev => {
+                return continueMeasureAction(prev, withoutStop);
+            })
 
-            return continueMeasureAction(prev, message);
-        })
+            setStateAmperage(prev => {
+                endMeasureAction(prev, isStopValue)
+                return { ...prev, open: true };
+            })
+        }
+
         setDima(Math.random().toString())
     };
 
@@ -193,15 +213,13 @@ export default function Amperage() {
                         setStateAmperage={setStateAmperage}
                     />
                     : <>
-                        {stateAmperage.measureAdditionInfo.frequency === 0
-                            ? <></>
-                            : <AmperageTime
-                                measureList={stateAmperage.measureList}
-                                amperageMarks={stateAmperage.amperageMarks}
-                                measureAdditionInfo={stateAmperage.measureAdditionInfo}
-                                managerMeasure={stateAmperage.managerMeasure}
-                                setStateAmperage={setStateAmperage}
-                            />
+                        {<AmperageTime
+                            measureList={stateAmperage.measureList}
+                            amperageMarks={stateAmperage.amperageMarks}
+                            measureAdditionInfo={stateAmperage.measureAdditionInfo}
+                            managerMeasure={stateAmperage.managerMeasure}
+                            setStateAmperage={setStateAmperage}
+                        />
                         }</>
             }
             <DialogComponent

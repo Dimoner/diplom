@@ -86,10 +86,10 @@ namespace AppServer.Managers
             {
                 Task.Delay(2000).Wait();
                 var rnd = new Random();
-                for (double i = 200; i <= 500; i += 0.01)
+                for (double i = 0; i <= 500; i += 1)
                 {
-                    _mqttManager.SendMessageAsync($"M_{fileId}-{(int)(i * 100)}-{rnd.Next(10, 100)}:", _appSettings.FromTopic);
-                    Task.Delay(1000).Wait();
+                    _mqttManager.SendMessageAsync($"M_{fileId}-{(int)i}-{rnd.Next(10, 100)}:", _appSettings.FromTopic);
+                    Task.Delay(10).Wait();
                 }
                 
                 _mqttManager.SendMessageAsync($"M_STOP_{fileId}", _appSettings.FromTopic);

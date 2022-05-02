@@ -1,6 +1,17 @@
 ﻿namespace AppServer.Domains.MqttResponse.Models
 {
     /// <summary>
+    /// Модель для отправки на фронт с пакетом измерений
+    /// </summary>
+    public class MeasureMqttFullResponse
+    {
+        /// <summary>
+        /// Сам пакет с измерениями
+        /// </summary>
+        public MeasureMqttResponse[] DataList { get; set; }
+    }
+    
+    /// <summary>
     /// Обработка результата 
     /// </summary>
     public class MeasureMqttResponse

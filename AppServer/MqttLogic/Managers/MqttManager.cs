@@ -42,6 +42,7 @@ namespace AppServer.MqttLogic.Managers
             
             var hubMeasure = serviceProvider.GetRequiredService<IHubContext<MeasureHub>>();
             var hubState = serviceProvider.GetRequiredService<IHubContext<StateHub>>();
+            MqttResponseParser.Init(hubMeasure, hubState);
             
             var factory = new MqttFactory();
             _client = factory.CreateMqttClient();
@@ -102,7 +103,7 @@ namespace AppServer.MqttLogic.Managers
                     var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
                     _logger.LogInformation($"Payload = {payload}");
 
-                    MqttResponseParser.ParseResponse(payload, _handlers, hubMeasure, hubState, _logger);
+                    MqttResponseParser.ParseResponse(payload, _handlers, _logger);
                 });
             }
             catch (Exception e)
