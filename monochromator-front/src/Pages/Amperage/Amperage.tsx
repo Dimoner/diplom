@@ -43,6 +43,7 @@ export default function Amperage() {
         .withUrl("http://localhost:5000/measure")
         .configureLogging(signalR.LogLevel.Information)
         .build());
+        
     const dispatch = useDispatch()
     const getDefaultValue = (): IAmperageState => {
         return defaultValue;

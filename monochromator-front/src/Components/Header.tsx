@@ -63,6 +63,7 @@ export default function Header() {
     const dispatch = useDispatch()
     // важно для перерендера при изменении localstorage
     const dima = useSelector((state: any) => state.counter.dima)
+    
     const hubConnection = useRef<HubConnection>(new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5000/state")
         .configureLogging(signalR.LogLevel.Information)

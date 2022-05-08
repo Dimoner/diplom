@@ -69,41 +69,22 @@ namespace AppServer.MqttLogic.Managers
                 Init(serviceProvider);
             });
             
-             try
+            try
             {
                 _client.UseApplicationMessageReceivedHandler(e =>
                 {
                     try
                     {
-                        var topic = e.ApplicationMessage.Topic;
-                        _logger.LogInformation(topic);
-                        if (!string.IsNullOrWhiteSpace(topic))
-                        {
-                            var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-                            _logger.LogInformation($"Topic: {topic}. Message Received: {payload}");
-                        }
+                        _logger.LogInformation("### RECEIVED APPLICATION MESSAGE ###");
+                        var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                        _logger.LogInformation($"Topic: {e.ApplicationMessage.Topic}. Payload = {payload}");
+
+                        MqttResponseParser.ParseResponse(payload, _handlers, _logger);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogInformation(ex.Message, ex);
+                        _logger.LogInformation(ex.Message, ex);                   
                     }
-                });
-            }
-            catch (Exception e)
-            {
-                _logger.LogInformation(e.Message);
-                throw;
-            }
-
-            try
-            {
-                _client.UseApplicationMessageReceivedHandler(e =>
-                {
-                    _logger.LogInformation("### RECEIVED APPLICATION MESSAGE ###");
-                    var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-                    _logger.LogInformation($"Payload = {payload}");
-
-                    MqttResponseParser.ParseResponse(payload, _handlers, _logger);
                 });
             }
             catch (Exception e)

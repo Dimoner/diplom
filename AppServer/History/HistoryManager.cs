@@ -20,16 +20,12 @@ namespace AppServer.History
         /// <summary>
         /// Путь до базы с файлами
         /// </summary>
-        private static readonly string _directoryPath = "./History/Files";
+        private const string _directoryPath = "./History/Files";
 
         public static FileHistoryModel WireInFile(MeasureMqttResponse mqttResponse)
         {
-            var files = GetFilesFromDirectory();
-            var currentFile = files.FirstOrDefault(info =>
-            {
-                var names = info.Name.Split('_');
-                return names[0] == mqttResponse.Id.ToString();
-            });
+            var currentFile = GetFilesFromDirectory()
+                .FirstOrDefault(info => info.Name.Split('_')[0] == mqttResponse.Id.ToString());
             
             var fileItem = GetFileHistory(currentFile);
             if (fileItem.SubType == SubActionTypeEnum.Range)
@@ -121,8 +117,6 @@ Measure:
 {dto.CreateTableHeader()}
 {dto.CreateTableMeasureHeader()}
 -----------------------------------------");
-
-
             return d;
         }
 

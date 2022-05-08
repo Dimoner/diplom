@@ -85,25 +85,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Dima\\.nuget\\packages\\": {},
-    "C:\\Microsoft\\Xamarin\\NuGet": {}
+    "C:\\Users\\user\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Dima\\Documents\\diplom\\AppServer\\AppServer.csproj",
+      "projectUniqueName": "C:\\Users\\user\\Documents\\diplom\\AppServer\\AppServer.csproj",
       "projectName": "AppServer",
-      "projectPath": "C:\\Users\\Dima\\Documents\\diplom\\AppServer\\AppServer.csproj",
-      "packagesPath": "C:\\Users\\Dima\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Dima\\Documents\\diplom\\AppServer\\obj\\",
+      "projectPath": "C:\\Users\\user\\Documents\\diplom\\AppServer\\AppServer.csproj",
+      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\user\\Documents\\diplom\\AppServer\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Microsoft\\Xamarin\\NuGet"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Dima\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
@@ -150,7 +145,7 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[5.0.16, 5.0.16]"
+            "version": "[5.0.14, 5.0.14]"
           }
         ],
         "frameworkReferences": {
@@ -161,7 +156,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }

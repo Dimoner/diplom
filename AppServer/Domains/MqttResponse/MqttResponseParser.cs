@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using AppServer.Controllers;
 using AppServer.Domains.MqttResponse.Models;
 using AppServer.History;
@@ -35,16 +36,18 @@ namespace AppServer.Domains.MqttResponse
         /// <summary>
         /// логика отправки пакета с измерениями
         /// </summary>
-        private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             var id = SendMeasureList.FirstOrDefault()?.Id;
             if (id != null)
             {
-                Task.Run(() => _hubContext.Clients.All.SendAsync(id.ToString(), new MeasureMqttFullResponse
+                var response = new MeasureMqttFullResponse
                 {
                     DataList = SendMeasureList.OrderByDescending(value => value.X).ToArray()
-                })).Wait();
+                };
+                
                 SendMeasureList.Clear();
+                Task.Run(() => _hubContext.Clients.All.SendAsync(id.ToString(), response)).Wait();
             }
         }
         
@@ -110,7 +113,7 @@ namespace AppServer.Domains.MqttResponse
             }
 
             // результат выполнения операции
-            // R_0_0*ERR={}_STAT={}
+            // R_0_0*E={}_S={}
             if (payload.StartsWith("R_"))
             {
                 ParseCommandResponse(payload, handlers);
